@@ -1,0 +1,21 @@
+generated: '2026-08-26'
+method: searched
+source: https://docs.oxide.computer/api/guides/responses
+limit_count: 0
+note: >-
+  Oxide documents no published rate limits for the Region API and the OpenAPI document
+  declares no rate-limit response headers. Grepping the 955KB spec for RateLimit,
+  X-RateLimit, Retry-After and 429 returns nothing, and the docs' own HTTP responses guide
+  enumerates 200/201/204/400/401/403/404/422/500/503 with no 429. This is consistent with the
+  deployment model: the API is served by the Nexus control plane on a rack the customer owns,
+  so there is no shared multi-tenant quota for Oxide to publish. An honest zero, not a gap in
+  our search.
+limits: []
+response_headers: []
+exhaustion_status: null
+evidence:
+- url: https://docs.oxide.computer/api/guides/responses
+  status: 200
+  finding: status-code table lists no 429 and no rate-limit headers
+- source: openapi/oxide-computer-region-api-openapi.json
+  finding: 0 occurrences of RateLimit / Retry-After / 429 across 315 operations

@@ -1,0 +1,228 @@
+generated: '2026-08-26'
+method: derived
+source: openapi/oxide-computer-region-api-openapi.json
+note: Entity-relationship graph derived from the Oxide Region API OpenAPI 3.0.3 document (217 paths, 315
+  operations, 469 component schemas). Entities are component schemas carrying an `id` plus a `name` or
+  `time_created`; relationships come from *_id reference fields and $ref links between those schemas.
+  Oxide identifiers are v4 UUIDs with no type prefix, and most resources are additionally addressable
+  by name within their parent scope (the {project}, {vpc}, {silo} path parameters accept either a name
+  or an ID).
+identifier_scheme:
+  format: uuid
+  prefixed: false
+  name_or_id: Most path parameters accept a resource name or a UUID; name lookups additionally require
+    the parent selector (e.g. ?project=<name>) as a query parameter.
+hierarchy:
+- level: fleet
+  description: 'The rack / region itself. Fleet-scoped resources: racks, sleds, physical disks, switches,
+    IP pools, subnet pools, silos, system update, support bundles, alert receivers.'
+- level: silo
+  parent: fleet
+  description: Tenant boundary. Owns users, groups, identity providers (SAML), SCIM tokens, quotas, auth
+    settings, and projects.
+- level: project
+  parent: silo
+  description: Resource grouping within a silo. Owns instances, disks, snapshots, images, VPCs, floating
+    IPs, external subnets, affinity/anti-affinity groups.
+- level: resource
+  parent: project
+  description: Instances, disks, VPCs and the rest of the tenant-visible objects.
+core_entities:
+- instance
+- external_subnet
+- floating_ip
+- image
+- affinity_group
+- anti_affinity_group
+- instance_network_interface
+- project
+- system_ip_pool
+- system_subnet_pool
+- support_bundle
+- vpc_router_route
+- vpc_router
+- vpc_subnet
+- vpc
+- probe
+- alert_receiver
+- certificate
+- disk
+- internet_gateway
+- current_user_ssh_key
+- snapshot
+- networking_address_lot
+- networking_bgp_config
+- networking_switch_port_settings
+- scim_token
+- silo
+- system_update_trust_root
+- affinity_group_member_instance
+- anti_affinity_group_member_instance
+entity_count: 59
+relationship_count: 41
+relationships:
+- from: AffinityGroup
+  type: belongs_to
+  to: Project
+  via: project_id
+- from: AntiAffinityGroup
+  type: belongs_to
+  to: Project
+  via: project_id
+- from: CurrentUser
+  type: belongs_to
+  to: Silo
+  via: silo_id
+- from: Disk
+  type: belongs_to
+  to: Image
+  via: image_id
+- from: Disk
+  type: belongs_to
+  to: Project
+  via: project_id
+- from: Disk
+  type: belongs_to
+  to: Snapshot
+  via: snapshot_id
+- from: ExternalSubnet
+  type: belongs_to
+  to: Instance
+  via: instance_id
+- from: ExternalSubnet
+  type: belongs_to
+  to: Project
+  via: project_id
+- from: ExternalSubnet
+  type: belongs_to
+  to: SubnetPool
+  via: subnet_pool_id
+- from: ExternalSubnet
+  type: belongs_to
+  to: SubnetPoolMember
+  via: subnet_pool_member_id
+- from: FloatingIp
+  type: belongs_to
+  to: Instance
+  via: instance_id
+- from: FloatingIp
+  type: belongs_to
+  to: IpPool
+  via: ip_pool_id
+- from: FloatingIp
+  type: belongs_to
+  to: Project
+  via: project_id
+- from: Group
+  type: belongs_to
+  to: Silo
+  via: silo_id
+- from: Image
+  type: belongs_to
+  to: Project
+  via: project_id
+- from: Instance
+  type: belongs_to
+  to: Project
+  via: project_id
+- from: InstanceNetworkInterface
+  type: belongs_to
+  to: Instance
+  via: instance_id
+- from: InstanceNetworkInterface
+  type: belongs_to
+  to: Vpc
+  via: vpc_id
+- from: InternetGateway
+  type: belongs_to
+  to: Vpc
+  via: vpc_id
+- from: InternetGatewayIpAddress
+  type: belongs_to
+  to: InternetGateway
+  via: internet_gateway_id
+- from: InternetGatewayIpPool
+  type: belongs_to
+  to: InternetGateway
+  via: internet_gateway_id
+- from: InternetGatewayIpPool
+  type: belongs_to
+  to: IpPool
+  via: ip_pool_id
+- from: IpPoolRange
+  type: belongs_to
+  to: IpPool
+  via: ip_pool_id
+- from: MulticastGroup
+  type: belongs_to
+  to: IpPool
+  via: ip_pool_id
+- from: MulticastGroupMember
+  type: belongs_to
+  to: Instance
+  via: instance_id
+- from: MulticastGroupMember
+  type: belongs_to
+  to: MulticastGroup
+  via: multicast_group_id
+- from: PhysicalDisk
+  type: belongs_to
+  to: Sled
+  via: sled_id
+- from: PhysicalDiskAdoptionRequest
+  type: belongs_to
+  to: Disk
+  via: disk_id
+- from: ProbeInfo
+  type: has_one
+  to: NetworkInterface
+  via: interface
+- from: RouterRoute
+  type: belongs_to
+  to: VpcRouter
+  via: vpc_router_id
+- from: Sled
+  type: belongs_to
+  to: Rack
+  via: rack_id
+- from: Snapshot
+  type: belongs_to
+  to: Disk
+  via: disk_id
+- from: Snapshot
+  type: belongs_to
+  to: Project
+  via: project_id
+- from: SubnetPoolMember
+  type: belongs_to
+  to: SubnetPool
+  via: subnet_pool_id
+- from: Switch
+  type: belongs_to
+  to: Rack
+  via: rack_id
+- from: User
+  type: belongs_to
+  to: Silo
+  via: silo_id
+- from: Vpc
+  type: belongs_to
+  to: Project
+  via: project_id
+- from: VpcFirewallRule
+  type: belongs_to
+  to: Vpc
+  via: vpc_id
+- from: VpcRouter
+  type: belongs_to
+  to: Vpc
+  via: vpc_id
+- from: VpcSubnet
+  type: belongs_to
+  to: Vpc
+  via: vpc_id
+- from: WebhookReceiver
+  type: has_many
+  to: WebhookSecret
+  via: secrets
+docs: https://docs.oxide.computer/guides/key-entities-and-concepts

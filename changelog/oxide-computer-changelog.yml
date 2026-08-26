@@ -1,0 +1,77 @@
+generated: '2026-08-26'
+method: searched
+source: https://docs.oxide.computer/release-notes/system
+docs: https://docs.oxide.computer/release-notes/system
+scheme: sequential integer system release (v3 onward), with occasional decimal patch releases (v20.1, v20.2)
+current_version: v22
+current_api_version: '2026081901.0.0'
+entry_count: 20
+note: >-
+  Oxide publishes dated release notes for every numbered system release. Dates below were read
+  from the release-notes page's own release metadata (release id + ISO timestamp). The page
+  itself renders the version headings without inline dates, so the timestamps are the
+  authoritative machine-readable values from the same document. Highlights are summarised from
+  the "Important notes" section of each release; breaking-change flags are only set where the
+  release notes themselves say API clients must change.
+entries:
+- version: v22
+  date: '2026-08-14'
+  breaking: false
+  highlights: OPTE metrics exposed; web console UX improvements; storage drive firmware updates
+- version: v21
+  date: '2026-07-14'
+  breaking: false
+  highlights: support for Dense Turin processors; increased sled provisioning memory capacity; expanded console features
+- version: v20
+  date: '2026-07-02'
+  breaking: true
+  highlights: jumbo frame support for external networking; network performance improvements; system update validation
+  note: release notes state API clients require updates
+- version: v19
+  date: '2026-05-15'
+  breaking: false
+  highlights: enhanced trust quorum; read-only distributed disks; audit log with 90-day retention
+- version: v18
+  date: '2026-02-20'
+  breaking: true
+  highlights: instance local storage; dual IP-stack networking; external subnets
+  note: significant API restructuring for disk backends and network interfaces; IP pool versioning changes
+- version: v17
+  date: '2025-11-11'
+  breaking: true
+  highlights: self-service system updates; SCIM 2.0 support; limited collaborator role
+  note: IP pool API response structure modified
+- version: v16
+  date: '2025-08-11'
+- version: v15
+  date: '2025-06-06'
+- version: v14
+  date: '2025-04-11'
+- version: v13
+  date: '2025-02-19'
+- version: v12
+  date: '2024-12-20'
+- version: v11
+  date: '2024-10-10'
+- version: v10
+  date: '2024-08-31'
+- version: v9
+  date: '2024-07-12'
+  highlights: web console session timeout changed to 8 hours idle / 24 hours absolute
+- version: v8
+  date: '2024-05-07'
+  highlights: CLI v0.4.0, Go SDK v0.1.0-beta4 and Terraform provider v0.3.0 remain compatible
+- version: v7
+  date: '2024-04-02'
+- version: v6
+  date: '2024-02-07'
+  highlights: IP pools reworked for greater flexibility and manageable through the web console
+- version: v5
+  date: '2023-12-17'
+  highlights: multi-tenant management features; silo creation now requires a resource quota set
+- version: v4
+  date: '2023-11-07'
+  highlights: BGP configuration fixes; OpenSSL update
+- version: v3
+  date: '2023-10-24'
+  highlights: numbering convention switched to integer system releases (upgrade path from v1.0.2)

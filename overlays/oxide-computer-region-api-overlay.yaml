@@ -1,0 +1,84 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements — Oxide Region API
+  version: 1.0.0
+x-generated: '2026-08-26'
+x-method: generated
+x-source: openapi/oxide-computer-region-api-openapi.json
+x-extends: openapi/oxide-computer-region-api-openapi.json
+x-note: >-
+  This overlay records API Evangelist's enhancements to Oxide's published OpenAPI document without
+  mutating it. Every action below adds information Oxide states in its own documentation but does
+  not encode in the contract: the servers block (dropshot emits none), the security schemes
+  (dropshot emits none), and the base-URL/versioning notes from the API guides. Nothing here
+  invents behaviour — each action's description names the Oxide page it came from.
+actions:
+- target: $
+  description: >-
+    Add a templated servers block. Oxide serves the API from the customer's own control-plane
+    domain, so the base URL is a variable, not a vendor host. The CLI names it with
+    `oxide auth login --host ...` or the OXIDE_HOST environment variable. Source:
+    https://docs.oxide.computer/guides/quickstart-cli
+  update:
+    servers:
+    - url: https://{controlPlaneHost}
+      description: The Oxide control plane (Nexus) on the customer's own rack.
+      variables:
+        controlPlaneHost:
+          default: engineering.cloud.example.com
+          description: >-
+            The DNS name of your Oxide control plane. Oxide's quickstart uses
+            engineering.cloud.example.com and states it is fictitious.
+- target: $.components
+  description: >-
+    Add the security schemes Oxide documents but dropshot does not emit. Source:
+    https://docs.oxide.computer/api/guides/authentication
+  update:
+    securitySchemes:
+      deviceToken:
+        type: http
+        scheme: bearer
+        description: >-
+          Device token issued by the OAuth 2.0 Device Authorization Grant (RFC 8628) and presented
+          as `Authorization: Bearer <token>`. Stored by the CLI at
+          $HOME/.config/oxide/credentials.toml or supplied via OXIDE_TOKEN.
+      sessionCookie:
+        type: apiKey
+        in: cookie
+        name: session
+        description: >-
+          Browser session used by the Oxide web console. Returned in Set-Cookie by the login
+          endpoints; terminated by POST /v1/logout. Timeout is 8 hours idle / 24 hours absolute
+          (system release v9).
+      scimToken:
+        type: http
+        scheme: bearer
+        description: >-
+          Per-silo bearer token for SCIM 2.0 provisioning clients, managed with
+          scim_token_create / scim_token_list / scim_token_view / scim_token_delete.
+- target: $.info
+  description: >-
+    Record the api-version negotiation header and where the frozen historical specs live. Source:
+    https://docs.oxide.computer/api/guides/introduction
+  update:
+    x-api-version-header: api-version
+    x-api-version-policy: >-
+      Each system release identifies its API by info.version. Clients send an `api-version` header;
+      requests without it target the latest version.
+    x-versioned-specs: https://github.com/oxidecomputer/omicron/tree/main/openapi/nexus
+- target: $.info
+  description: Record the absence of an idempotency contract so a consumer does not assume one.
+  update:
+    x-idempotency: none
+    x-idempotency-note: >-
+      No Idempotency-Key header is defined on any operation. Creates are name-scoped within a
+      parent, so a duplicate create conflicts rather than duplicating, but that is a resource-model
+      property and not a published retry contract.
+- target: $.info
+  description: Record the error envelope shape, which is not RFC 9457.
+  update:
+    x-error-envelope:
+      media_type: application/json
+      schema: '#/components/schemas/Error'
+      fields: [message, request_id, error_code]
+      rfc9457: false

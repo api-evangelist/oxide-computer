@@ -1,0 +1,43 @@
+generated: '2026-08-26'
+method: searched
+source: live probes of /.well-known/* on oxide.computer and docs.oxide.computer
+note: >-
+  oxide.computer serves a real RFC 9116 security.txt (325 bytes, text/plain-style
+  comment block naming security@oxidecomputer.com). Every other probed path returns a
+  genuine 404 with the site's HTML 404 page, and a deliberate nonsense control path
+  (/.well-known/thisdoesnotexist-control) also returns 404 — so this host is NOT a
+  catch-all and the security.txt hit is real. The API itself runs on each customer's
+  own rack, so there is no vendor-hosted API host to probe for OIDC/OAuth discovery
+  documents; those would be served by the customer's own control-plane domain.
+hosts:
+- host: https://oxide.computer
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    file: oxide-computer-security.txt
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: https://docs.oxide.computer
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+soft_404_control:
+  path: /.well-known/thisdoesnotexist-control
+  host: https://oxide.computer
+  status: 404
+  bytes: 27075
+hit_count: 1

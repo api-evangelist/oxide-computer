@@ -1,0 +1,236 @@
+# Oxide Documentation
+
+Oxide is a rack-scale computing system with integrated hardware and software. These docs cover the REST API, CLI, and guides for operators and users.
+
+- Homepage: https://oxide.computer
+- Docs: https://docs.oxide.computer
+- RFDs: https://rfd.shared.oxide.computer
+- GitHub: https://github.com/oxidecomputer
+
+All unqualified paths below like /guides/quickstart are for docs.oxide.computer.
+
+## Top Tasks
+
+- Create your first VM (web): /guides/quickstart — Questions answered: create instance via console, pick image, network/IP basics.
+- Create your first VM (CLI): /guides/quickstart-cli — Questions answered: install CLI, auth, create instance from image.
+- Authenticate for API/CLI: /api/guides/authentication, /cli/guides/introduction#_authentication — Questions answered: device flow, tokens, sessions, storing credentials.
+- Manage instances: /guides/managing-instances — Questions answered: start/stop, resize, delete, naming.
+- Configure networking: /guides/configuring-guest-networking — Questions answered: VPCs, subnets, firewalls, default networking.
+- Assign external IPs: /guides/managing-floating-ips — Questions answered: floating vs ephemeral IPs, attach/detach.
+- Work with disks and snapshots: /guides/managing-disks-and-snapshots — Questions answered: create/attach, snapshot/restore.
+- Create and share images: /guides/creating-and-sharing-images — Questions answered: import, generalize, share to projects.
+- Troubleshoot common issues: /guides/troubleshooting — Questions answered: auth failures, connectivity, provisioning errors.
+
+## Documentation Structure
+
+### Search
+
+Search the docs by fetching /search?term=instance&section=Release%20Notes
+
+Section is required and must be API, CLI, Guides, or Release Notes. Response
+contains a `hits` array. Each hit includes an `id`, `score`, and `document`
+object with `path`, `title`, `section`, and `content` fields containing the
+matched documentation text.
+
+### Getting Started
+
+- /guides/introduction - Overview of Oxide rack hardware and software
+- /guides/quickstart - Create your first VM instance via web console
+- /guides/quickstart-cli - Create your first VM instance via CLI
+- /guides/key-entities-and-concepts - Core concepts: silos, projects, VPCs, instances
+- /guides/onboarding-projects - Create and organize projects for teams
+- /guides/user-settings - Manage SSH keys and preferences
+- /guides/configuring-access - Roles, policies, and access control
+
+### User Guides
+
+- /guides/deploying-workloads - VM provisioning and configuration
+- /guides/managing-instances - Instance lifecycle operations
+- /guides/managing-disks-and-snapshots - Disk and snapshot management
+- /guides/configuring-guest-networking - VPC, subnet, and firewall configuration
+- /guides/managing-floating-ips - External IP address management
+- /guides/creating-and-sharing-images - Custom image creation and management
+- /guides/remote-access - SSH and serial console access
+- /guides/working-with-windows-vms - Windows-specific guidance
+- /guides/troubleshooting - Common issues and resolutions
+
+### Operator Guides
+
+- /guides/operator/silo-management - Multi-tenancy configuration
+- /guides/operator/ip-pool-management - External IP allocation
+- /guides/operator/configuring-bgp - BGP routing setup
+- /guides/operator/audit-log - Security and compliance logging
+- /guides/operator/keycloak - SAML integration with Keycloak
+- /guides/operator/ms-entra - SAML integration with Microsoft Entra ID
+- /guides/operator/duo - SAML integration with Duo
+- /guides/operator/expanding-connectivity - Add uplinks, prefixes, routing scenarios
+- /guides/operator/expanding-physical-connectivity - Physical cabling and ports
+- /guides/operator/configuring-bfd - Bidirectional Forwarding Detection
+- /guides/operator/hardware-maintenance - Maintenance, event and fault handling
+
+### System Setup
+
+- /guides/system/rack-installation - Physical installation
+- /guides/system/network-preparations - Network prerequisites
+- /guides/system/initial-rack-setup - First-time configuration
+- /guides/system/completing-rack-config - Finalize setup
+
+### API Reference
+
+The REST API is documented at /api with endpoints organized by resource type. Common operations:
+
+- Authentication: device_auth_request, device_auth_confirm, login_local
+- Projects: project_list, project_create, project_view
+- Instances: instance_list, instance_create, instance_start, instance_stop
+- Disks: disk_list, disk_create, disk_attach, disk_detach
+- VPCs: vpc_list, vpc_create, vpc_subnet_list, vpc_firewall_rules_view
+- Floating IPs: floating_ip_list, floating_ip_create, floating_ip_attach
+
+Full API endpoint list available at /api.
+
+API guides:
+
+- /api/guides/introduction - API overview and base URL
+- /api/guides/authentication - OAuth2 device flow and session tokens
+- /api/guides/sdks - Language-specific client libraries
+
+### CLI Reference
+
+The `oxide` CLI provides a command-line interface to the API. All commands documented at /cli.
+
+ CLI guides:
+
+ - /cli/guides/introduction - Installation and authentication
+
+Common commands:
+
+- oxide auth login - Authenticate with device flow
+- oxide project create/list - Manage projects
+- oxide instance create/start/stop/list - Manage instances
+- oxide disk create/attach/detach/list - Manage disks
+- oxide vpc/subnet/firewall-rules - Configure networking
+
+Full CLI command tree available at /cli.
+
+### CLI ↔ API mapping examples
+
+- oxide auth login → device_auth_request, device_auth_confirm (device flow); login_local (web session)
+- oxide project create/list → project_create, project_list
+- oxide instance create/start/stop/list → instance_create, instance_start, instance_stop, instance_list
+- oxide disk create/attach/detach/list → disk_create, disk_attach, disk_detach, disk_list
+- oxide vpc subnet list → vpc_subnet_list
+- oxide vpc firewall-rules view → vpc_firewall_rules_view
+- oxide floating-ip create/attach/detach/list → floating_ip_create, floating_ip_attach, floating_ip_detach, floating_ip_list
+
+### Architecture Documentation
+
+- /guides/architecture/control-plane - Nexus, CockroachDB, and service architecture
+- /guides/architecture/networking - OPTE, DDM routing, and data plane
+- /guides/architecture/os-hypervisor-storage - Helios, Propolis, and Crucible
+- /guides/architecture/rack-components - Rack components including Service Processors
+- /guides/architecture/power-shelf-controller - Power shelf and controller overview
+
+### Integrations
+
+- /guides/integrations/terraform - Infrastructure as code
+- /guides/integrations/packer - Image building
+- /guides/integrations/rancher - Kubernetes platform
+
+### Monitoring and Alerts
+
+- /guides/metrics/timeseries-schemas - Available metrics
+- /guides/metrics/oxql-tutorial - Query language for metrics
+- /guides/alerts/overview - Alert system architecture
+- /guides/alerts/webhooks - Webhook receiver configuration
+- /guides/alerts/reliable-receivers - Durable, resilient webhook delivery
+
+### Release Notes
+
+- /release-notes/system - System release notes and changes
+
+### Security
+
+- /security/advisories - Security advisories
+- /security/announcements - Security announcements
+
+## Synonyms and Disambiguation
+
+- Instance (VM, virtual machine) — See: /guides/deploying-workloads, /guides/managing-instances
+- Disk (volume) — See: /guides/managing-disks-and-snapshots
+- Image (template) — See: /guides/creating-and-sharing-images
+- VPC (network, private network) — See: /guides/configuring-guest-networking
+- Floating IP (static IP, elastic IP) — See: /guides/managing-floating-ips
+- Ephemeral IP (temporary IP) — See: /guides/managing-floating-ips
+- External IP — See: /guides/managing-floating-ips, /guides/configuring-guest-networking
+- Silo (tenant, organization) — See: /guides/operator/silo-management
+- Project (workspace, namespace) — See: /guides/onboarding-projects
+- Access Control (RBAC, roles, policies) — See: /guides/configuring-access
+
+Notes on similar concepts:
+
+- External IP vs Floating IP vs Ephemeral IP: External IPs provide connectivity from/to outside the rack. Floating IPs are persistent and re‑attachable within a project. Ephemeral IPs are temporary and lifecycle‑tied to instances. See: /guides/managing-floating-ips.
+- Silo vs Project: Silos are top‑level tenants with isolation; projects are resource groupings within a silo. See: /guides/operator/silo-management and /guides/onboarding-projects.
+
+
+## Glossary
+
+- **ACS URL**: The URL to which an identity provider will redirect with its authentication response.
+- **Admin Group Name**: The group created during Silo creation and granted the "Silo Admin" role.
+- **BGP (Border Gateway Protocol)**: A standardized exterior gateway protocol designed to exchange routing and reachability information between autonomous systems.
+- **Bhyve**: A lightweight hypervisor used in Oxide's virtualization stack.
+- **CockroachDB**: A distributed database used in Oxide control plane for data consistency and availability.
+- **ClickHouse**: A columnar database managing telemetry data.
+- **Crucible**: The Oxide block storage subsystem, which provides a virtual block device layer backed by ZFS.
+- **Dendrite**: The component responsible for managing data plane code, including P4 programs, on the Tofino ASIC.
+- **Delay Driven Multipath (DDM)**: A routing protocol used in the Oxide platform to provide high-performance, delay-sensitive routing.
+- **Device Token**: An authentication token used by the Oxide CLI tool to authenticate API requests.
+- **Disk Import**: The process of uploading an external image file to create a new disk.
+- **External DNS Zone**: The DNS domain name delegated to the Oxide system for external DNS functionalities.
+- **Firewall Rules**: Configurations that govern what type of traffic is allowed or denied between sources and targets.
+- **Generalization**: The process of removing installation-specific data from a Windows installation to create a reusable image, typically performed by running `sysprep`.
+- **Gimlet**: Oxide’s server sled. It is responsible for running all customer workloads and the control plane itself.
+- **Helios**: Oxide's illumos distribution, the operating system for the host CPU in server sleds.
+- **Hubris**: A lightweight, memory-protected, message-passing kernel for deeply embedded systems, used in Oxide's service processors and Root of Trust.
+- **Identity Provider (IdP)**: A service that manages user identities and provides authentication services, often using SAML.
+- **IP Pool**: A collection of external IPs that can be assigned to silos and used by instances for networking.
+- **Local User**: A user authenticated by username and password managed directly, without involving an external identity provider.
+- **Management Gateway Service (MGS)**: A bridge service between service processors and control plane components.
+- **Nexus**: The central component of the Oxide control plane, responsible for hosting user-facing APIs and background control plane activities.
+- **OPTE (Oxide Packet Transformation Engine)**: A component in the Oxide platform that performs network address translation, routing, and other packet transformations.
+- **Oximeter**: The Oxide platform's telemetry system, responsible for collecting, storing, and exposing system metrics.
+- **OxQL**: Oximeter query language, a domain-specific language (DSL) for querying and processing metrics data.
+- **Propolis**: the userspace for illumos’s hypervisor, Bhyve.
+- **Quotas**: Limits on compute and storage resources that can be allocated to a silo.
+- **Rack Secret**: A secret used for the storage encryption scheme.
+- **Recovery Silo**: A built-in silo used for setup and recovery purposes.
+- **Root of Trust (RoT)**: A secure computing base that manages keys and securely boots the system.
+- **Scrimlet**: A gimlet attached to a sidecar via PCIe
+- **Service Processor (SP)**: A processor that allows for control and operation of various rack components over the management network.
+- **Sidecar**: Oxide's rack-level switch. There are two sidecars per rack.
+- **Sled**: A pluggable server in an Oxide rack. There are up to 32 sleds per rack.
+- **Sled Agent**: An agent that runs on each server to create, update, and destroy instances, storage, and networking resources.
+- **Snapshot**: A lightweight, point-in-time copy of a disk.
+- **Subnet**: A logically visible subdivision of an IP network.
+- **Trust Quorum**: A mechanism requiring multiple shares to reconstruct the rack secret.
+- **Upstream DNS**: External DNS servers used for name resolution.
+- **User Data**: Custom scripts or data provided during VM provisioning to configure instances on first boot.
+- **vCPU (Virtual CPU)**: Virtualized CPU cores allocated to virtual machines.
+- **Web Console**: The web-based user interface for interacting with the Oxide system.
+
+## Open Source
+
+Nearly all of our software is open source. See repos at github.com/oxidecomputer/<repo_name>.
+
+- omicron - Control plane for the Oxide rack
+- propolis - VMM userspace for illumos bhyve hypervisor
+- crucible - Distributed block storage service
+- maghemite - Routing protocol suite (BGP, BFD, DDM, static)
+- opte - Oxide Packet Transformation Engine for network virtualization
+- console - Web UI for the Oxide rack
+- helios - Oxide's illumos distribution for server sleds
+- hubris - Embedded OS for microcontrollers and service processors
+- humility - Debugger for Hubris
+- oxide.rs - Rust SDK and CLI
+- oxide.go - Go SDK
+- oxide.ts - TypeScript SDK
+- dropshot - Rust framework for REST APIs

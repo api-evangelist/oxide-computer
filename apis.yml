@@ -1,18 +1,73 @@
 aid: oxide-computer
 name: Oxide
-description: 'Oxide is a company surfaced via the API Evangelist harvest backlog (source: secondary-market)
-  and added to the network as a stub for full-pipeline profiling.'
+description: 'Oxide Computer Company builds a rack-scale cloud computer: integrated
+  server sleds (Gimlet), a rack-level switch (Sidecar), Oxide''s own illumos distribution
+  (Helios), the Propolis/bhyve hypervisor and the Crucible distributed block store,
+  all driven by a single control plane called Nexus. Nexus exposes the Oxide Region
+  API, a 315-operation OpenAPI 3.0.3 REST contract covering silos, projects, instances,
+  disks, snapshots, images, VPCs, subnets, firewall rules, floating and ephemeral IPs,
+  IP pools, affinity groups, alerts and webhook receivers, audit log, metrics/OxQL,
+  hardware inventory, BGP/BFD networking, SAML and SCIM identity, support bundles and
+  system update. Because the product is a rack a customer owns, the API is served from
+  the customer''s own control-plane domain rather than a vendor-hosted endpoint. Oxide
+  publishes first-party Rust, TypeScript and Go SDKs, an `oxide` CLI, a Terraform provider
+  and a Packer plugin, and develops essentially the entire stack in the open on GitHub.'
+image: https://oxide.computer/favicon.png
 url: https://raw.githubusercontent.com/api-evangelist/oxide-computer/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:secondary-market
-x-tier: stub
-x-tier-reason: harvest
 specificationVersion: '0.20'
 created: '2026-08-26'
 modified: '2026-08-26'
 tags:
-- Company
-apis: []
+- Cloud Computing
+- Infrastructure
+- Compute
+- Virtualization
+- Networking
+- Storage
+- Hardware
+- On-Premise
+- Private Cloud
+- Open Source
+apis:
+- aid: oxide-computer-region-api
+  name: Oxide Region API
+  description: 'The Oxide Region API is the public REST contract of the Oxide control
+    plane (Nexus). It is an OpenAPI 3.0.3 document with 217 paths, 315 operations and
+    469 schemas, organized by the resources an operator or tenant works with: silos,
+    projects, instances, disks, snapshots, images, VPCs and subnets, firewall rules,
+    floating/ephemeral IPs, IP and subnet pools, affinity and anti-affinity groups,
+    alert receivers and webhook secrets, audit log, metrics and OxQL, hardware and
+    rack inventory, networking (BGP, BFD, switch port settings), SAML identity providers
+    and SCIM tokens, support bundles, and system update. Auth is an OAuth 2.0 device
+    authorization grant producing a bearer device token, plus browser session cookies
+    for the web console.'
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - Compute
+  - Virtualization
+  - Networking
+  - Storage
+  - Identity
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-region-api-openapi.json
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Overlay
+    url: overlays/oxide-computer-region-api-overlay.yaml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -20,4 +75,63 @@ maintainers:
   email: info@apis.io
 common:
 - type: Website
-  url: https://forgeglobal.com/oxide-computer_stock/
+  url: https://oxide.computer
+- type: DeveloperPortal
+  url: https://docs.oxide.computer
+- type: Documentation
+  url: https://docs.oxide.computer
+- type: APIReference
+  url: https://docs.oxide.computer/api
+- type: GettingStarted
+  url: https://docs.oxide.computer/guides/quickstart
+- type: Blog
+  url: https://oxide.computer/blog
+- type: GitHubOrganization
+  url: https://github.com/oxidecomputer
+- type: Support
+  url: https://oxide.computer/contact
+- type: PrivacyPolicy
+  url: https://oxide.computer/privacy-policy
+- type: ChangeLog
+  url: changelog/oxide-computer-changelog.yml
+- type: ReleaseNotes
+  url: https://docs.oxide.computer/release-notes/system
+- type: Lifecycle
+  url: lifecycle/oxide-computer-lifecycle.yml
+- type: Packages
+  url: packages/oxide-computer-packages.yml
+- type: SDKs
+  url: packages/oxide-computer-packages.yml
+- type: CLI
+  url: cli/oxide-computer-cli.yml
+- type: LLMsTxt
+  url: llms/oxide-computer-llms.txt
+- type: WellKnown
+  url: well-known/oxide-computer-well-known.yml
+- type: SecurityTxt
+  url: well-known/oxide-computer-security.txt
+- type: Security
+  url: security/oxide-computer-vulnerability-disclosure.yml
+- type: VulnerabilityDisclosure
+  url: security/oxide-computer-vulnerability-disclosure.yml
+- type: DomainSecurity
+  url: security/oxide-computer-domain-security.yml
+- type: Conformance
+  url: conformance/oxide-computer-conformance.yml
+- type: Conventions
+  url: conventions/oxide-computer-conventions.yml
+- type: DataModel
+  url: data-model/oxide-computer-data-model.yml
+- type: Plans
+  url: plans/oxide-computer-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/oxide-computer-rate-limits.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: Webhooks
+  url: asyncapi/oxide-computer-alerts-webhooks.yml
+x-enrichment:
+  date: '2026-08-26'
+  status: enriched
+  artifacts_added: 26
+  pass: local-v1

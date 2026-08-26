@@ -1,0 +1,8 @@
+# We always appreciate opportunities to do better. Please submit any security
+# issues you find to:
+Contact: mailto:security@oxidecomputer.com
+
+# We do not currently have a bug bounty program. That may change in the future.
+#
+# We're happy to set up an acknowledgements page and give folks credit once we
+# get some reports!

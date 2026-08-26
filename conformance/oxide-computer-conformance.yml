@@ -1,0 +1,125 @@
+generated: '2026-08-26'
+method: derived
+source: openapi/oxide-computer-region-api-openapi.json + https://docs.oxide.computer/api/guides
+note: >-
+  Each entry is asserted against the contract or the provider's own documentation, with the exact
+  location recorded. Standards Oxide does not implement are recorded as conforms: false rather
+  than omitted, because an honest negative is data.
+standards:
+- id: openapi
+  version: 3.0.3
+  conforms: true
+  evidence: 'openapi/oxide-computer-region-api-openapi.json — openapi: "3.0.3", 217 paths, 315 operations, 469 component schemas, info.version 2026081901.0.0'
+- id: oauth2-device-grant
+  name: OAuth 2.0 Device Authorization Grant (RFC 8628)
+  conforms: true
+  evidence: >-
+    Three operations implement the grant verbatim — device_auth_request (POST /device/auth,
+    summary "Start an OAuth 2.0 Device Authorization Grant"), device_auth_confirm
+    (POST /device/confirm) and device_access_token (POST /device/token, "Request a device access
+    token"). Documented at https://docs.oxide.computer/api/guides/authentication.
+- id: oauth2
+  name: OAuth 2.0 (RFC 6749)
+  conforms: partial
+  evidence: >-
+    Only the device authorization grant is implemented. No authorization-code or client-credentials
+    flow, no scope vocabulary, and no /.well-known/oauth-authorization-server metadata document
+    (RFC 8414) — probed 404 on oxide.computer, and the control plane is customer-hosted so there is
+    no vendor host to serve one.
+- id: oidc
+  name: OpenID Connect
+  conforms: false
+  evidence: '/.well-known/openid-configuration returns 404 on oxide.computer; no OIDC surface in the spec'
+- id: saml2
+  name: SAML 2.0
+  conforms: true
+  evidence: >-
+    Per-silo SAML identity providers are first-class API resources —
+    saml_identity_provider_create (POST /v1/system/identity-providers/saml),
+    saml_identity_provider_view, and login_saml (POST /login/{silo_name}/saml/{provider_name},
+    "Authenticate user via SAML"). Integration guides published for Keycloak, Microsoft Entra ID
+    and Duo.
+- id: scim2
+  name: SCIM 2.0 (System for Cross-domain Identity Management, RFC 7643/7644)
+  conforms: true
+  evidence: >-
+    Oxide's v17 system release notes announce "SCIM v2.0 support". The public contract exposes the
+    token surface a SCIM client authenticates with — scim_token_create, scim_token_list,
+    scim_token_view, scim_token_delete under /v1/system/scim/tokens, scoped per silo. The
+    /scim/v2/Users and /Groups resource endpoints themselves are not present in the external
+    OpenAPI document, so the standard is declared and its credential surface is contracted, but
+    the SCIM resource schemas (urn:ietf:params:scim:schemas:*) do not appear in this spec.
+- id: rfc9457
+  name: Problem Details for HTTP APIs
+  conforms: false
+  evidence: >-
+    Errors use a custom application/json envelope (message, request_id, error_code) via
+    #/components/schemas/Error, not application/problem+json. See
+    errors/oxide-computer-problem-types.yml.
+- id: rfc9116
+  name: security.txt
+  conforms: true
+  evidence: 'https://oxide.computer/.well-known/security.txt returns 200 with Contact: mailto:security@oxidecomputer.com'
+- id: rfc7231
+  name: HTTP semantics / conventional status codes
+  conforms: true
+  evidence: >-
+    https://docs.oxide.computer/api/guides/responses explicitly cites RFC 7231 and enumerates
+    200/201/204/400/401/403/404/422/500/503 as the response vocabulary.
+- id: pagination
+  conforms: true
+  evidence: >-
+    Cursor pagination via the x-dropshot-pagination vendor extension: limit + page_token query
+    parameters, *ResultsPage response schemas with items + next_page.
+- id: idempotency
+  conforms: false
+  evidence: >-
+    No Idempotency-Key header on any of the 315 operations; the string "idempoten" does not appear
+    in the OpenAPI document or the API guides.
+- id: rfc8594
+  name: Sunset / Deprecation headers
+  conforms: false
+  evidence: 'no Sunset or Deprecation header declared in the spec; 0 operations marked deprecated'
+- id: hmac-webhook-signing
+  conforms: true
+  evidence: >-
+    Webhook deliveries are signed HMAC-SHA256 and presented as
+    x-oxide-signature: a=sha256&id={secret-id}&s={signature}, hex-encoded, with multiple headers
+    for multiple secrets. https://docs.oxide.computer/guides/alerts/webhooks
+- id: websocket
+  name: RFC 6455 WebSocket upgrade
+  conforms: true
+  evidence: 'operations marked x-dropshot-websocket return HTTP 101; used for serial console and remote access'
+- id: uuid
+  name: RFC 9562 UUID identifiers
+  conforms: true
+  evidence: 'resource identifiers are unprefixed UUIDs across the component schemas'
+- id: rfc3339
+  conforms: true
+  evidence: 'timestamps (time_created, time_modified, sent_at) are RFC 3339'
+
+domain_standard:
+  market: cloud infrastructure / IaaS control plane
+  finding: >-
+    The cloud-infrastructure market has no ratified cross-vendor control-plane API standard — there
+    is no IaaS equivalent of FHIR, SCIM or OpenRTB that Oxide could conform to, so nothing is
+    claimed here and nothing is invented to fill the slot. The two genuine domain standards Oxide
+    DOES declare in its contract are identity standards, and both are recorded above with their
+    exact spec locations: SAML 2.0 (saml_identity_provider_create / login_saml) and SCIM 2.0
+    (v1/system/scim/tokens, announced in system release v17). Oxide's own posture on de facto
+    standardisation is the opposite of conformance: the product exists to replace the hyperscaler
+    control plane rather than reimplement its API, and the entire stack — control plane (omicron),
+    hypervisor userspace (propolis), block storage (crucible), routing (maghemite), packet
+    transformation (opte), host OS (helios), embedded OS (hubris) and the dropshot REST framework
+    that generates this very OpenAPI document — is published open source under github.com/oxidecomputer.
+  standards_declared_in_contract: [saml2, scim2, oauth2-device-grant]
+
+compliance:
+  certifications_published: false
+  trust_center: false
+  note: >-
+    No trust center, no SOC 2 / ISO 27001 / FedRAMP / PCI / HIPAA certification page found on
+    oxide.computer. Oxide publishes security advisories and announcements
+    (https://docs.oxide.computer/security/advisories) and an RFC 9116 security.txt, and the API
+    carries an operator audit log with 90-day retention (audit_log_list, system release v19), but
+    no attestation program is published. Recorded as absent, not assumed.

@@ -1,0 +1,18 @@
+generated: '2026-08-26'
+method: searched
+source: https://oxide.computer/contact
+plan_count: 0
+note: >-
+  Oxide publishes no pricing page and no plan tiers. The product is a physical rack-scale
+  computer sold through a direct sales motion — https://oxide.computer/pricing returns 404,
+  and the site's own footer/navigation carries no pricing link (verified by enumerating every
+  href on the homepage and the privacy-policy page on 2026-08-26). The commercial entry point
+  is the contact form at https://oxide.computer/contact. The Oxide Region API is not sold
+  separately or metered: it is the control-plane interface of a rack the customer owns, so
+  there is no per-call price, no free tier, and no self-service sign-up.
+plans: []
+evidence:
+- url: https://oxide.computer/pricing
+  status: 404
+- url: https://oxide.computer/contact
+  status: 200

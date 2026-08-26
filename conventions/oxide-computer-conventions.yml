@@ -1,0 +1,211 @@
+generated: '2026-08-26'
+method: searched
+source: https://docs.oxide.computer/api/guides/introduction
+docs:
+- https://docs.oxide.computer/api/guides/introduction
+- https://docs.oxide.computer/api/guides/authentication
+- https://docs.oxide.computer/api/guides/responses
+spec: openapi/oxide-computer-region-api-openapi.json
+note: >-
+  Cross-cutting runtime semantics for the Oxide Region API, read from Oxide's own API guides
+  and cross-checked against the 955KB OpenAPI 3.0.3 document. Where the docs are silent the
+  entry says so rather than inferring a behaviour.
+
+auth:
+  style: bearer-token
+  header: 'Authorization: Bearer <device token>'
+  alternate: session cookie (web console), SCIM bearer token (provisioning)
+  detail: authentication/oxide-computer-authentication.yml
+
+base_url:
+  form: templated
+  value: https://{oxide-control-plane-host}
+  note: >-
+    Oxide sells a rack the customer owns, so the API is served by the Nexus control plane on
+    the customer's own domain. There is no vendor-hosted base URL and the OpenAPI document
+    deliberately declares no servers[] block. The CLI names the host explicitly
+    (`oxide auth login --host https://engineering.cloud.example.com` — Oxide labels that URL
+    fictitious) or reads it from the OXIDE_HOST environment variable.
+
+versioning:
+  scheme: date-based build version in info.version
+  current: '2026081901.0.0'
+  header: api-version
+  policy: >-
+    "The API typically changes between system releases. Each release of the API is identified
+    by the info.version field in its OpenAPI schema." Clients send an `api-version` header;
+    "Requests without the header are assumed to target the latest version." The header is what
+    lets an older client keep working after a control-plane update.
+  spec_history: https://github.com/oxidecomputer/omicron/tree/main/openapi/nexus
+  system_releases: https://docs.oxide.computer/release-notes/system
+  path_prefix: /v1 (plus /device/*, /login/*, and an /experimental/v1 prefix for unstable surfaces)
+
+pagination:
+  style: cursor
+  extension: x-dropshot-pagination
+  params:
+  - name: limit
+    in: query
+    description: maximum number of items returned in one page
+  - name: page_token
+    in: query
+    description: opaque cursor returned by the previous page
+  - name: sort_by
+    in: query
+    description: sort key, where the operation supports one
+  response_fields:
+  - items
+  - next_page
+  note: >-
+    Paginated operations are marked in the spec with the vendor extension
+    x-dropshot-pagination and return a *ResultsPage schema (e.g. InstanceResultsPage) with
+    `items` and `next_page`. Some paginated operations declare required scope parameters
+    (e.g. probe_list requires `project`).
+
+filtering_and_scoping:
+  style: parent-selector query parameters
+  note: >-
+    Resources are addressable by name within a parent scope, so most project-scoped
+    operations take a `project` query parameter alongside the path name, and silo-scoped
+    system operations take a `silo` parameter. A UUID in the path needs no selector.
+
+error_envelope:
+  format: custom-json
+  rfc9457: false
+  fields: [message, request_id, error_code]
+  detail: errors/oxide-computer-problem-types.yml
+
+request_id_tracing:
+  supported: true
+  field: request_id
+  location: error response body
+  note: >-
+    Every error response carries a `request_id`. Oxide does not document a request-id
+    response header on successful responses, and none is declared in the OpenAPI document.
+
+idempotency:
+  supported: false
+  mechanism: none
+  header: null
+  note: >-
+    Oxide publishes no idempotency mechanism. The spec declares no Idempotency-Key header on
+    any of the 315 operations and the string "idempoten" does not appear anywhere in the
+    document; the API guides do not discuss retry safety for creates. Safety comes instead
+    from the resource model: creates are name-scoped within a parent (project, silo, VPC), so
+    a duplicate create of the same named resource fails with a conflict rather than producing
+    a second object, and DELETE/PUT are naturally idempotent. That is a real property but it
+    is not a published idempotency contract, and an agent replaying a create after a timeout
+    cannot distinguish "already created by my first attempt" from "created by someone else".
+    Recorded as unsupported rather than inferred.
+
+rate_limit_signaling:
+  supported: false
+  detail: rate-limits/oxide-computer-rate-limits.yml
+  note: no 429, no RateLimit-*/X-RateLimit-*/Retry-After headers in the spec or the docs
+
+dry_run_mode:
+  supported: false
+  note: >-
+    No preview/validate/dry-run parameter is declared on any operation. The closest published
+    rehearsal surface is alert_receiver_probe, which sends a synthetic `probe` alert to a
+    webhook receiver so an operator can test delivery without waiting for a real event.
+
+expansion_and_sparse_fields:
+  supported: false
+  note: no ?expand / ?fields mechanism is declared in the spec
+
+metadata:
+  supported: false
+  note: >-
+    Resources carry identity fields (id, name, description, time_created, time_modified) but
+    Oxide exposes no free-form customer metadata/labels map on API resources.
+
+websockets:
+  supported: true
+  extension: x-dropshot-websocket
+  note: >-
+    Some operations upgrade to a WebSocket (HTTP 101) rather than returning JSON — serial
+    console and remote-access surfaces. Marked in the spec with x-dropshot-websocket.
+  docs: https://docs.oxide.computer/guides/remote-access
+
+reversibility:
+  grade: documented
+  note: >-
+    Oxide ships a genuine reversal path for nearly every write in the tenant surface, and the
+    operations below are all real operationIds in the spec. What it does NOT publish anywhere
+    is a WINDOW — no undelete period, no retention clock on deleted instances/disks/projects,
+    no stated grace interval. Deletes appear to be immediate and terminal. Because no window
+    is stated, this grades `documented` rather than `verified`, and no window is asserted here.
+    The one durability affordance Oxide does document is the snapshot: a snapshot taken before
+    a destructive change is the supported way to get data back, and it is an explicit,
+    operator-initiated act rather than an automatic safety net.
+  surfaces:
+  - action: start an instance
+    forward: instance_start
+    reversal: instance_stop
+    window: null
+    note: also instance_reboot; state transitions are not destructive
+  - action: attach a disk to an instance
+    forward: instance_disk_attach
+    reversal: instance_disk_detach
+    window: null
+  - action: attach a floating IP
+    forward: floating_ip_attach
+    reversal: floating_ip_detach
+    window: null
+  - action: attach an ephemeral IP
+    forward: instance_ephemeral_ip_attach
+    reversal: instance_ephemeral_ip_detach
+    window: null
+  - action: attach an external subnet
+    forward: external_subnet_attach
+    reversal: external_subnet_detach
+    window: null
+  - action: promote an image to the silo
+    forward: image_promote
+    reversal: image_demote
+    window: null
+  - action: add a member to an affinity group
+    forward: affinity_group_member_instance_add
+    reversal: affinity_group_member_instance_delete
+    window: null
+  - action: subscribe an alert receiver to a class
+    forward: alert_receiver_subscription_add
+    reversal: alert_receiver_subscription_remove
+    window: null
+  - action: add a range to an IP pool
+    forward: system_ip_pool_range_add
+    reversal: system_ip_pool_range_remove
+    window: null
+  - action: begin a bulk disk import
+    forward: disk_bulk_write_import_start
+    reversal: disk_bulk_write_import_stop
+    window: null
+  - action: abort an in-flight rack membership change
+    forward: rack_membership_add_sleds
+    reversal: rack_membership_abort
+    window: null
+  - action: enable BFD on a session
+    forward: networking_bfd_enable
+    reversal: networking_bfd_disable
+    window: null
+  irreversible:
+  - operations: [instance_delete, disk_delete, snapshot_delete, image_delete, project_delete,
+      vpc_delete, silo_delete, certificate_delete, current_user_access_token_delete,
+      scim_token_delete, webhook_secrets_delete, support_bundle_delete]
+    note: >-
+      No restore/undelete operation exists for any of these and no retention window is
+      published. The only documented recovery path for disk data is restoring from a
+      snapshot taken beforehand (snapshot_create, then disk_create with a snapshot source).
+  - operations: [alert_delivery_resend]
+    note: >-
+      Not a reversal — it re-sends an alert that already fired. Listed so it is not mistaken
+      for one.
+  audit:
+    operation: audit_log_list
+    retention: 90 days
+    source: https://docs.oxide.computer/guides/operator/audit-log
+    note: >-
+      System release v19 introduced the audit log with 90-day retention. It records what was
+      done, which is how a reversal is reconstructed after the fact, but it does not itself
+      reverse anything.

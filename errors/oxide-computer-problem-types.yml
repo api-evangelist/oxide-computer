@@ -1,0 +1,68 @@
+generated: '2026-08-26'
+method: derived
+source: openapi/oxide-computer-region-api-openapi.json + https://docs.oxide.computer/api/guides/responses
+docs: https://docs.oxide.computer/api/guides/responses
+format: custom-json
+rfc9457: false
+note: The Oxide Region API does NOT use RFC 9457 problem+json. Every operation declares a single 4XX and
+  a single 5XX response, both bound to the shared `Error` component schema and served as application/json.
+  The envelope carries a stable machine-readable `error_code`, a human `message`, and a `request_id` that
+  correlates the failure with control-plane logs. Oxide does not publish a registry of error_code values,
+  so the catalogue below is the HTTP status vocabulary the docs enumerate, not an enumeration of error_code
+  strings.
+envelope:
+  media_type: application/json
+  schema: '#/components/schemas/Error'
+  fields:
+  - name: message
+    type: string
+    required: true
+    description: Human-readable description of the failure.
+  - name: request_id
+    type: string
+    required: true
+    description: Correlation id for the request; quote it to Oxide support.
+  - name: error_code
+    type: string
+    required: false
+    description: Stable machine-readable code. Not registry-published by Oxide.
+response_coverage:
+  4XX_declared_on: 310
+  5XX_declared_on: 310
+  operations: 315
+problem_types:
+- status: 400
+  title: Bad Request
+  detail: Malformed or invalid request.
+  remediation: Validate the request body against the component schema for the operation; check required
+    fields and enum values.
+- status: 401
+  title: Unauthorized
+  detail: Authentication required, invalid credentials.
+  remediation: Re-run `oxide auth login`, or refresh the device token in OXIDE_TOKEN. Session cookies
+    expire after 8 hours idle / 24 hours absolute.
+- status: 403
+  title: Forbidden
+  detail: Insufficient permissions.
+  remediation: The caller authenticated but lacks the role for the resource. Check the silo/project role
+    assignment (policy_view); fleet-scoped operations such as alert receiver management require fleet.admin.
+- status: 404
+  title: Not Found
+  detail: Resource not found.
+  remediation: Oxide returns 404 rather than 403 for resources the caller cannot see, so an unexpected
+    404 can also mean missing authorization. Confirm the parent selector (project/silo/vpc) as well as
+    the resource name.
+- status: 422
+  title: Unprocessable Entity
+  detail: Well-formed request, semantic errors.
+  remediation: The payload parsed but violates a domain rule (e.g. a name collision, a quota, an invalid
+    CIDR). Read `message`.
+- status: 500
+  title: Internal Server Error
+  detail: Server-side error.
+  remediation: Capture `request_id` and open a support case; a support bundle (support_bundle_create)
+    collects the correlating control-plane state.
+- status: 503
+  title: Service Unavailable
+  detail: Server unable to handle request (maintenance/overload).
+  remediation: Retry with backoff. Expected during a system update window.

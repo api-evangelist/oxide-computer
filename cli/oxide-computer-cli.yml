@@ -1,0 +1,103 @@
+generated: '2026-08-26'
+method: searched
+source: https://docs.oxide.computer/cli/guides/introduction
+docs: https://docs.oxide.computer/cli
+name: oxide
+description: >-
+  `oxide` is the first-party command-line interface to the Oxide API, "for use in scripts or the
+  terminal". It is generated from the same Oxide Region API OpenAPI document as the SDKs and
+  ships from the oxide.rs repository alongside the Rust SDK, so the command tree tracks the API
+  surface release for release.
+repository: https://github.com/oxidecomputer/oxide.rs
+documented_version: 0.17.0+2026060800.0.0
+note: >-
+  The version above is the one rendered on docs.oxide.computer/cli on 2026-08-26. The crates.io
+  `oxide` crate that carries the CLI source was at 0.18.0+2026073100.0.0 (published 2026-08-21),
+  so the published docs trail the current release. Recorded as observed, not reconciled.
+install:
+- method: homebrew
+  command: brew install oxidecomputer/tap/oxide-cli
+  platform: macOS
+- method: github-releases
+  command: null
+  url: https://github.com/oxidecomputer/oxide.rs/releases
+  note: prebuilt binaries; Oxide says "You can find builds of the `oxide` CLI here"
+authentication:
+  interactive: oxide auth login --host https://engineering.cloud.example.com
+  flow: OAuth 2.0 device authorization grant; the CLI opens a browser and prints a verification code
+  headless: --no-browser prints the URL for entry on another machine
+  credentials_file: $HOME/.config/oxide/credentials.toml
+  config_file: $HOME/.config/oxide/config.toml
+  profiles: 'multiple credentials selected by default-profile in config.toml, or --profile on any command'
+  service_accounts: 'set OXIDE_HOST and OXIDE_TOKEN environment variables'
+  note: >-
+    credentials.toml "contains sensitive information such as your token and user ID" — Oxide's
+    own warning.
+commands:
+- group: alert
+- group: api
+  note: raw passthrough to any API path
+- group: audit-log
+- group: auth
+  key_flows: [login, logout, status]
+- group: auth-settings
+- group: bundle
+  note: support bundles
+- group: certificate
+- group: completion
+- group: current-user
+- group: disk
+- group: docs
+- group: experimental
+- group: external-subnet
+- group: floating-ip
+- group: group
+- group: image
+- group: instance
+  key_flows: [from-image, create, start, stop, reboot, list, view, delete, serial-console]
+- group: internet-gateway
+- group: ip-pool
+- group: ping
+- group: policy
+- group: project
+  key_flows: [create, list, view, delete]
+- group: scim
+- group: silo
+- group: snapshot
+- group: subnet-pool
+- group: system
+- group: user
+- group: utilization
+- group: version
+- group: vpc
+  key_flows: [create, subnet, firewall-rules, router]
+command_group_count: 29
+examples:
+- description: create an instance from an image
+  command: 'oxide instance from-image --image bookworm --name <name> ...'
+  note: >-
+    Certain CLI requests take nested JSON input in a `json-body` argument, including the disk
+    and instance provisioning requests.
+error_handling: >-
+  "Failed requests return both the API error messages and standard HTTP response codes." See
+  https://docs.oxide.computer/api/guides/responses and errors/oxide-computer-problem-types.yml.
+cli_api_mapping:
+  source: https://docs.oxide.computer/llms.txt
+  note: >-
+    Oxide's own llms.txt publishes an explicit CLI-to-operationId crosswalk, which is unusual
+    and directly useful to an agent.
+  mappings:
+  - cli: oxide auth login
+    operations: [device_auth_request, device_auth_confirm, login_local]
+  - cli: oxide project create/list
+    operations: [project_create, project_list]
+  - cli: oxide instance create/start/stop/list
+    operations: [instance_create, instance_start, instance_stop, instance_list]
+  - cli: oxide disk create/attach/detach/list
+    operations: [disk_create, instance_disk_attach, instance_disk_detach, disk_list]
+  - cli: oxide vpc subnet list
+    operations: [vpc_subnet_list]
+  - cli: oxide vpc firewall-rules view
+    operations: [vpc_firewall_rules_view]
+  - cli: oxide floating-ip create/attach/detach/list
+    operations: [floating_ip_create, floating_ip_attach, floating_ip_detach, floating_ip_list]

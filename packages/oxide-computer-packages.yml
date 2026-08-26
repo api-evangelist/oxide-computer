@@ -1,0 +1,92 @@
+generated: '2026-08-26'
+method: searched
+source: https://docs.oxide.computer/api/guides/sdks
+note: >-
+  Oxide documents three first-party SDKs (Rust, TypeScript, Go) plus the `oxide` CLI,
+  a Terraform provider and a Packer plugin. All are generated from the same Oxide Region
+  API OpenAPI document that ships in the oxide.rs repository. Versions and dates below
+  were read from each registry's metadata endpoint on 2026-08-26.
+packages:
+- language: rust
+  registry: crates.io
+  name: oxide
+  url: https://crates.io/crates/oxide
+  install: cargo add oxide
+  repository: https://github.com/oxidecomputer/oxide.rs
+  official: true
+  version: 0.18.0+2026073100.0.0
+  published: '2026-08-21'
+  note: >-
+    Build metadata in the version string pins the Oxide Region API version the SDK was
+    generated against (2026073100.0.0).
+- language: typescript
+  registry: npm
+  name: "@oxide/api"
+  url: https://www.npmjs.com/package/@oxide/api
+  install: npm install @oxide/api
+  repository: https://github.com/oxidecomputer/oxide.ts
+  official: true
+  version: 0.9.0
+  published: '2026-08-13'
+- language: go
+  registry: pkg.go.dev
+  name: github.com/oxidecomputer/oxide.go
+  url: https://pkg.go.dev/github.com/oxidecomputer/oxide.go
+  install: go get github.com/oxidecomputer/oxide.go@latest
+  repository: https://github.com/oxidecomputer/oxide.go
+  official: true
+  version: v0.10.0
+  published: '2026-06-13'
+  note: version read from https://proxy.golang.org/github.com/oxidecomputer/oxide.go/@latest
+- language: rust
+  registry: crates.io
+  name: oxide-api
+  url: https://crates.io/crates/oxide-api
+  official: true
+  version: 0.1.0-rc.41
+  published: '2022-09-09'
+  status: superseded
+  note: >-
+    The original generated client crate, last published 2022-09-09. Superseded by the
+    `oxide` crate; recorded here as decay evidence, not as a current SDK.
+- language: rust
+  registry: github-releases
+  name: oxide-cli
+  url: https://github.com/oxidecomputer/oxide.rs/releases
+  install: brew install oxidecomputer/tap/oxide-cli
+  repository: https://github.com/oxidecomputer/oxide.rs
+  official: true
+  version: null
+  published: null
+  note: >-
+    The `oxide` CLI binary is distributed via GitHub Releases and a Homebrew tap
+    (oxidecomputer/tap), neither of which is a language package registry with a
+    metadata endpoint this pipeline queries. docs.oxide.computer/cli displays
+    0.17.0+2026060800.0.0 as the documented CLI version; the crates.io `oxide`
+    crate that carries the CLI source is at 0.18.0+2026073100.0.0. Recorded null
+    rather than guessed. See cli/oxide-computer-cli.yml.
+- language: hcl
+  registry: terraform-registry
+  name: oxidecomputer/oxide
+  url: https://github.com/oxidecomputer/terraform-provider-oxide
+  repository: https://github.com/oxidecomputer/terraform-provider-oxide
+  official: true
+  version: null
+  published: null
+  note: >-
+    First-party Terraform provider, documented at
+    https://docs.oxide.computer/guides/integrations/terraform. Version not read —
+    the Terraform Registry metadata endpoint was not queried in this pass.
+- language: go
+  registry: github-releases
+  name: packer-plugin-oxide
+  url: https://github.com/oxidecomputer/packer-plugin-oxide
+  repository: https://github.com/oxidecomputer/packer-plugin-oxide
+  official: true
+  version: null
+  published: null
+  note: >-
+    First-party Packer plugin, documented at
+    https://docs.oxide.computer/guides/integrations/packer. Distributed via GitHub
+    Releases; no registry metadata endpoint queried.
+official_count: 6

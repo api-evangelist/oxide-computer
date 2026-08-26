@@ -1,0 +1,134 @@
+generated: '2026-08-26'
+method: searched
+source: https://docs.oxide.computer/guides/alerts/webhooks
+docs:
+- https://docs.oxide.computer/guides/alerts/overview
+- https://docs.oxide.computer/guides/alerts/webhooks
+- https://docs.oxide.computer/guides/alerts/reliable-receivers
+type: Webhooks
+asyncapi_published: false
+note: >-
+  Oxide publishes no AsyncAPI document, but it does ship a genuine, well-specified event surface:
+  the alerts system. "Alerts are the mechanism through which the Oxide control plane notifies the
+  outside world of events that occur within the system... while the Oxide HTTP API allows external
+  software to make requests of the rack, alerts allow the rack to notify external software when an
+  event occurs." Webhooks are presently the sole delivery mechanism. The receiver lifecycle is
+  fully modelled in the REST contract (16 operations under the system/alerts tag), which is why
+  this is captured as a Webhooks catalog rather than a fabricated AsyncAPI.
+
+delivery:
+  transport: HTTPS POST to a customer-supplied receiver endpoint
+  content_type: application/json
+  success_condition: 2xx response
+  timeout_seconds: 30
+  retries: 'failed deliveries are retried up to two times'
+  failure_modes:
+  - endpoint unreachable
+  - response timeout (30-second limit)
+  - receiver HTTP error (3xx, 4xx, 5xx)
+  replay:
+    operationId: alert_delivery_resend
+    path: POST /v1/alerts/{alert_id}/resend
+    note: an operator can re-send a specific alert to a receiver after a failed delivery
+  inspection:
+    operationId: alert_delivery_list
+    path: GET /v1/alert-receivers/{receiver}/deliveries
+
+signature:
+  algorithm: HMAC-SHA256
+  header: x-oxide-signature
+  format: 'x-oxide-signature: a=sha256&id={secret-id}&s={signature}'
+  encoding: hexadecimal
+  multi_secret: >-
+    Multiple x-oxide-signature headers are sent when the receiver has multiple secrets, which is
+    how secret rotation works without dropping deliveries.
+  secret_management:
+    list: webhook_secrets_list
+    add: webhook_secrets_add
+    delete: webhook_secrets_delete
+
+payload:
+  shape:
+    alert_class: string
+    alert_id: UUID
+    data:
+      version: integer
+      _: 'class-specific payload'
+    delivery:
+      id: UUID
+      receiver_id: UUID
+      sent_at: RFC3339 timestamp
+      trigger: alert | resend | probe
+  note: >-
+    The `data` object schema is specific to the alert class and carries its own `version` field,
+    so payload evolution is versioned per class rather than globally.
+
+alert_classes:
+  registry_published: false
+  addressing:
+    style: dot-separated hierarchical segments
+    segment_charset: alphanumeric and underscore
+    example_from_docs: hardware.turboencabulator.fault.side_fumbling_detected
+    example_note: >-
+      Oxide's documentation deliberately uses an imaginary class (a turboencabulator) to teach the
+      hierarchy. It does NOT publish the concrete class registry as static documentation.
+    real_classes_documented:
+    - probe
+    globbing:
+      single_segment: '*'
+      multi_segment: '**'
+      constraint: >-
+        Globs are evaluated per segment, not within one. A subscription segment is either
+        alphanumeric/underscore text or a glob, never both — `example.*_thingy.some_event` is
+        rejected.
+  discovery:
+    operationId: alert_class_list
+    path: GET /v1/alert-classes
+    note: >-
+      The authoritative list of alert classes is served by the rack itself. Because the control
+      plane runs on the customer's hardware there is no vendor-hosted endpoint to enumerate them
+      from, so this catalog records the addressing scheme and the discovery operation rather than
+      inventing class names.
+  scope_examples_from_docs:
+  - hardware component failures, such as SSD failure
+  - normal-operation events, such as an instance rebooting
+
+receivers:
+  kinds: [webhook]
+  authorization: 'alert receivers may only be created or modified by users with the fleet.admin role'
+  operations:
+  - operationId: alert_receiver_list
+    method: GET
+    path: /v1/alert-receivers
+  - operationId: alert_receiver_view
+    method: GET
+    path: /v1/alert-receivers/{receiver}
+  - operationId: alert_receiver_delete
+    method: DELETE
+    path: /v1/alert-receivers/{receiver}
+  - operationId: alert_receiver_probe
+    method: POST
+    path: /v1/alert-receivers/{receiver}/probe
+    note: sends a synthetic liveness alert (trigger=probe) to test delivery
+  - operationId: alert_receiver_subscription_add
+    method: POST
+    path: /v1/alert-receivers/{receiver}/subscriptions
+  - operationId: alert_receiver_subscription_remove
+    method: DELETE
+    path: /v1/alert-receivers/{receiver}/subscriptions/{subscription}
+  - operationId: webhook_receiver_create
+    method: POST
+    path: /v1/webhook-receivers
+  - operationId: webhook_receiver_update
+    method: PUT
+    path: /v1/webhook-receivers/{receiver}
+  - operationId: alert_list
+    method: GET
+    path: /v1/alerts
+  - operationId: alert_view
+    method: GET
+    path: /v1/alerts/{alert_id}
+  - operationId: alert_class_list
+    method: GET
+    path: /v1/alert-classes
+operation_count: 16

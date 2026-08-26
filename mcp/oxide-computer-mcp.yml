@@ -1,0 +1,100 @@
+generated: '2026-08-26'
+method: derived
+source: openapi/oxide-computer-region-api-openapi.json
+status: candidate
+note: >-
+  Oxide publishes NO MCP server. Searched the oxidecomputer GitHub organization (414 public repos;
+  a repository search for "mcp" in the org returns zero results), the documentation site, and the
+  web. There is no hosted endpoint and no stdio package. The tools below are a CANDIDATE surface
+  derived from real operationIds in the Oxide Region API OpenAPI document — they describe what an
+  MCP server for Oxide would expose if one existed, and nothing here should be read as a shipped
+  agent surface. Note also that the control plane runs on the customer's own rack, so any Oxide
+  MCP server would be local/self-hosted by design rather than a vendor-hosted URL.
+
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: none
+  verified: searched
+
+discovery:
+  probed:
+  - url: https://api.github.com/search/repositories?q=org:oxidecomputer+mcp
+    status: 200
+    result: 0 repositories
+  - url: https://oxide.computer/.well-known/ai-plugin.json
+    status: 404
+  - url: https://oxide.computer/.well-known/agent-card.json
+    status: 404
+
+candidate_tools:
+- name: oxide_project_list
+  description: List projects in the current silo.
+  rest: [project_list]
+- name: oxide_project_create
+  description: Create a project within the silo.
+  rest: [project_create]
+- name: oxide_instance_list
+  description: List VM instances in a project.
+  rest: [instance_list]
+- name: oxide_instance_view
+  description: Fetch a single instance by name or id.
+  rest: [instance_view]
+- name: oxide_instance_create
+  description: Provision a VM instance from an image or disk.
+  rest: [instance_create]
+- name: oxide_instance_start
+  description: Start a stopped instance.
+  rest: [instance_start]
+- name: oxide_instance_stop
+  description: Stop a running instance.
+  rest: [instance_stop]
+- name: oxide_instance_delete
+  description: Delete an instance. Irreversible — no undelete operation exists.
+  rest: [instance_delete]
+- name: oxide_disk_list
+  description: List disks in a project.
+  rest: [disk_list]
+- name: oxide_disk_create
+  description: Create a disk, optionally from a snapshot or image source.
+  rest: [disk_create]
+- name: oxide_disk_attach
+  description: Attach a disk to an instance.
+  rest: [instance_disk_attach]
+- name: oxide_disk_detach
+  description: Detach a disk from an instance.
+  rest: [instance_disk_detach]
+- name: oxide_snapshot_create
+  description: Take a point-in-time snapshot of a disk.
+  rest: [snapshot_create]
+- name: oxide_image_list
+  description: List images available to the project or promoted to the silo.
+  rest: [image_list]
+- name: oxide_vpc_list
+  description: List VPCs in a project.
+  rest: [vpc_list]
+- name: oxide_vpc_firewall_rules_view
+  description: Read the firewall rules attached to a VPC.
+  rest: [vpc_firewall_rules_view]
+- name: oxide_floating_ip_list
+  description: List floating IPs in a project.
+  rest: [floating_ip_list]
+- name: oxide_floating_ip_attach
+  description: Attach a floating IP to an instance.
+  rest: [floating_ip_attach]
+- name: oxide_alert_receiver_list
+  description: List alert receivers (fleet.admin only).
+  rest: [alert_receiver_list]
+- name: oxide_alert_class_list
+  description: List the alert classes this rack can emit.
+  rest: [alert_class_list]
+- name: oxide_metrics_query
+  description: Run an OxQL query against the timeseries store.
+  rest: [timeseries_query]
+- name: oxide_ping
+  description: Liveness check against the control plane.
+  rest: [ping]
+candidate_tool_count: 22
+total_operations_available: 315

@@ -1,0 +1,66 @@
+generated: '2026-08-26'
+method: searched
+source: https://docs.oxide.computer/api/guides/introduction
+docs:
+- https://docs.oxide.computer/api/guides/introduction
+- https://docs.oxide.computer/release-notes/system
+- https://docs.oxide.computer/security/advisories
+versioning:
+  scheme: date-based build version (YYYYMMDDNN.0.0) in OpenAPI info.version
+  current_api_version: '2026081901.0.0'
+  current_system_release: v22
+  negotiation_header: api-version
+  policy: >-
+    "The API typically changes between system releases. Each release of the API is identified
+    by the info.version field in its OpenAPI schema." Clients send an `api-version` header so an
+    older client keeps working after a control-plane update; requests without the header target
+    the latest version.
+  versioned_specs: https://github.com/oxidecomputer/omicron/tree/main/openapi/nexus
+  note: >-
+    Oxide commits one frozen OpenAPI document per API version into the omicron repository
+    (openapi/nexus/nexus-<version>-<hash>.json), so every historical version of the contract is
+    publicly retrievable. That is a stronger versioning artifact than most providers publish.
+deprecation:
+  policy_published: false
+  deprecated_operations: 0
+  sunset_header: false
+  note: >-
+    Zero operations in the current spec carry `deprecated: true`, and the spec contains no
+    Sunset or Deprecation headers (RFC 8594). Oxide does not publish a standalone deprecation
+    policy page. Breaking changes are instead announced in the system release notes — for
+    example v20 states API clients require updates, v18 records a significant restructuring of
+    disk backends and network interfaces plus IP pool versioning changes, and v17 records a
+    modified IP pool response structure. That is a real, dated, honest record of breaking
+    change; it is just not a forward-looking deprecation contract, and there is no machine
+    signal on the wire.
+  evidence:
+    url: https://docs.oxide.computer/release-notes/system
+    status: 200
+status_page:
+  published: false
+  note: >-
+    No status page. https://status.oxide.computer does not resolve to a valid certificate for
+    that name (TLS SNI mismatch, no HTTP response). This is architecturally consistent: the
+    control plane runs on each customer's own rack, so there is no shared multi-tenant service
+    whose uptime Oxide could publish. Per-rack health is exposed through the API itself
+    (system_status, ping, alert receivers) rather than a public page.
+  evidence:
+    url: https://status.oxide.computer/
+    status: '<no response> — TLS: no alternative certificate subject name matches host'
+  in_api:
+    operations: [ping, system_status]
+sla:
+  published: false
+  note: no public SLA document found on oxide.computer
+release_cadence:
+  observed: 'roughly every 6-10 weeks across 20 numbered system releases from v3 (2023-10-24) to v22 (2026-08-14)'
+  source: changelog/oxide-computer-changelog.yml
+security_advisories:
+  published: true
+  url: https://docs.oxide.computer/security/advisories
+  announcements: https://docs.oxide.computer/security/announcements
+support_bundles:
+  note: >-
+    Oxide exposes support bundle creation/download as first-class API operations
+    (support_bundle_create, support_bundle_view, support_bundle_download,
+    support_bundle_delete) — the escalation path is part of the contract, not only a form.

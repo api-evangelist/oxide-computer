@@ -1,0 +1,28 @@
+generated: '2026-08-26'
+method: generated
+source: openapi/oxide-computer-region-api-openapi.json
+api: Oxide Region API
+note: >-
+  Packaged Agent Skills for the Oxide Region API. Every operationId referenced in these skills was
+  verified to exist in openapi/oxide-computer-region-api-openapi.json before the skill was written;
+  none is invented. Each skill carries the same three warnings that apply to the whole API — there
+  is no vendor-hosted base URL, there is no idempotency key, and there is no dry-run mode — because
+  an agent acting on this API without knowing those three things will get one of them wrong.
+skills:
+- name: oxide-provision-instance
+  file: oxide-computer-provision-instance.md
+  description: Provision a VM instance from an image, attach storage and networking, and start it.
+  operation_count: 9
+- name: oxide-manage-storage
+  file: oxide-computer-manage-storage.md
+  description: Create, attach, snapshot and restore disks; import and promote images.
+  operation_count: 15
+- name: oxide-receive-alerts
+  file: oxide-computer-receive-alerts.md
+  description: Stand up a webhook receiver, subscribe to alert classes, verify HMAC signatures, test delivery.
+  operation_count: 16
+- name: oxide-configure-networking
+  file: oxide-computer-configure-networking.md
+  description: Build VPCs, subnets, firewall rules and external addressing, and attach them to instances.
+  operation_count: 25
+skill_count: 4
