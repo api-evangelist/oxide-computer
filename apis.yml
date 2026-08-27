@@ -31,29 +31,16 @@ tags:
 - Private Cloud
 - Open Source
 apis:
-- aid: oxide-computer-region-api
-  name: Oxide Region API
-  description: 'The Oxide Region API is the public REST contract of the Oxide control
-    plane (Nexus). It is an OpenAPI 3.0.3 document with 217 paths, 315 operations and
-    469 schemas, organized by the resources an operator or tenant works with: silos,
-    projects, instances, disks, snapshots, images, VPCs and subnets, firewall rules,
-    floating/ephemeral IPs, IP and subnet pools, affinity and anti-affinity groups,
-    alert receivers and webhook secrets, audit log, metrics and OxQL, hardware and
-    rack inventory, networking (BGP, BFD, switch port settings), SAML identity providers
-    and SCIM tokens, support bundles, and system update. Auth is an OAuth 2.0 device
-    authorization grant producing a bearer device token, plus browser session cookies
-    for the web console.'
+- aid: oxide-computer:oxide-computer-affinity-api
+  name: Oxide Affinity API
+  description: Anti-affinity groups give control over instance placement.
   humanURL: https://docs.oxide.computer/api
   baseURL: https://{oxide-control-plane-host}
   tags:
-  - Compute
-  - Virtualization
-  - Networking
-  - Storage
-  - Identity
+  - affinity
   properties:
   - type: OpenAPI
-    url: openapi/oxide-computer-region-api-openapi.json
+    url: openapi/oxide-computer-affinity-api-openapi.yml
   - type: Documentation
     url: https://docs.oxide.computer/api
   - type: APIReference
@@ -64,8 +51,659 @@ apis:
     url: errors/oxide-computer-problem-types.yml
   - type: DataModel
     url: data-model/oxide-computer-data-model.yml
-  - type: Overlay
-    url: overlays/oxide-computer-region-api-overlay.yaml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-console-auth-api
+  name: Oxide Console Auth API
+  description: API for console authentication
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - console-auth
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-console-auth-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-current-user-api
+  name: Oxide Current User API
+  description: Information pertaining to the current user.
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - current-user
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-current-user-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-disks-api
+  name: Oxide Disks API
+  description: Virtual disks are used to store instance-local data which includes the operating system.
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - disks
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-disks-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-experimental-api
+  name: Oxide Experimental API
+  description: Experimental, unstable interfaces, primarily for use by Oxide personnel
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - experimental
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-experimental-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-external-subnets-api
+  name: Oxide External Subnets API
+  description: External subnets that can be attached to instances.
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - external-subnets
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-external-subnets-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-floating-ips-api
+  name: Oxide Floating Ips API
+  description: Floating IPs allow a project to allocate well-known IPs to instances.
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - floating-ips
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-floating-ips-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-images-api
+  name: Oxide Images API
+  description: Images are read-only virtual disks that may be used to boot virtual machines.
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - images
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-images-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-instances-api
+  name: Oxide Instances API
+  description: >-
+    Virtual machine instances are the basic unit of computation. These operations are used for provisioning,
+    controlling, and destroying instances.
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - instances
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-instances-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-ip-pools-api
+  name: Oxide Ip Pools API
+  description: >-
+    IP pools are collections of external IPs that can be allocated and attached to instances.
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - ip-pools
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-ip-pools-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-login-api
+  name: Oxide Login API
+  description: Authentication endpoints
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - login
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-login-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-metrics-api
+  name: Oxide Metrics API
+  description: Silo-scoped metrics
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - metrics
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-metrics-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-policy-api
+  name: Oxide Policy API
+  description: System-wide IAM policy
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - policy
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-policy-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-projects-api
+  name: Oxide Projects API
+  description: >-
+    Projects are a grouping of associated resources such as instances and disks within a silo for purposes
+    of billing and access control.
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - projects
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-projects-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-silos-api
+  name: Oxide Silos API
+  description: Silos represent a logical partition of users and resources.
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - silos
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-silos-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-snapshots-api
+  name: Oxide Snapshots API
+  description: Snapshots of virtual disks at a particular point in time.
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - snapshots
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-snapshots-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-subnet-pools-api
+  name: Oxide Subnet Pools API
+  description: >-
+    Subnet pools are collections of external subnets that can be allocated and attached to instances.
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - subnet-pools
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-subnet-pools-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-system-alerts-api
+  name: Oxide System/alerts API
+  description: Alerts deliver notifications for events that occur on the Oxide rack
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - system/alerts
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-system-alerts-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-system-audit-log-api
+  name: Oxide System/audit Log API
+  description: These endpoints relate to audit logs.
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - system/audit-log
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-system-audit-log-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-system-hardware-api
+  name: Oxide System/hardware API
+  description: >-
+    These operations pertain to hardware inventory and management. Racks are the unit of expansion of
+    an Oxide deployment. Racks are in turn composed of sleds, switches, power supplies, and a cabled backplane.
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - system/hardware
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-system-hardware-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-system-ip-pools-api
+  name: Oxide System/ip Pools API
+  description: >-
+    IP pools are collections of external IPs. Linking a pool to a silo makes it available for allocation
+    by users in that silo.
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - system/ip-pools
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-system-ip-pools-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-system-metrics-api
+  name: Oxide System/metrics API
+  description: >-
+    Metrics provide insight into the operation of the Oxide deployment. These include telemetry on hardware
+    and software components that can be used to understand the current state as well as to diagnose issues.
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - system/metrics
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-system-metrics-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-system-networking-api
+  name: Oxide System/networking API
+  description: This provides rack-level network configuration.
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - system/networking
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-system-networking-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-system-silos-api
+  name: Oxide System/silos API
+  description: Silos represent a logical partition of users and resources.
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - system/silos
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-system-silos-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-system-status-api
+  name: Oxide System/status API
+  description: Endpoints related to system health
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - system/status
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-system-status-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-system-subnet-pools-api
+  name: Oxide System/subnet Pools API
+  description: >-
+    Subnet pools are collections of external subnets. Linking a pool to a silo makes it available for
+    allocation by users in that silo.
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - system/subnet-pools
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-system-subnet-pools-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-system-support-bundles-api
+  name: Oxide System/support Bundles API
+  description: Support bundles collect debugging information from the rack for use by Oxide support.
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - system/support-bundles
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-system-support-bundles-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-system-update-api
+  name: Oxide System/update API
+  description: Upload and manage system updates
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - system/update
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-system-update-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-tokens-api
+  name: Oxide Tokens API
+  description: API clients use device access tokens for authentication.
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - tokens
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-tokens-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
+  - type: Webhooks
+    url: asyncapi/oxide-computer-alerts-webhooks.yml
+- aid: oxide-computer:oxide-computer-vpcs-api
+  name: Oxide Vpcs API
+  description: >-
+    Virtual Private Clouds (VPCs) provide isolated network environments for managing and deploying services.
+  humanURL: https://docs.oxide.computer/api
+  baseURL: https://{oxide-control-plane-host}
+  tags:
+  - vpcs
+  properties:
+  - type: OpenAPI
+    url: openapi/oxide-computer-vpcs-api-openapi.yml
+  - type: Documentation
+    url: https://docs.oxide.computer/api
+  - type: APIReference
+    url: https://docs.oxide.computer/api
+  - type: Authentication
+    url: authentication/oxide-computer-authentication.yml
+  - type: ErrorCatalog
+    url: errors/oxide-computer-problem-types.yml
+  - type: DataModel
+    url: data-model/oxide-computer-data-model.yml
   - type: Webhooks
     url: asyncapi/oxide-computer-alerts-webhooks.yml
 maintainers:
@@ -74,6 +712,8 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: Overlay
+  url: overlays/oxide-computer-region-api-overlay.yaml
 - type: Website
   url: https://oxide.computer
 - type: DeveloperPortal
