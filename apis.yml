@@ -12,6 +12,18 @@ description: 'Oxide Computer Company builds a rack-scale cloud computer: integra
   the customer''s own control-plane domain rather than a vendor-hosted endpoint. Oxide
   publishes first-party Rust, TypeScript and Go SDKs, an `oxide` CLI, a Terraform provider
   and a Packer plugin, and develops essentially the entire stack in the open on GitHub.'
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: false
+  label: Hosted service · you call their endpoint
+  confidence: medium
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 image: https://oxide.computer/favicon.png
 url: https://raw.githubusercontent.com/api-evangelist/oxide-computer/refs/heads/main/apis.yml
 x-type: company
