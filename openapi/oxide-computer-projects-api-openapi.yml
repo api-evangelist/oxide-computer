@@ -1,0 +1,366 @@
+openapi: 3.2.0
+info:
+  title: Oxide Region Projects API
+  description: API for interacting with the Oxide control plane
+  contact:
+    url: https://oxide.computer
+    email: api@oxide.computer
+  version: 2026081901.0.0
+tags:
+- name: projects
+  description: Projects are a grouping of associated resources such as instances and disks within a silo for purposes of billing and access control.
+  externalDocs:
+    url: http://docs.oxide.computer/api/projects
+paths:
+  /v1/projects:
+    get:
+      tags:
+      - projects
+      summary: List projects
+      operationId: project_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+    post:
+      tags:
+      - projects
+      summary: Create project
+      operationId: project_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/projects/{project}:
+    get:
+      tags:
+      - projects
+      summary: Fetch project
+      operationId: project_view
+      parameters:
+      - in: path
+        name: project
+        description: Name or ID of the project
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+      - projects
+      summary: Update project
+      operationId: project_update
+      parameters:
+      - in: path
+        name: project
+        description: Name or ID of the project
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectUpdate'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - projects
+      summary: Delete project
+      operationId: project_delete
+      parameters:
+      - in: path
+        name: project
+        description: Name or ID of the project
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/projects/{project}/policy:
+    get:
+      tags:
+      - projects
+      summary: Fetch project's IAM policy
+      operationId: project_policy_view
+      parameters:
+      - in: path
+        name: project
+        description: Name or ID of the project
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectRolePolicy'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+      - projects
+      summary: Update project's IAM policy
+      operationId: project_policy_update
+      parameters:
+      - in: path
+        name: project
+        description: Name or ID of the project
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectRolePolicy'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectRolePolicy'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+components:
+  schemas:
+    ProjectCreate:
+      description: Create-time parameters for a `Project`
+      type: object
+      properties:
+        description:
+          type: string
+        name:
+          $ref: '#/components/schemas/Name'
+      required:
+      - description
+      - name
+    ProjectRole:
+      type: string
+      enum:
+      - admin
+      - collaborator
+      - limited_collaborator
+      - viewer
+    ProjectResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/Project'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
+    Project:
+      description: View of a Project
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - id
+      - name
+      - time_created
+      - time_modified
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
+    ProjectUpdate:
+      description: Updateable properties of a `Project`
+      type: object
+      properties:
+        description:
+          type:
+          - string
+          - 'null'
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+    ProjectRoleRoleAssignment:
+      description: 'Describes the assignment of a particular role on a particular resource to a particular identity (user, group, etc.)
+
+
+        The resource is not part of this structure.  Rather, `RoleAssignment`s are put into a `Policy` and that Policy is applied to a particular resource.'
+      type: object
+      properties:
+        identity_id:
+          type: string
+          format: uuid
+        identity_type:
+          $ref: '#/components/schemas/IdentityType'
+        role_name:
+          $ref: '#/components/schemas/ProjectRole'
+      required:
+      - identity_id
+      - identity_type
+      - role_name
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    IdentityType:
+      description: Describes what kind of identity is described by an id
+      type: string
+      enum:
+      - silo_user
+      - silo_group
+    NameOrIdSortMode:
+      description: Supported set of sort modes for scanning by name or id
+      oneOf:
+      - description: Sort in increasing order of "name"
+        type: string
+        enum:
+        - name_ascending
+      - description: Sort in decreasing order of "name"
+        type: string
+        enum:
+        - name_descending
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    ProjectRolePolicy:
+      description: 'Policy for a particular resource
+
+
+        Note that the Policy only describes access granted explicitly for this resource.  The policies of parent resources can also cause a user to have access to this resource.'
+      type: object
+      properties:
+        role_assignments:
+          description: Roles directly assigned on this resource
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectRoleRoleAssignment'
+      required:
+      - role_assignments
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

@@ -1,0 +1,283 @@
+openapi: 3.2.0
+info:
+  title: Oxide Region Snapshots API
+  description: API for interacting with the Oxide control plane
+  contact:
+    url: https://oxide.computer
+    email: api@oxide.computer
+  version: 2026081901.0.0
+tags:
+- name: snapshots
+  description: Snapshots of virtual disks at a particular point in time.
+  externalDocs:
+    url: http://docs.oxide.computer/api/snapshots
+paths:
+  /v1/snapshots:
+    get:
+      tags:
+      - snapshots
+      summary: List snapshots
+      operationId: snapshot_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SnapshotResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required:
+        - project
+    post:
+      tags:
+      - snapshots
+      summary: Create snapshot
+      description: Creates a point-in-time snapshot from a disk.
+      operationId: snapshot_create
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SnapshotCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Snapshot'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/snapshots/{snapshot}:
+    get:
+      tags:
+      - snapshots
+      summary: Fetch snapshot
+      operationId: snapshot_view
+      parameters:
+      - in: path
+        name: snapshot
+        description: Name or ID of the snapshot
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Snapshot'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - snapshots
+      summary: Delete snapshot
+      operationId: snapshot_delete
+      parameters:
+      - in: path
+        name: snapshot
+        description: Name or ID of the snapshot
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+components:
+  schemas:
+    SnapshotResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/Snapshot'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    Snapshot:
+      description: View of a Snapshot
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        disk_id:
+          type: string
+          format: uuid
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        project_id:
+          type: string
+          format: uuid
+        size:
+          $ref: '#/components/schemas/ByteCount'
+        state:
+          $ref: '#/components/schemas/SnapshotState'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - disk_id
+      - id
+      - name
+      - project_id
+      - size
+      - state
+      - time_created
+      - time_modified
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
+    SnapshotState:
+      type: string
+      enum:
+      - creating
+      - ready
+      - faulted
+      - destroyed
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
+    ByteCount:
+      description: Byte count to express memory or storage capacity.
+      type: integer
+      format: uint64
+      minimum: 0
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    NameOrIdSortMode:
+      description: Supported set of sort modes for scanning by name or id
+      oneOf:
+      - description: Sort in increasing order of "name"
+        type: string
+        enum:
+        - name_ascending
+      - description: Sort in decreasing order of "name"
+        type: string
+        enum:
+        - name_descending
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    SnapshotCreate:
+      description: Create-time parameters for a `Snapshot`
+      type: object
+      properties:
+        description:
+          type: string
+        disk:
+          description: The disk to be snapshotted
+          allOf:
+          - $ref: '#/components/schemas/NameOrId'
+        name:
+          $ref: '#/components/schemas/Name'
+      required:
+      - description
+      - disk
+      - name
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

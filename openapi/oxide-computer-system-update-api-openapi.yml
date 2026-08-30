@@ -1,0 +1,506 @@
+openapi: 3.2.0
+info:
+  title: Oxide Region System/update API
+  description: API for interacting with the Oxide control plane
+  contact:
+    url: https://oxide.computer
+    email: api@oxide.computer
+  version: 2026081901.0.0
+tags:
+- name: system/update
+  description: Upload and manage system updates
+  externalDocs:
+    url: http://docs.oxide.computer/api/system-update
+paths:
+  /v1/system/update/recovery-finish:
+    put:
+      tags:
+      - system/update
+      summary: Clear system recovery status
+      description: 'Instructs the system that a system recovery operation ("mupdate") was completed using the software in the specified release.
+
+
+        The system recovery operation is used to bypass the control plane to deploy known-working software when the control plane itself is not functioning or otherwise unable to update itself.  When the control plane detects this, it stops making any changes to deployed software to avoid reverting the recovery itself.  This operation puts the control plane back in charge of determining what software should be deployed, instructing it that the specified software (which is also what''s currently running) is what''s supposed to be deployed.
+
+
+        If the control plane knows the version of all running software (e.g., a single sled was recovered to the same version as the rest of the rack), requests where the provided version does not match what''s currently running will fail. If the control plane does not know the version of all running software (e.g., the entire rack was mupdated to a new release), requests with an incorrect provided version will succeed, but the control plane will continue to avoid changing deployed software until this operation is invoked with the correct version.
+
+
+        This endpoint should only be called at the direction of Oxide support.'
+      operationId: system_update_recovery_finish
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetTargetReleaseParams'
+        required: true
+      responses:
+        '204':
+          description: resource updated
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/update/repositories:
+    get:
+      tags:
+      - system/update
+      summary: List all TUF repositories
+      description: Returns a paginated list of all TUF repositories ordered by system version (newest first by default).
+      operationId: system_update_repository_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/VersionSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TufRepoResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+    put:
+      tags:
+      - system/update
+      summary: Upload system release repository
+      description: System release repositories are verified by the updates trust store.
+      operationId: system_update_repository_upload
+      parameters:
+      - in: query
+        name: file_name
+        description: The name of the uploaded file.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TufRepoUpload'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/update/repositories/{system_version}:
+    get:
+      tags:
+      - system/update
+      summary: Fetch system release repository by version
+      operationId: system_update_repository_view
+      parameters:
+      - in: path
+        name: system_version
+        description: The version to get.
+        required: true
+        schema:
+          type: string
+          pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TufRepo'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/update/status:
+    get:
+      tags:
+      - system/update
+      summary: Fetch system update status
+      description: Returns information about the current target release and the progress of system software updates.
+      operationId: system_update_status
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateStatus'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/update/target-release:
+    put:
+      tags:
+      - system/update
+      summary: Set target release
+      description: Set the current target release of the rack's system software. The rack reconfigurator will treat the software specified here as a goal state for the rack's software, and attempt to asynchronously update to that release. Use the update status endpoint to view the current target release.
+      operationId: target_release_update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetTargetReleaseParams'
+        required: true
+      responses:
+        '204':
+          description: resource updated
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/update/trust-roots:
+    get:
+      tags:
+      - system/update
+      summary: List root roles in the updates trust store
+      description: A root role is a JSON document describing the cryptographic keys that are trusted to sign system release repositories, as described by The Update Framework. Uploading a repository requires its metadata to be signed by keys trusted by the trust store.
+      operationId: system_update_trust_root_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/IdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdatesTrustRootResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+    post:
+      tags:
+      - system/update
+      summary: Add trusted root role to updates trust store
+      operationId: system_update_trust_root_create
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdatesTrustRoot'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/update/trust-roots/{trust_root_id}:
+    get:
+      tags:
+      - system/update
+      summary: Fetch trusted root role
+      operationId: system_update_trust_root_view
+      parameters:
+      - in: path
+        name: trust_root_id
+        description: ID of the trust root
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdatesTrustRoot'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - system/update
+      summary: Delete trusted root role
+      description: Note that this method does not currently check for any uploaded system release repositories that would become untrusted after deleting the root role.
+      operationId: system_update_trust_root_delete
+      parameters:
+      - in: path
+        name: trust_root_id
+        description: ID of the trust root
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+components:
+  schemas:
+    IdSortMode:
+      description: 'Supported set of sort modes for scanning by id only.
+
+
+        Currently, we only support scanning in ascending order.'
+      oneOf:
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    TargetRelease:
+      description: View of a system software target release
+      type: object
+      properties:
+        time_requested:
+          description: Time this was set as the target release
+          type: string
+          format: date-time
+        version:
+          description: The specified release of the rack's system software
+          type: string
+          pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+      required:
+      - time_requested
+      - version
+    TufRepoResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/TufRepo'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    UpdateStatus:
+      type: object
+      properties:
+        components_by_release_version:
+          description: 'Count of components running each release version
+
+
+            Keys will be either:
+
+
+            * Semver-like release version strings * "install dataset", representing the initial rack software before any updates * "unknown", which means there is no TUF repo uploaded that matches the software running on the component)'
+          type: object
+          additionalProperties:
+            type: integer
+            format: uint
+            minimum: 0
+        contact_support:
+          description: 'If true, the system has detected one or more known conditions that require Oxide support to resolve
+
+
+            You should contact support to resolve these issues before proceeding with an update, or after one has completed. The checks underlying this field are not exhaustive, so this being `false` does not mean the entire system is completely healthy.'
+          type: boolean
+        suspended:
+          description: 'Whether automatic update is suspended due to manual update activity
+
+
+            After a manual support procedure that changes the system software, automatic update activity is suspended to avoid undoing the change. To resume automatic update, first upload the TUF repository matching the manually applied update, then set that as the target release.'
+          type: boolean
+        target_release:
+          description: 'Current target release of the system software
+
+
+            This may not correspond to the actual system software running at the time of request; it is instead the release that the system should be moving towards as a goal state. The system asynchronously updates software to match this target release.
+
+
+            Will only be null if a target release has never been set. In that case, the system is not automatically attempting to manage software versions.'
+          allOf:
+          - $ref: '#/components/schemas/TargetRelease'
+        time_last_step_planned:
+          description: 'Time of most recent update planning activity
+
+
+            This is intended as a rough indicator of the last time something happened in the update planner.'
+          type: string
+          format: date-time
+      required:
+      - components_by_release_version
+      - contact_support
+      - suspended
+      - target_release
+      - time_last_step_planned
+    SetTargetReleaseParams:
+      description: Parameters for PUT requests to `/v1/system/update/target-release`.
+      type: object
+      properties:
+        system_version:
+          description: Version of the system software to make the target release.
+          type: string
+          pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+      required:
+      - system_version
+    UpdatesTrustRootResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/UpdatesTrustRoot'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    TufRepoUpload:
+      type: object
+      properties:
+        repo:
+          $ref: '#/components/schemas/TufRepo'
+        status:
+          $ref: '#/components/schemas/TufRepoUploadStatus'
+      required:
+      - repo
+      - status
+    VersionSortMode:
+      description: Supported sort modes when scanning by semantic version
+      oneOf:
+      - description: Sort in increasing semantic version order (oldest first)
+        type: string
+        enum:
+        - version_ascending
+      - description: Sort in decreasing semantic version order (newest first)
+        type: string
+        enum:
+        - version_descending
+    TufRepoUploadStatus:
+      description: Whether the uploaded TUF repo already existed or was new and had to be inserted. Part of `TufRepoUpload`.
+      oneOf:
+      - description: The repository already existed in the database
+        type: string
+        enum:
+        - already_exists
+      - description: The repository did not exist, and was inserted into the database
+        type: string
+        enum:
+        - inserted
+    UpdatesTrustRoot:
+      description: Trusted root role used by the update system to verify update repositories.
+      type: object
+      properties:
+        id:
+          description: The UUID of this trusted root role.
+          type: string
+          format: uuid
+        root_role:
+          description: The trusted root role itself, a JSON document as described by The Update Framework.
+        time_created:
+          description: Time the trusted root role was added.
+          type: string
+          format: date-time
+      required:
+      - id
+      - root_role
+      - time_created
+    TufRepo:
+      description: Metadata about a TUF repository
+      type: object
+      properties:
+        file_name:
+          description: 'The file name of the repository, as reported by the client that uploaded it
+
+
+            This is intended for debugging. The file name may not match any particular pattern, and even if it does, it may not be accurate since it''s just what the client reported.'
+          type: string
+        hash:
+          description: The hash of the repository
+          type: string
+          format: hex string (32 bytes)
+        system_version:
+          description: 'The system version for this repository
+
+
+            The system version is a top-level version number applied to all the software in the repository.'
+          type: string
+          pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+        time_created:
+          description: Time the repository was uploaded
+          type: string
+          format: date-time
+      required:
+      - file_name
+      - hash
+      - system_version
+      - time_created
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

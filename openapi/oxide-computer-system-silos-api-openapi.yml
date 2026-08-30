@@ -1,0 +1,1826 @@
+openapi: 3.2.0
+info:
+  title: Oxide Region System/silos API
+  description: API for interacting with the Oxide control plane
+  contact:
+    url: https://oxide.computer
+    email: api@oxide.computer
+  version: 2026081901.0.0
+tags:
+- name: system/silos
+  description: Silos represent a logical partition of users and resources.
+  externalDocs:
+    url: http://docs.oxide.computer/api/system-silos
+paths:
+  /v1/system/identity-providers:
+    get:
+      tags:
+      - system/silos
+      summary: List identity providers for silo
+      description: List identity providers for silo by silo name or ID.
+      operationId: silo_identity_provider_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: silo
+        description: Name or ID of the silo
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityProviderResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required:
+        - silo
+  /v1/system/identity-providers/local/users:
+    post:
+      tags:
+      - system/silos
+      summary: Create user
+      description: Users can only be created in Silos with `provision_type` == `Fixed`. Otherwise, Silo users are just-in-time (JIT) provisioned when a user first logs in using an external Identity Provider.
+      operationId: local_idp_user_create
+      parameters:
+      - in: query
+        name: silo
+        description: Name or ID of the silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/identity-providers/local/users/{user_id}:
+    delete:
+      tags:
+      - system/silos
+      summary: Delete user
+      operationId: local_idp_user_delete
+      parameters:
+      - in: path
+        name: user_id
+        description: The user's internal ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: silo
+        description: Name or ID of the silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/identity-providers/local/users/{user_id}/set-password:
+    post:
+      tags:
+      - system/silos
+      summary: Set or invalidate user's password
+      description: Passwords can only be updated for users in Silos with identity mode `LocalOnly`.
+      operationId: local_idp_user_set_password
+      parameters:
+      - in: path
+        name: user_id
+        description: The user's internal ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: silo
+        description: Name or ID of the silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPassword'
+        required: true
+      responses:
+        '204':
+          description: resource updated
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/identity-providers/saml:
+    post:
+      tags:
+      - system/silos
+      summary: Create SAML identity provider
+      operationId: saml_identity_provider_create
+      parameters:
+      - in: query
+        name: silo
+        description: Name or ID of the silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SamlIdentityProviderCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SamlIdentityProvider'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/identity-providers/saml/{provider}:
+    get:
+      tags:
+      - system/silos
+      summary: Fetch SAML identity provider
+      operationId: saml_identity_provider_view
+      parameters:
+      - in: path
+        name: provider
+        description: Name or ID of the SAML identity provider
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: silo
+        description: Name or ID of the silo
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SamlIdentityProvider'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/scim/tokens:
+    get:
+      tags:
+      - system/silos
+      summary: List SCIM tokens
+      description: Specify the silo by name or ID using the `silo` query parameter.
+      operationId: scim_token_list
+      parameters:
+      - in: query
+        name: silo
+        description: Name or ID of the silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                title: Array_of_ScimClientBearerToken
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScimClientBearerToken'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    post:
+      tags:
+      - system/silos
+      summary: Create SCIM token
+      description: Specify the silo by name or ID using the `silo` query parameter. Be sure to save the bearer token in the response. It will not be retrievable later through the token view and list endpoints.
+      operationId: scim_token_create
+      parameters:
+      - in: query
+        name: silo
+        description: Name or ID of the silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScimClientBearerTokenValue'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/scim/tokens/{token_id}:
+    get:
+      tags:
+      - system/silos
+      summary: Fetch SCIM token
+      description: Specify the silo by name or ID using the `silo` query parameter.
+      operationId: scim_token_view
+      parameters:
+      - in: path
+        name: token_id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: silo
+        description: Name or ID of the silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScimClientBearerToken'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - system/silos
+      summary: Delete SCIM token
+      description: Specify the silo by name or ID using the `silo` query parameter.
+      operationId: scim_token_delete
+      parameters:
+      - in: path
+        name: token_id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: silo
+        description: Name or ID of the silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/silo-quotas:
+    get:
+      tags:
+      - system/silos
+      summary: List resource quotas for all silos
+      operationId: system_quotas_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/IdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiloQuotasResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+  /v1/system/silos:
+    get:
+      tags:
+      - system/silos
+      summary: List silos
+      description: Lists silos that are discoverable based on the current permissions.
+      operationId: silo_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiloResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+    post:
+      tags:
+      - system/silos
+      summary: Create silo
+      operationId: silo_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SiloCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Silo'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/silos/{silo}:
+    get:
+      tags:
+      - system/silos
+      summary: Fetch silo
+      description: Fetch silo by name or ID.
+      operationId: silo_view
+      parameters:
+      - in: path
+        name: silo
+        description: Name or ID of the silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Silo'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - system/silos
+      summary: Delete silo
+      description: Delete a silo by name or ID.
+      operationId: silo_delete
+      parameters:
+      - in: path
+        name: silo
+        description: Name or ID of the silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/silos/{silo}/ip-pools:
+    get:
+      tags:
+      - system/silos
+      summary: List IP pools linked to silo
+      description: Linked IP pools are available to users in the specified silo. A silo can have at most one default pool. IPs are allocated from the default pool when users ask for one without specifying a pool.
+      operationId: silo_ip_pool_list
+      parameters:
+      - in: path
+        name: silo
+        description: Name or ID of the silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiloIpPoolResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+  /v1/system/silos/{silo}/policy:
+    get:
+      tags:
+      - system/silos
+      summary: Fetch silo IAM policy
+      operationId: silo_policy_view
+      parameters:
+      - in: path
+        name: silo
+        description: Name or ID of the silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiloRolePolicy'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+      - system/silos
+      summary: Update silo IAM policy
+      operationId: silo_policy_update
+      parameters:
+      - in: path
+        name: silo
+        description: Name or ID of the silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SiloRolePolicy'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiloRolePolicy'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/silos/{silo}/quotas:
+    get:
+      tags:
+      - system/silos
+      summary: Fetch resource quotas for silo
+      operationId: silo_quotas_view
+      parameters:
+      - in: path
+        name: silo
+        description: Name or ID of the silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiloQuotas'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+      - system/silos
+      summary: Update resource quotas for silo
+      description: If a quota value is not specified, it will remain unchanged.
+      operationId: silo_quotas_update
+      parameters:
+      - in: path
+        name: silo
+        description: Name or ID of the silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SiloQuotasUpdate'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiloQuotas'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/silos/{silo}/subnet-pools:
+    get:
+      tags:
+      - system/silos
+      summary: List subnet pools linked to a silo
+      operationId: silo_subnet_pool_list
+      parameters:
+      - in: path
+        name: silo
+        description: Name or ID of the silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiloSubnetPoolResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+  /v1/system/users:
+    get:
+      tags:
+      - system/silos
+      summary: List built-in (system) users in silo
+      operationId: silo_user_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: silo
+        description: Name or ID of the silo
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/IdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required:
+        - silo
+  /v1/system/users/{user_id}:
+    get:
+      tags:
+      - system/silos
+      summary: Fetch built-in (system) user
+      operationId: silo_user_view
+      parameters:
+      - in: path
+        name: user_id
+        description: The user's internal ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: silo
+        description: Name or ID of the silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/users-builtin:
+    get:
+      tags:
+      - system/silos
+      summary: List built-in users
+      operationId: user_builtin_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserBuiltinResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+  /v1/system/users-builtin/{user}:
+    get:
+      tags:
+      - system/silos
+      summary: Fetch built-in user
+      operationId: user_builtin_view
+      parameters:
+      - in: path
+        name: user
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserBuiltin'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/utilization/silos:
+    get:
+      tags:
+      - system/silos
+      summary: List current utilization state for all silos
+      operationId: silo_utilization_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiloUtilizationResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+  /v1/system/utilization/silos/{silo}:
+    get:
+      tags:
+      - system/silos
+      summary: Fetch current utilization for given silo
+      operationId: silo_utilization_view
+      parameters:
+      - in: path
+        name: silo
+        description: Name or ID of the silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiloUtilization'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+components:
+  schemas:
+    UserResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    SiloRolePolicy:
+      description: 'Policy for a particular resource
+
+
+        Note that the Policy only describes access granted explicitly for this resource.  The policies of parent resources can also cause a user to have access to this resource.'
+      type: object
+      properties:
+        role_assignments:
+          description: Roles directly assigned on this resource
+          type: array
+          items:
+            $ref: '#/components/schemas/SiloRoleRoleAssignment'
+      required:
+      - role_assignments
+    FleetRole:
+      type: string
+      enum:
+      - admin
+      - collaborator
+      - viewer
+    SiloIpPoolResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/SiloIpPool'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    SiloQuotasCreate:
+      description: The amount of provisionable resources for a Silo
+      type: object
+      properties:
+        cpus:
+          description: The amount of virtual CPUs available for running instances in the Silo
+          type: integer
+          format: int64
+        memory:
+          description: The amount of RAM (in bytes) available for running instances in the Silo
+          allOf:
+          - $ref: '#/components/schemas/ByteCount'
+        storage:
+          description: The amount of storage (in bytes) available for disks or snapshots
+          allOf:
+          - $ref: '#/components/schemas/ByteCount'
+      required:
+      - cpus
+      - memory
+      - storage
+    NameSortMode:
+      description: 'Supported set of sort modes for scanning by name only
+
+
+        Currently, we only support scanning in ascending order.'
+      oneOf:
+      - description: Sort in increasing order of "name"
+        type: string
+        enum:
+        - name_ascending
+    SamlIdentityProvider:
+      description: A SAML identity provider
+      type: object
+      properties:
+        acs_url:
+          description: Service provider endpoint where the response will be sent
+          type: string
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        group_attribute_name:
+          description: If set, attributes with this name will be considered to denote a user's group membership, where the values will be the group names.
+          type:
+          - string
+          - 'null'
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        idp_entity_id:
+          description: IdP's entity id
+          type: string
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        public_cert:
+          description: Optional request signing public certificate (base64 encoded der file)
+          type:
+          - string
+          - 'null'
+        slo_url:
+          description: Service provider endpoint where the idp should send log out requests
+          type: string
+        sp_client_id:
+          description: SP's client id
+          type: string
+        technical_contact_email:
+          description: Customer's technical contact for saml configuration
+          type: string
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - acs_url
+      - description
+      - id
+      - idp_entity_id
+      - name
+      - slo_url
+      - sp_client_id
+      - technical_contact_email
+      - time_created
+      - time_modified
+    UserId:
+      title: A username for a local-only user
+      description: Usernames must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Usernames cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
+    SiloUtilization:
+      description: View of a silo's resource utilization and capacity
+      type: object
+      properties:
+        allocated:
+          description: Accounts for the total amount of resources reserved for silos via their quotas.
+          allOf:
+          - $ref: '#/components/schemas/VirtualResourceCounts'
+        provisioned:
+          description: 'Accounts for the total resources allocated by the silo, including CPU and memory for running instances and storage for disks and snapshots.
+
+
+            Note that CPU and memory resources associated with stopped instances are not counted here.'
+          allOf:
+          - $ref: '#/components/schemas/VirtualResourceCounts'
+        silo_id:
+          type: string
+          format: uuid
+        silo_name:
+          $ref: '#/components/schemas/Name'
+      required:
+      - allocated
+      - provisioned
+      - silo_id
+      - silo_name
+    SiloQuotas:
+      description: A collection of resource counts used to set the virtual capacity of a silo
+      type: object
+      properties:
+        cpus:
+          description: Number of virtual CPUs
+          type: integer
+          format: int64
+        memory:
+          description: Amount of memory in bytes
+          allOf:
+          - $ref: '#/components/schemas/ByteCount'
+        silo_id:
+          type: string
+          format: uuid
+        storage:
+          description: Amount of disk storage in bytes
+          allOf:
+          - $ref: '#/components/schemas/ByteCount'
+      required:
+      - cpus
+      - memory
+      - silo_id
+      - storage
+    IdentityType:
+      description: Describes what kind of identity is described by an id
+      type: string
+      enum:
+      - silo_user
+      - silo_group
+    NameOrIdSortMode:
+      description: Supported set of sort modes for scanning by name or id
+      oneOf:
+      - description: Sort in increasing order of "name"
+        type: string
+        enum:
+        - name_ascending
+      - description: Sort in decreasing order of "name"
+        type: string
+        enum:
+        - name_descending
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    DerEncodedKeyPair:
+      type: object
+      properties:
+        private_key:
+          description: Request signing RSA private key in PKCS#1 format (base64 encoded DER file)
+          type: string
+        public_cert:
+          description: Request signing public certificate (base64 encoded DER file)
+          type: string
+      required:
+      - private_key
+      - public_cert
+    Password:
+      title: A password used to authenticate a user
+      description: Passwords may be subject to additional constraints.
+      type: string
+      maxLength: 512
+    IdSortMode:
+      description: 'Supported set of sort modes for scanning by id only.
+
+
+        Currently, we only support scanning in ascending order.'
+      oneOf:
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    ScimClientBearerToken:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        time_created:
+          type: string
+          format: date-time
+        time_expires:
+          type:
+          - string
+          - 'null'
+          format: date-time
+      required:
+      - id
+      - time_created
+    ScimClientBearerTokenValue:
+      description: The POST response is the only time the generated bearer token is returned to the client.
+      type: object
+      properties:
+        bearer_token:
+          type: string
+        id:
+          type: string
+          format: uuid
+        time_created:
+          type: string
+          format: date-time
+        time_expires:
+          type:
+          - string
+          - 'null'
+          format: date-time
+      required:
+      - bearer_token
+      - id
+      - time_created
+    ByteCount:
+      description: Byte count to express memory or storage capacity.
+      type: integer
+      format: uint64
+      minimum: 0
+    ServiceUsingCertificate:
+      description: The service intended to use this certificate.
+      oneOf:
+      - description: This certificate is intended for access to the external API.
+        type: string
+        enum:
+        - external_api
+    IdentityProvider:
+      description: View of an Identity Provider
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        provider_type:
+          description: Identity provider type
+          allOf:
+          - $ref: '#/components/schemas/IdentityProviderType'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - id
+      - name
+      - provider_type
+      - time_created
+      - time_modified
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    SiloIdentityMode:
+      description: Describes how identities are managed and users are authenticated in this Silo
+      oneOf:
+      - description: Users are authenticated with SAML using an external authentication provider.  The system updates information about users and groups only during successful authentication (i.e,. "JIT provisioning" of users and groups).
+        type: string
+        enum:
+        - saml_jit
+      - description: The system is the source of truth about users.  There is no linkage to an external authentication provider or identity provider.
+        type: string
+        enum:
+        - local_only
+      - description: Users are authenticated with SAML using an external authentication provider. Users and groups are managed with SCIM API calls, likely from the same authentication provider.
+        type: string
+        enum:
+        - saml_scim
+    UserBuiltinResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/UserBuiltin'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    IdentityProviderResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentityProvider'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    IpPoolType:
+      description: Type of IP pool.
+      oneOf:
+      - description: Unicast IP pool for standard IP allocations.
+        type: string
+        enum:
+        - unicast
+      - description: 'Multicast IP pool for multicast group allocations.
+
+
+          All ranges in a multicast pool must be either ASM or SSM (not mixed).'
+        type: string
+        enum:
+        - multicast
+    SiloUtilizationResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/SiloUtilization'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    SiloRoleRoleAssignment:
+      description: 'Describes the assignment of a particular role on a particular resource to a particular identity (user, group, etc.)
+
+
+        The resource is not part of this structure.  Rather, `RoleAssignment`s are put into a `Policy` and that Policy is applied to a particular resource.'
+      type: object
+      properties:
+        identity_id:
+          type: string
+          format: uuid
+        identity_type:
+          $ref: '#/components/schemas/IdentityType'
+        role_name:
+          $ref: '#/components/schemas/SiloRole'
+      required:
+      - identity_id
+      - identity_type
+      - role_name
+    SiloResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/Silo'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    UserBuiltin:
+      description: 'View of a Built-in User
+
+
+        Built-in users are identities internal to the system, used when the control plane performs actions autonomously'
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - id
+      - name
+      - time_created
+      - time_modified
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
+    Silo:
+      description: 'View of a Silo
+
+
+        A Silo is the highest level unit of isolation.'
+      type: object
+      properties:
+        admin_group_name:
+          description: Optionally, silos can have a group name that is automatically granted the silo admin role.
+          type:
+          - string
+          - 'null'
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        discoverable:
+          description: A silo where discoverable is false can be retrieved only by its id - it will not be part of the "list all silos" output.
+          type: boolean
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        identity_mode:
+          description: How users and groups are managed in this Silo
+          allOf:
+          - $ref: '#/components/schemas/SiloIdentityMode'
+        mapped_fleet_roles:
+          description: 'Mapping of which Fleet roles are conferred by each Silo role
+
+
+            The default is that no Fleet roles are conferred by any Silo roles unless there''s a corresponding entry in this map.'
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/FleetRole'
+            uniqueItems: true
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - discoverable
+      - id
+      - identity_mode
+      - mapped_fleet_roles
+      - name
+      - time_created
+      - time_modified
+    SiloCreate:
+      description: Create-time parameters for a `Silo`
+      type: object
+      properties:
+        admin_group_name:
+          description: 'If set, this group will be created during Silo creation and granted the "Silo Admin" role. Identity providers can assert that users belong to this group and those users can log in and further initialize the Silo.
+
+
+            Note that if configuring a SAML based identity provider, group_attribute_name must be set for users to be considered part of a group. See `SamlIdentityProviderCreate` for more information.'
+          type:
+          - string
+          - 'null'
+        description:
+          type: string
+        discoverable:
+          type: boolean
+        identity_mode:
+          $ref: '#/components/schemas/SiloIdentityMode'
+        mapped_fleet_roles:
+          description: 'Mapping of which Fleet roles are conferred by each Silo role
+
+
+            The default is that no Fleet roles are conferred by any Silo roles unless there''s a corresponding entry in this map.'
+          default: {}
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/FleetRole'
+            uniqueItems: true
+        name:
+          $ref: '#/components/schemas/Name'
+        quotas:
+          description: Limits the amount of provisionable CPU, memory, and storage in the Silo. CPU and memory are only consumed by running instances, while storage is consumed by any disk or snapshot. A value of 0 means that resource is *not* provisionable.
+          allOf:
+          - $ref: '#/components/schemas/SiloQuotasCreate'
+        tls_certificates:
+          description: Initial TLS certificates to be used for the new Silo's console and API endpoints.  These should be valid for the Silo's DNS name(s).
+          type: array
+          items:
+            $ref: '#/components/schemas/CertificateCreate'
+      required:
+      - description
+      - discoverable
+      - identity_mode
+      - name
+      - quotas
+      - tls_certificates
+    IpVersion:
+      description: The IP address version.
+      type: string
+      enum:
+      - v4
+      - v6
+    SiloSubnetPool:
+      description: A subnet pool in the context of a silo
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        ip_version:
+          description: The IP version for the pool.
+          allOf:
+          - $ref: '#/components/schemas/IpVersion'
+        is_default:
+          description: 'When a pool is the default for a silo, external subnet allocations will come from that pool when no other pool is specified.
+
+
+            A silo can have at most one default pool per IP version (IPv4 or IPv6), allowing up to 2 default pools total.'
+          type: boolean
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - id
+      - ip_version
+      - is_default
+      - name
+      - time_created
+      - time_modified
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
+    IdpMetadataSource:
+      oneOf:
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - url
+          url:
+            type: string
+        required:
+        - type
+        - url
+      - type: object
+        properties:
+          data:
+            type: string
+          type:
+            type: string
+            enum:
+            - base64_encoded_xml
+        required:
+        - data
+        - type
+    CertificateCreate:
+      description: Create-time parameters for a `Certificate`
+      type: object
+      properties:
+        cert:
+          description: PEM-formatted string containing public certificate chain
+          type: string
+        description:
+          type: string
+        key:
+          description: PEM-formatted string containing private key
+          type: string
+        name:
+          $ref: '#/components/schemas/Name'
+        service:
+          description: The service using this certificate
+          allOf:
+          - $ref: '#/components/schemas/ServiceUsingCertificate'
+      required:
+      - cert
+      - description
+      - key
+      - name
+      - service
+    IdentityProviderType:
+      oneOf:
+      - description: SAML identity provider
+        type: string
+        enum:
+        - saml
+    SiloIpPool:
+      description: An IP pool in the context of a silo
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        ip_version:
+          description: The IP version for the pool.
+          allOf:
+          - $ref: '#/components/schemas/IpVersion'
+        is_default:
+          description: 'When a pool is the default for a silo, floating IPs and instance ephemeral IPs will come from that pool when no other pool is specified.
+
+
+            A silo can have at most one default pool per combination of pool type (unicast or multicast) and IP version (IPv4 or IPv6), allowing up to 4 default pools total.'
+          type: boolean
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        pool_type:
+          description: Type of IP pool (unicast or multicast).
+          allOf:
+          - $ref: '#/components/schemas/IpPoolType'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - id
+      - ip_version
+      - is_default
+      - name
+      - pool_type
+      - time_created
+      - time_modified
+    SiloQuotasResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/SiloQuotas'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    User:
+      description: View of a User
+      type: object
+      properties:
+        display_name:
+          description: Human-readable name that can identify the user
+          type: string
+        id:
+          type: string
+          format: uuid
+        silo_id:
+          description: Uuid of the silo to which this user belongs
+          type: string
+          format: uuid
+        time_created:
+          description: Timestamp when this user was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this user was last modified
+          type: string
+          format: date-time
+      required:
+      - display_name
+      - id
+      - silo_id
+      - time_created
+      - time_modified
+    UserPassword:
+      description: Parameters for setting a user's password
+      oneOf:
+      - description: Sets the user's password to the provided value
+        type: object
+        properties:
+          mode:
+            type: string
+            enum:
+            - password
+          value:
+            $ref: '#/components/schemas/Password'
+        required:
+        - mode
+        - value
+      - description: Invalidates any current password (disabling password authentication)
+        type: object
+        properties:
+          mode:
+            type: string
+            enum:
+            - login_disallowed
+        required:
+        - mode
+    SiloSubnetPoolResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/SiloSubnetPool'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    SamlIdentityProviderCreate:
+      description: Create-time identity-related parameters
+      type: object
+      properties:
+        acs_url:
+          description: Service provider endpoint where the response will be sent
+          type: string
+        description:
+          type: string
+        group_attribute_name:
+          description: If set, SAML attributes with this name will be considered to denote a user's group membership, where the attribute value(s) should be a comma-separated list of group names.
+          type:
+          - string
+          - 'null'
+        idp_entity_id:
+          description: IdP's entity ID
+          type: string
+        idp_metadata_source:
+          description: The source of an identity provider metadata descriptor
+          allOf:
+          - $ref: '#/components/schemas/IdpMetadataSource'
+        name:
+          $ref: '#/components/schemas/Name'
+        signing_keypair:
+          description: Request signing key pair
+          default: null
+          allOf:
+          - $ref: '#/components/schemas/DerEncodedKeyPair'
+        slo_url:
+          description: Service provider endpoint where the IdP should send log out requests
+          type: string
+        sp_client_id:
+          description: SP's client ID
+          type: string
+        technical_contact_email:
+          description: Customer's technical contact for SAML configuration
+          type: string
+      required:
+      - acs_url
+      - description
+      - idp_entity_id
+      - idp_metadata_source
+      - name
+      - slo_url
+      - sp_client_id
+      - technical_contact_email
+    SiloRole:
+      type: string
+      enum:
+      - admin
+      - collaborator
+      - limited_collaborator
+      - viewer
+    UserCreate:
+      description: Create-time parameters for a `User`
+      type: object
+      properties:
+        external_id:
+          description: Username used to log in
+          allOf:
+          - $ref: '#/components/schemas/UserId'
+        password:
+          description: How to set the user's login password
+          allOf:
+          - $ref: '#/components/schemas/UserPassword'
+      required:
+      - external_id
+      - password
+    VirtualResourceCounts:
+      description: A collection of resource counts used to describe capacity and utilization
+      type: object
+      properties:
+        cpus:
+          description: Number of virtual CPUs
+          type: integer
+          format: int64
+        memory:
+          description: Amount of memory in bytes
+          allOf:
+          - $ref: '#/components/schemas/ByteCount'
+        storage:
+          description: Amount of disk storage in bytes
+          allOf:
+          - $ref: '#/components/schemas/ByteCount'
+      required:
+      - cpus
+      - memory
+      - storage
+    SiloQuotasUpdate:
+      description: Updateable properties of a Silo's resource limits. If a value is omitted it will not be updated.
+      type: object
+      properties:
+        cpus:
+          description: The amount of virtual CPUs available for running instances in the Silo
+          type:
+          - integer
+          - 'null'
+          format: int64
+        memory:
+          description: The amount of RAM (in bytes) available for running instances in the Silo
+          allOf:
+          - $ref: '#/components/schemas/ByteCount'
+        storage:
+          description: The amount of storage (in bytes) available for disks or snapshots
+          allOf:
+          - $ref: '#/components/schemas/ByteCount'
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

@@ -1,0 +1,129 @@
+openapi: 3.2.0
+info:
+  title: Oxide Region Login API
+  description: API for interacting with the Oxide control plane
+  contact:
+    url: https://oxide.computer
+    email: api@oxide.computer
+  version: 2026081901.0.0
+tags:
+- name: login
+  description: Authentication endpoints
+  externalDocs:
+    url: http://docs.oxide.computer/api/login
+paths:
+  /login/{silo_name}/saml/{provider_name}:
+    post:
+      tags:
+      - login
+      summary: Authenticate user via SAML
+      operationId: login_saml
+      parameters:
+      - in: path
+        name: provider_name
+        required: true
+        schema:
+          $ref: '#/components/schemas/Name'
+      - in: path
+        name: silo_name
+        required: true
+        schema:
+          $ref: '#/components/schemas/Name'
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+        required: true
+      responses:
+        '303':
+          description: redirect (see other)
+          headers:
+            location:
+              description: HTTP "Location" header
+              style: simple
+              required: true
+              schema:
+                type: string
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/login/{silo_name}/local:
+    post:
+      tags:
+      - login
+      summary: Authenticate user via username and password
+      operationId: login_local
+      parameters:
+      - in: path
+        name: silo_name
+        required: true
+        schema:
+          $ref: '#/components/schemas/Name'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsernamePasswordCredentials'
+        required: true
+      responses:
+        '204':
+          description: resource updated
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+components:
+  schemas:
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
+    UserId:
+      title: A username for a local-only user
+      description: Usernames must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Usernames cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
+    UsernamePasswordCredentials:
+      description: Credentials for local user login
+      type: object
+      properties:
+        password:
+          $ref: '#/components/schemas/Password'
+        username:
+          $ref: '#/components/schemas/UserId'
+      required:
+      - password
+      - username
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    Password:
+      title: A password used to authenticate a user
+      description: Passwords may be subject to additional constraints.
+      type: string
+      maxLength: 512
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

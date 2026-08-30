@@ -1,0 +1,2621 @@
+openapi: 3.2.0
+info:
+  title: Oxide Region Instances API
+  description: API for interacting with the Oxide control plane
+  contact:
+    url: https://oxide.computer
+    email: api@oxide.computer
+  version: 2026081901.0.0
+tags:
+- name: instances
+  description: Virtual machine instances are the basic unit of computation. These operations are used for provisioning, controlling, and destroying instances.
+  externalDocs:
+    url: http://docs.oxide.computer/api/instances
+paths:
+  /v1/instances:
+    get:
+      tags:
+      - instances
+      summary: List instances
+      operationId: instance_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstanceResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required:
+        - project
+    post:
+      tags:
+      - instances
+      summary: Create instance
+      operationId: instance_create
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstanceCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instance'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/instances/{instance}:
+    get:
+      tags:
+      - instances
+      summary: Fetch instance
+      operationId: instance_view
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instance'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+      - instances
+      summary: Update instance
+      operationId: instance_update
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstanceUpdate'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instance'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - instances
+      summary: Delete instance
+      operationId: instance_delete
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/instances/{instance}/anti-affinity-groups:
+    get:
+      tags:
+      - instances
+      summary: List anti-affinity groups containing instance
+      operationId: instance_anti_affinity_group_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      - in: path
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AntiAffinityGroupResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+  /v1/instances/{instance}/disks:
+    get:
+      tags:
+      - instances
+      summary: List disks for instance
+      operationId: instance_disk_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      - in: path
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiskResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+  /v1/instances/{instance}/disks/attach:
+    post:
+      tags:
+      - instances
+      summary: Attach disk to instance
+      operationId: instance_disk_attach
+      parameters:
+      - in: path
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiskPath'
+        required: true
+      responses:
+        '202':
+          description: successfully enqueued operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Disk'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/instances/{instance}/disks/detach:
+    post:
+      tags:
+      - instances
+      summary: Detach disk from instance
+      operationId: instance_disk_detach
+      parameters:
+      - in: path
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiskPath'
+        required: true
+      responses:
+        '202':
+          description: successfully enqueued operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Disk'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/instances/{instance}/external-ips:
+    get:
+      tags:
+      - instances
+      summary: List external IP addresses
+      operationId: instance_external_ip_list
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalIpResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/instances/{instance}/external-ips/ephemeral:
+    post:
+      tags:
+      - instances
+      summary: Allocate and attach ephemeral IP to instance
+      operationId: instance_ephemeral_ip_attach
+      parameters:
+      - in: path
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EphemeralIpCreate'
+        required: true
+      responses:
+        '202':
+          description: successfully enqueued operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalIp'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - instances
+      summary: Detach and deallocate ephemeral IP from instance
+      description: When an instance has both IPv4 and IPv6 ephemeral IPs, the `ip_version` query parameter must be specified to identify which IP to detach.
+      operationId: instance_ephemeral_ip_detach
+      parameters:
+      - in: path
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: ip_version
+        description: 'The IP version of the ephemeral IP to detach.
+
+
+          Required when the instance has both IPv4 and IPv6 ephemeral IPs. If only one ephemeral IP is attached, this field may be omitted.'
+        schema:
+          $ref: '#/components/schemas/IpVersion'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/instances/{instance}/external-subnets:
+    get:
+      tags:
+      - instances
+      summary: List external subnets attached to instance
+      operationId: instance_external_subnet_list
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalSubnetResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/instances/{instance}/reboot:
+    post:
+      tags:
+      - instances
+      summary: Reboot instance
+      operationId: instance_reboot
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '202':
+          description: successfully enqueued operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instance'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/instances/{instance}/serial-console:
+    get:
+      tags:
+      - instances
+      summary: Fetch instance serial console
+      operationId: instance_serial_console
+      parameters:
+      - in: path
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: from_start
+        description: Character index in the serial buffer from which to read, counting the bytes output since instance start. If this is not provided, `most_recent` must be provided, and if this *is* provided, `most_recent` must *not* be provided.
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint64
+          minimum: 0
+      - in: query
+        name: max_bytes
+        description: Maximum number of bytes of buffered serial console contents to return. If the requested range runs to the end of the available buffer, the data returned will be shorter than `max_bytes`.
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint64
+          minimum: 0
+      - in: query
+        name: most_recent
+        description: Character index in the serial buffer from which to read, counting *backward* from the most recently buffered data retrieved from the instance. (See note on `from_start` about mutual exclusivity)
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint64
+          minimum: 0
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `instance` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstanceSerialConsoleData'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/instances/{instance}/serial-console/stream:
+    get:
+      tags:
+      - instances
+      summary: Stream instance serial console
+      operationId: instance_serial_console_stream
+      parameters:
+      - in: path
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: most_recent
+        description: Character index in the serial buffer from which to read, counting *backward* from the most recently buffered data retrieved from the instance.
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint64
+          minimum: 0
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `instance` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '101':
+          description: Negotiating protocol upgrade from HTTP/1.1 to WebSocket
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-websocket: {}
+  /v1/instances/{instance}/ssh-public-keys:
+    get:
+      tags:
+      - instances
+      summary: List SSH public keys for instance
+      description: List SSH public keys injected via cloud-init during instance creation. Note that this list is a snapshot in time and will not reflect updates made after the instance is created.
+      operationId: instance_ssh_public_key_list
+      parameters:
+      - in: path
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SshKeyResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+  /v1/instances/{instance}/start:
+    post:
+      tags:
+      - instances
+      summary: Boot instance
+      operationId: instance_start
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '202':
+          description: successfully enqueued operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instance'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/instances/{instance}/stop:
+    post:
+      tags:
+      - instances
+      summary: Stop instance
+      operationId: instance_stop
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '202':
+          description: successfully enqueued operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instance'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/network-interfaces:
+    get:
+      tags:
+      - instances
+      summary: List network interfaces
+      operationId: instance_network_interface_list
+      parameters:
+      - in: query
+        name: instance
+        description: Name or ID of the instance
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `instance` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstanceNetworkInterfaceResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required:
+        - instance
+    post:
+      tags:
+      - instances
+      summary: Create network interface
+      operationId: instance_network_interface_create
+      parameters:
+      - in: query
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `instance` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstanceNetworkInterfaceCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstanceNetworkInterface'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/network-interfaces/{interface}:
+    get:
+      tags:
+      - instances
+      summary: Fetch network interface
+      operationId: instance_network_interface_view
+      parameters:
+      - in: path
+        name: interface
+        description: Name or ID of the network interface
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: instance
+        description: Name or ID of the instance
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `instance` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstanceNetworkInterface'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+      - instances
+      summary: Update network interface
+      operationId: instance_network_interface_update
+      parameters:
+      - in: path
+        name: interface
+        description: Name or ID of the network interface
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: instance
+        description: Name or ID of the instance
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `instance` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstanceNetworkInterfaceUpdate'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstanceNetworkInterface'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - instances
+      summary: Delete network interface
+      description: Note that the primary interface for an instance cannot be deleted if there are any secondary interfaces. A new primary interface must be designated first. The primary interface can be deleted if there are no secondary interfaces.
+      operationId: instance_network_interface_delete
+      parameters:
+      - in: path
+        name: interface
+        description: Name or ID of the network interface
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: instance
+        description: Name or ID of the instance
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `instance` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+components:
+  schemas:
+    Ipv4Assignment:
+      description: How a VPC-private IP address is assigned to a network interface.
+      oneOf:
+      - description: Automatically assign an IP address from the VPC Subnet.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - auto
+        required:
+        - type
+      - description: Explicitly assign a specific address, if available.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - explicit
+          value:
+            type: string
+            format: ipv4
+        required:
+        - type
+        - value
+    DiskPath:
+      type: object
+      properties:
+        disk:
+          description: Name or ID of the disk
+          allOf:
+          - $ref: '#/components/schemas/NameOrId'
+      required:
+      - disk
+    InstanceNetworkInterfaceResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/InstanceNetworkInterface'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    ExternalIpCreate:
+      description: Parameters for creating an external IP address for instances.
+      oneOf:
+      - description: An IP address providing both inbound and outbound access. The address is automatically assigned from a pool.
+        type: object
+        properties:
+          pool_selector:
+            description: Pool to allocate from.
+            default:
+              ip_version: null
+              type: auto
+            allOf:
+            - $ref: '#/components/schemas/PoolSelector'
+          type:
+            type: string
+            enum:
+            - ephemeral
+        required:
+        - type
+      - description: 'An IP address providing both inbound and outbound access. The address is an existing floating IP object assigned to the current project.
+
+
+          The floating IP must not be in use by another instance or service.'
+        type: object
+        properties:
+          floating_ip:
+            $ref: '#/components/schemas/NameOrId'
+          type:
+            type: string
+            enum:
+            - floating
+        required:
+        - floating_ip
+        - type
+    AntiAffinityGroup:
+      description: View of an Anti-Affinity Group
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        failure_domain:
+          $ref: '#/components/schemas/FailureDomain'
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        policy:
+          $ref: '#/components/schemas/AffinityPolicy'
+        project_id:
+          type: string
+          format: uuid
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - failure_domain
+      - id
+      - name
+      - policy
+      - project_id
+      - time_created
+      - time_modified
+    FailureDomain:
+      description: Describes the scope of affinity for the purposes of co-location.
+      oneOf:
+      - description: Instances are considered co-located if they are on the same sled
+        type: string
+        enum:
+        - sled
+    DiskResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/Disk'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    PoolSelector:
+      description: Specify which IP or external subnet pool to allocate from.
+      oneOf:
+      - description: Use the specified pool by name or ID.
+        type: object
+        properties:
+          pool:
+            description: The pool to allocate from.
+            allOf:
+            - $ref: '#/components/schemas/NameOrId'
+          type:
+            type: string
+            enum:
+            - explicit
+        required:
+        - pool
+        - type
+      - description: Use the default pool for the silo.
+        type: object
+        properties:
+          ip_version:
+            description: IP version to use when multiple default pools exist. Required if both IPv4 and IPv6 default pools are configured.
+            default: null
+            allOf:
+            - $ref: '#/components/schemas/IpVersion'
+          type:
+            type: string
+            enum:
+            - auto
+        required:
+        - type
+    PrivateIpStackCreate:
+      description: Create parameters for a network interface's IP stack.
+      oneOf:
+      - description: The interface has only an IPv4 stack.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - v4
+          value:
+            $ref: '#/components/schemas/PrivateIpv4StackCreate'
+        required:
+        - type
+        - value
+      - description: The interface has only an IPv6 stack.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - v6
+          value:
+            $ref: '#/components/schemas/PrivateIpv6StackCreate'
+        required:
+        - type
+        - value
+      - description: The interface has both an IPv4 and IPv6 stack.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - dual_stack
+          value:
+            type: object
+            properties:
+              v4:
+                $ref: '#/components/schemas/PrivateIpv4StackCreate'
+              v6:
+                $ref: '#/components/schemas/PrivateIpv6StackCreate'
+            required:
+            - v4
+            - v6
+        required:
+        - type
+        - value
+    DiskType:
+      type: string
+      enum:
+      - distributed
+      - local
+    NameOrIdSortMode:
+      description: Supported set of sort modes for scanning by name or id
+      oneOf:
+      - description: Sort in increasing order of "name"
+        type: string
+        enum:
+        - name_ascending
+      - description: Sort in decreasing order of "name"
+        type: string
+        enum:
+        - name_descending
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    DiskState:
+      description: State of a Disk
+      oneOf:
+      - description: Disk is being initialized
+        type: object
+        properties:
+          state:
+            type: string
+            enum:
+            - creating
+        required:
+        - state
+      - description: Disk is ready but detached from any Instance
+        type: object
+        properties:
+          state:
+            type: string
+            enum:
+            - detached
+        required:
+        - state
+      - description: Disk is ready to receive blocks from an external source
+        type: object
+        properties:
+          state:
+            type: string
+            enum:
+            - import_ready
+        required:
+        - state
+      - description: Disk is importing blocks from a URL
+        type: object
+        properties:
+          state:
+            type: string
+            enum:
+            - importing_from_url
+        required:
+        - state
+      - description: Disk is importing blocks from bulk writes
+        type: object
+        properties:
+          state:
+            type: string
+            enum:
+            - importing_from_bulk_writes
+        required:
+        - state
+      - description: Disk is being finalized to state Detached
+        type: object
+        properties:
+          state:
+            type: string
+            enum:
+            - finalizing
+        required:
+        - state
+      - description: Disk is undergoing maintenance
+        type: object
+        properties:
+          state:
+            type: string
+            enum:
+            - maintenance
+        required:
+        - state
+      - description: Disk is being attached to the given Instance
+        type: object
+        properties:
+          instance:
+            type: string
+            format: uuid
+          state:
+            type: string
+            enum:
+            - attaching
+        required:
+        - instance
+        - state
+      - description: Disk is attached to the given Instance
+        type: object
+        properties:
+          instance:
+            type: string
+            format: uuid
+          state:
+            type: string
+            enum:
+            - attached
+        required:
+        - instance
+        - state
+      - description: Disk is being detached from the given Instance
+        type: object
+        properties:
+          instance:
+            type: string
+            format: uuid
+          state:
+            type: string
+            enum:
+            - detaching
+        required:
+        - instance
+        - state
+      - description: Disk has been destroyed
+        type: object
+        properties:
+          state:
+            type: string
+            enum:
+            - destroyed
+        required:
+        - state
+      - description: Disk is unavailable
+        type: object
+        properties:
+          state:
+            type: string
+            enum:
+            - faulted
+        required:
+        - state
+    MulticastGroupIdentifier:
+      title: A multicast group identifier
+      description: Can be a UUID, a name, or an IP address
+      type: string
+    SshKey:
+      description: View of an SSH Key
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        public_key:
+          description: SSH public key, e.g., `"ssh-ed25519 AAAAC3NzaC..."`
+          type: string
+        silo_user_id:
+          description: The user to whom this key belongs
+          type: string
+          format: uuid
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - id
+      - name
+      - public_key
+      - silo_user_id
+      - time_created
+      - time_modified
+    InstanceAutoRestartPolicy:
+      description: A policy determining when an instance should be automatically restarted by the control plane.
+      oneOf:
+      - description: The instance should not be automatically restarted by the control plane if it fails.
+        type: string
+        enum:
+        - never
+      - description: If this instance is running and unexpectedly fails (e.g. due to a host software crash or unexpected host reboot), the control plane will make a best-effort attempt to restart it. The control plane may choose not to restart the instance to preserve the overall availability of the system.
+        type: string
+        enum:
+        - best_effort
+    InstanceNetworkInterfaceCreate:
+      description: Create-time parameters for an `InstanceNetworkInterface`
+      type: object
+      properties:
+        description:
+          type: string
+        ip_config:
+          description: 'The IP stack configuration for this interface.
+
+
+            If not provided, a default configuration will be used, which creates a dual-stack IPv4 / IPv6 interface.'
+          default:
+            type: dual_stack
+            value:
+              v4:
+                ip:
+                  type: auto
+                transit_ips: []
+              v6:
+                ip:
+                  type: auto
+                transit_ips: []
+          allOf:
+          - $ref: '#/components/schemas/PrivateIpStackCreate'
+        name:
+          $ref: '#/components/schemas/Name'
+        subnet_name:
+          description: The VPC Subnet in which to create the interface.
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        vpc_name:
+          description: The VPC in which to create the interface.
+          allOf:
+          - $ref: '#/components/schemas/Name'
+      required:
+      - description
+      - name
+      - subnet_name
+      - vpc_name
+    MacAddr:
+      example: ff:ff:ff:ff:ff:ff
+      title: A MAC address
+      description: A Media Access Control address, in EUI-48 format
+      type: string
+      pattern: ^([0-9a-fA-F]{0,2}:){5}[0-9a-fA-F]{0,2}$
+      minLength: 5
+      maxLength: 17
+    ByteCount:
+      description: Byte count to express memory or storage capacity.
+      type: integer
+      format: uint64
+      minimum: 0
+    PrivateIpv6StackCreate:
+      description: Configuration for a network interface's IPv6 addressing.
+      type: object
+      properties:
+        ip:
+          description: The VPC-private address to assign to the interface.
+          allOf:
+          - $ref: '#/components/schemas/Ipv6Assignment'
+        transit_ips:
+          description: Additional IP networks the interface can send / receive on.
+          default: []
+          type: array
+          items:
+            $ref: '#/components/schemas/Ipv6Net'
+      required:
+      - ip
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    PrivateIpv4StackCreate:
+      description: Configuration for a network interface's IPv4 addressing.
+      type: object
+      properties:
+        ip:
+          description: The VPC-private address to assign to the interface.
+          allOf:
+          - $ref: '#/components/schemas/Ipv4Assignment'
+        transit_ips:
+          description: Additional IP networks the interface can send / receive on.
+          default: []
+          type: array
+          items:
+            $ref: '#/components/schemas/Ipv4Net'
+      required:
+      - ip
+    AffinityPolicy:
+      description: 'Affinity policy used to describe "what to do when a request cannot be satisfied"
+
+
+        Used for both Affinity and Anti-Affinity Groups'
+      oneOf:
+      - description: 'If the affinity request cannot be satisfied, allow it anyway.
+
+
+          This enables a "best-effort" attempt to satisfy the affinity policy.'
+        type: string
+        enum:
+        - allow
+      - description: If the affinity request cannot be satisfied, fail explicitly.
+        type: string
+        enum:
+        - fail
+    EphemeralIpCreate:
+      description: Parameters for creating an ephemeral IP address for an instance.
+      type: object
+      properties:
+        pool_selector:
+          description: Pool to allocate from.
+          default:
+            ip_version: null
+            type: auto
+          allOf:
+          - $ref: '#/components/schemas/PoolSelector'
+    InstanceSerialConsoleData:
+      description: Contents of an Instance's serial console buffer.
+      type: object
+      properties:
+        data:
+          description: The bytes starting from the requested offset up to either the end of the buffer or the request's `max_bytes`. Provided as a u8 array rather than a string, as it may not be UTF-8.
+          type: array
+          items:
+            type: integer
+            format: uint8
+            minimum: 0
+        last_byte_offset:
+          description: The absolute offset since boot (suitable for use as `byte_offset` in a subsequent request) of the last byte returned in `data`.
+          type: integer
+          format: uint64
+          minimum: 0
+      required:
+      - data
+      - last_byte_offset
+    ExternalSubnetResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalSubnet'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    Disk:
+      description: View of a Disk
+      type: object
+      properties:
+        block_size:
+          $ref: '#/components/schemas/BlockSize'
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        device_path:
+          type: string
+        disk_type:
+          $ref: '#/components/schemas/DiskType'
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        image_id:
+          description: ID of image from which disk was created, if any
+          type:
+          - string
+          - 'null'
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        project_id:
+          type: string
+          format: uuid
+        read_only:
+          description: Whether or not this disk is read-only.
+          type: boolean
+        size:
+          $ref: '#/components/schemas/ByteCount'
+        snapshot_id:
+          description: ID of snapshot from which disk was created, if any
+          type:
+          - string
+          - 'null'
+          format: uuid
+        state:
+          $ref: '#/components/schemas/DiskState'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - block_size
+      - description
+      - device_path
+      - disk_type
+      - id
+      - name
+      - project_id
+      - read_only
+      - size
+      - state
+      - time_created
+      - time_modified
+    InstanceState:
+      description: 'Running state of an Instance (primarily: booted or stopped)
+
+
+        This typically reflects whether it''s starting, running, stopping, or stopped, but also includes states related to the Instance''s lifecycle'
+      oneOf:
+      - description: The instance is being created.
+        type: string
+        enum:
+        - creating
+      - description: The instance is currently starting up.
+        type: string
+        enum:
+        - starting
+      - description: The instance is currently running.
+        type: string
+        enum:
+        - running
+      - description: The instance has been requested to stop and a transition to "Stopped" is imminent.
+        type: string
+        enum:
+        - stopping
+      - description: The instance is currently stopped.
+        type: string
+        enum:
+        - stopped
+      - description: The instance is in the process of rebooting - it will remain in the "rebooting" state until the VM is starting once more.
+        type: string
+        enum:
+        - rebooting
+      - description: The instance is in the process of migrating - it will remain in the "migrating" state until the migration process is complete and the destination propolis is ready to continue execution.
+        type: string
+        enum:
+        - migrating
+      - description: The instance is attempting to recover from a failure.
+        type: string
+        enum:
+        - repairing
+      - description: The instance has encountered a failure.
+        type: string
+        enum:
+        - failed
+      - description: The instance has been deleted.
+        type: string
+        enum:
+        - destroyed
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
+    Ipv6Assignment:
+      description: How a VPC-private IP address is assigned to a network interface.
+      oneOf:
+      - description: Automatically assign an IP address from the VPC Subnet.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - auto
+        required:
+        - type
+      - description: Explicitly assign a specific address, if available.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - explicit
+          value:
+            type: string
+            format: ipv6
+        required:
+        - type
+        - value
+    SshKeyResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/SshKey'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    ExternalSubnet:
+      description: An external subnet allocated from a subnet pool
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        instance_id:
+          description: The instance this subnet is attached to, if any
+          type:
+          - string
+          - 'null'
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        project_id:
+          description: The project this subnet belongs to
+          type: string
+          format: uuid
+        subnet:
+          description: The allocated subnet CIDR
+          allOf:
+          - $ref: '#/components/schemas/IpNet'
+        subnet_pool_id:
+          description: The subnet pool this was allocated from
+          type: string
+          format: uuid
+        subnet_pool_member_id:
+          description: The subnet pool member this subnet corresponds to
+          type: string
+          format: uuid
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - id
+      - name
+      - project_id
+      - subnet
+      - subnet_pool_id
+      - subnet_pool_member_id
+      - time_created
+      - time_modified
+    InstanceCpuCount:
+      description: The number of CPUs in an Instance
+      type: integer
+      format: uint16
+      minimum: 0
+    IpVersion:
+      description: The IP address version.
+      type: string
+      enum:
+      - v4
+      - v6
+    MulticastGroupJoinSpec:
+      description: 'Specification for joining a multicast group with optional source filtering.
+
+
+        Used in `InstanceCreate` and `InstanceUpdate` to specify multicast group membership along with per-member source IP configuration.'
+      type: object
+      properties:
+        group:
+          description: The multicast group to join, specified by name, UUID, or IP address.
+          allOf:
+          - $ref: '#/components/schemas/MulticastGroupIdentifier'
+        ip_version:
+          description: IP version for pool selection when creating a group by name. Required if both IPv4 and IPv6 default multicast pools are linked.
+          default: null
+          allOf:
+          - $ref: '#/components/schemas/IpVersion'
+        source_ips:
+          description: Source IPs for source-filtered multicast (SSM). Optional for ASM groups, required for SSM groups (232.0.0.0/8, ff3x::/32).
+          default: null
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+            format: ip
+      required:
+      - group
+    Hostname:
+      title: An RFC-1035-compliant hostname
+      description: A hostname identifies a host on a network, and is usually a dot-delimited sequence of labels, where each label contains only letters, digits, or the hyphen. See RFCs 1035 and 952 for more details.
+      type: string
+      pattern: ^([a-zA-Z0-9]+[a-zA-Z0-9\-]*(?<!-))(\.[a-zA-Z0-9]+[a-zA-Z0-9\-]*(?<!-))*$
+      minLength: 1
+      maxLength: 253
+    Ipv6Net:
+      example: fd12:3456::/64
+      title: An IPv6 subnet
+      description: An IPv6 subnet, including prefix and subnet mask
+      x-rust-type:
+        crate: oxnet
+        path: oxnet::Ipv6Net
+        version: 0.1.0
+      type: string
+      pattern: ^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))\/([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])$
+    PrivateIpStack:
+      description: The VPC-private IP stack for a network interface.
+      oneOf:
+      - description: The interface has only an IPv4 stack.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - v4
+          value:
+            $ref: '#/components/schemas/PrivateIpv4Stack'
+        required:
+        - type
+        - value
+      - description: The interface has only an IPv6 stack.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - v6
+          value:
+            $ref: '#/components/schemas/PrivateIpv6Stack'
+        required:
+        - type
+        - value
+      - description: The interface is dual-stack IPv4 and IPv6.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - dual_stack
+          value:
+            type: object
+            properties:
+              v4:
+                $ref: '#/components/schemas/PrivateIpv4Stack'
+              v6:
+                $ref: '#/components/schemas/PrivateIpv6Stack'
+            required:
+            - v4
+            - v6
+        required:
+        - type
+        - value
+    Ipv4Net:
+      example: 192.168.1.0/24
+      title: An IPv4 subnet
+      description: An IPv4 subnet, including prefix and prefix length
+      x-rust-type:
+        crate: oxnet
+        path: oxnet::Ipv4Net
+        version: 0.1.0
+      type: string
+      pattern: ^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/([0-9]|1[0-9]|2[0-9]|3[0-2])$
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
+    InstanceNetworkInterfaceAttachment:
+      description: Describes an attachment of an `InstanceNetworkInterface` to an `Instance`, at the time the instance is created.
+      oneOf:
+      - description: 'Create one or more `InstanceNetworkInterface`s for the `Instance`.
+
+
+          If more than one interface is provided, then the first will be designated the primary interface for the instance.'
+        type: object
+        properties:
+          params:
+            type: array
+            items:
+              $ref: '#/components/schemas/InstanceNetworkInterfaceCreate'
+          type:
+            type: string
+            enum:
+            - create
+        required:
+        - params
+        - type
+      - description: 'Create a single primary interface with an automatically-assigned IPv4 address.
+
+
+          The IP will be pulled from the Project''s default VPC / VPC Subnet.'
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - default_ipv4
+        required:
+        - type
+      - description: 'Create a single primary interface with an automatically-assigned IPv6 address.
+
+
+          The IP will be pulled from the Project''s default VPC / VPC Subnet.'
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - default_ipv6
+        required:
+        - type
+      - description: 'Create a single primary interface with automatically-assigned IPv4 and IPv6 addresses.
+
+
+          The IPs will be pulled from the Project''s default VPC / VPC Subnet.'
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - default_dual_stack
+        required:
+        - type
+      - description: No network interfaces at all will be created for the instance.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - none
+        required:
+        - type
+    InstanceNetworkInterface:
+      description: An `InstanceNetworkInterface` represents a virtual network interface device attached to an instance.
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        instance_id:
+          description: The Instance to which the interface belongs.
+          type: string
+          format: uuid
+        ip_stack:
+          description: The VPC-private IP stack for this interface.
+          allOf:
+          - $ref: '#/components/schemas/PrivateIpStack'
+        mac:
+          description: The MAC address assigned to this interface.
+          allOf:
+          - $ref: '#/components/schemas/MacAddr'
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        primary:
+          description: True if this interface is the primary for the instance to which it's attached.
+          type: boolean
+        subnet_id:
+          description: The subnet to which the interface belongs.
+          type: string
+          format: uuid
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+        vpc_id:
+          description: The VPC to which the interface belongs.
+          type: string
+          format: uuid
+      required:
+      - description
+      - id
+      - instance_id
+      - ip_stack
+      - mac
+      - name
+      - primary
+      - subnet_id
+      - time_created
+      - time_modified
+      - vpc_id
+    IpNet:
+      x-rust-type:
+        crate: oxnet
+        path: oxnet::IpNet
+        version: 0.1.0
+      oneOf:
+      - title: v4
+        allOf:
+        - $ref: '#/components/schemas/Ipv4Net'
+      - title: v6
+        allOf:
+        - $ref: '#/components/schemas/Ipv6Net'
+    PrivateIpv6Stack:
+      description: The VPC-private IPv6 stack for a network interface
+      type: object
+      properties:
+        ip:
+          description: The VPC-private IPv6 address for the interface.
+          type: string
+          format: ipv6
+        transit_ips:
+          description: A set of additional IPv6 networks that this interface may send and receive traffic on.
+          type: array
+          items:
+            $ref: '#/components/schemas/Ipv6Net'
+      required:
+      - ip
+      - transit_ips
+    BlockSize:
+      title: Block size in bytes
+      description: 'Valid values are: 512, 2048, or 4096.'
+      type: integer
+      enum:
+      - 512
+      - 2048
+      - 4096
+    ExternalIpResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalIp'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    Instance:
+      description: View of an Instance
+      type: object
+      properties:
+        auto_restart_cooldown_expiration:
+          description: 'The time at which the auto-restart cooldown period for this instance completes, permitting it to be automatically restarted again. If the instance enters the `Failed` state, it will not be restarted until after this time.
+
+
+            If this is not present, then either the instance has never been automatically restarted, or the cooldown period has already expired, allowing the instance to be restarted immediately if it fails.'
+          type:
+          - string
+          - 'null'
+          format: date-time
+        auto_restart_enabled:
+          description: '`true` if this instance''s auto-restart policy will permit the control plane to automatically restart it if it enters the `Failed` state.'
+          type: boolean
+        auto_restart_policy:
+          description: 'The auto-restart policy configured for this instance, or `null` if no explicit policy has been configured.
+
+
+            This policy determines whether the instance should be automatically restarted by the control plane on failure. If this is `null`, the control plane will use the default policy when determining whether or not to automatically restart this instance, which may or may not allow it to be restarted. The value of the `auto_restart_enabled` field indicates whether the instance will be auto-restarted, based on its current policy or the default if it has no configured policy.'
+          allOf:
+          - $ref: '#/components/schemas/InstanceAutoRestartPolicy'
+        boot_disk_id:
+          description: The ID of the disk used to boot this instance, if a specific one is assigned
+          type:
+          - string
+          - 'null'
+          format: uuid
+        cpu_platform:
+          description: The CPU platform for this instance. If this is `null`, the instance requires no particular CPU platform.
+          allOf:
+          - $ref: '#/components/schemas/InstanceCpuPlatform'
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        enable_jumbo_frames:
+          description: When true, this instance has opted in to jumbo frames (8500 byte MTU) on its primary network interface. The effective MTU also depends on the fleet-wide jumbo-frames opt-in; if that is disabled, the primary interface uses the default MTU regardless of this value. Changes only take effect on the next instance restart.
+          type: boolean
+        hostname:
+          description: RFC1035-compliant hostname for the instance
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        memory:
+          description: Memory allocated for this instance
+          allOf:
+          - $ref: '#/components/schemas/ByteCount'
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        ncpus:
+          description: Number of CPUs allocated for this instance
+          allOf:
+          - $ref: '#/components/schemas/InstanceCpuCount'
+        project_id:
+          description: ID for the project containing this instance
+          type: string
+          format: uuid
+        run_state:
+          $ref: '#/components/schemas/InstanceState'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_last_auto_restarted:
+          description: 'The timestamp of the most recent time this instance was automatically restarted by the control plane.
+
+
+            If this is not present, then this instance has not been automatically restarted.'
+          type:
+          - string
+          - 'null'
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+        time_run_state_updated:
+          type: string
+          format: date-time
+      required:
+      - auto_restart_enabled
+      - description
+      - enable_jumbo_frames
+      - hostname
+      - id
+      - memory
+      - name
+      - ncpus
+      - project_id
+      - run_state
+      - time_created
+      - time_modified
+      - time_run_state_updated
+    InstanceCpuPlatform:
+      description: 'A required CPU platform for an instance.
+
+
+        When an instance specifies a required CPU platform:
+
+
+        - The system may expose (to the VM) new CPU features that are only present on that platform (or on newer platforms of the same lineage that also support those features). - The instance must run on hosts that have CPUs that support all the features of the supplied platform.
+
+
+        That is, the instance is restricted to hosts that have the CPUs which support all features of the required platform, but in exchange the CPU features exposed by the platform are available for the guest to use. Note that this may prevent an instance from starting (if the hosts that could run it are full but there is capacity on other incompatible hosts).
+
+
+        If an instance does not specify a required CPU platform, then when it starts, the control plane selects a host for the instance and then supplies the guest with the "minimum" CPU platform supported by that host. This maximizes the number of hosts that can run the VM if it later needs to migrate to another host.
+
+
+        In all cases, the CPU features presented by a given CPU platform are a subset of what the corresponding hardware may actually support; features which cannot be used from a virtual environment or do not have full hypervisor support may be masked off.'
+      oneOf:
+      - description: An AMD Milan-like CPU platform.
+        type: string
+        enum:
+        - amd_milan
+      - description: 'An AMD Turin-like CPU platform. Prefer `amd_turin_v2` over this; this CPU platform is retained for instances that specifically requested it before `amd_turin_v2` was added.
+
+
+          This initial version of the Turin CPU platform includes no cache or TLB information in CPUID leaf `8000_0006`. While this was intentional, Oxide later discovered some guest software interprets the zeroed leaves as reporting cache sizes of 0 bytes and behaves incorrectly and unpredictably as a result (see [Propolis#1152](https://github.com/oxidecomputer/propolis/issues/1152)).'
+        type: string
+        enum:
+        - amd_turin
+      - description: 'An AMD Turin-like CPU platform.
+
+
+          This version of the Turin CPU platform includes cache and TLB information in CPUID leaf `8000_0006`, similar to the cache information included in the initial Milan-like CPU platform.'
+        type: string
+        enum:
+        - amd_turin_v2
+    InstanceDiskAttachment:
+      description: Describe the instance's disks at creation time
+      oneOf:
+      - description: During instance creation, create and attach disks
+        type: object
+        properties:
+          description:
+            type: string
+          disk_backend:
+            description: The source for this `Disk`'s blocks
+            allOf:
+            - $ref: '#/components/schemas/DiskBackend'
+          name:
+            $ref: '#/components/schemas/Name'
+          size:
+            description: The total size of the Disk (in bytes)
+            allOf:
+            - $ref: '#/components/schemas/ByteCount'
+          type:
+            type: string
+            enum:
+            - create
+        required:
+        - description
+        - disk_backend
+        - name
+        - size
+        - type
+      - description: During instance creation, attach this disk
+        type: object
+        properties:
+          name:
+            description: A disk name to attach
+            allOf:
+            - $ref: '#/components/schemas/Name'
+          type:
+            type: string
+            enum:
+            - attach
+        required:
+        - name
+        - type
+    ExternalIp:
+      oneOf:
+      - description: 'A source NAT IP address.
+
+
+          SNAT addresses are ephemeral addresses used only for outbound connectivity.'
+        type: object
+        properties:
+          first_port:
+            description: The first usable port within the IP address.
+            type: integer
+            format: uint16
+            minimum: 0
+          ip:
+            description: The IP address.
+            type: string
+            format: ip
+          ip_pool_id:
+            description: ID of the IP Pool from which the address is taken.
+            type: string
+            format: uuid
+          kind:
+            type: string
+            enum:
+            - snat
+          last_port:
+            description: The last usable port within the IP address.
+            type: integer
+            format: uint16
+            minimum: 0
+        required:
+        - first_port
+        - ip
+        - ip_pool_id
+        - kind
+        - last_port
+      - type: object
+        properties:
+          ip:
+            type: string
+            format: ip
+          ip_pool_id:
+            type: string
+            format: uuid
+          kind:
+            type: string
+            enum:
+            - ephemeral
+        required:
+        - ip
+        - ip_pool_id
+        - kind
+      - description: A Floating IP is a well-known IP address which can be attached and detached from instances.
+        type: object
+        properties:
+          description:
+            description: Human-readable free-form text about a resource
+            type: string
+          id:
+            description: Unique, immutable, system-controlled identifier for each resource
+            type: string
+            format: uuid
+          instance_id:
+            description: The ID of the instance that this Floating IP is attached to, if it is presently in use.
+            type:
+            - string
+            - 'null'
+            format: uuid
+          ip:
+            description: The IP address held by this resource.
+            type: string
+            format: ip
+          ip_pool_id:
+            description: The ID of the IP pool this resource belongs to.
+            type: string
+            format: uuid
+          kind:
+            type: string
+            enum:
+            - floating
+          name:
+            description: Unique, mutable, user-controlled identifier for each resource
+            allOf:
+            - $ref: '#/components/schemas/Name'
+          project_id:
+            description: The project this resource exists within.
+            type: string
+            format: uuid
+          time_created:
+            description: Timestamp when this resource was created
+            type: string
+            format: date-time
+          time_modified:
+            description: Timestamp when this resource was last modified
+            type: string
+            format: date-time
+        required:
+        - description
+        - id
+        - ip
+        - ip_pool_id
+        - kind
+        - name
+        - project_id
+        - time_created
+        - time_modified
+    InstanceNetworkInterfaceUpdate:
+      description: 'Parameters for updating an `InstanceNetworkInterface`
+
+
+        Note that modifying IP addresses for an interface is not yet supported, a new interface must be created instead.'
+      type: object
+      properties:
+        description:
+          type:
+          - string
+          - 'null'
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        primary:
+          description: 'Make a secondary interface the instance''s primary interface.
+
+
+            If applied to a secondary interface, that interface will become the primary on the next reboot of the instance. Note that this may have implications for routing between instances, as the new primary interface will be on a distinct subnet from the previous primary interface.
+
+
+            Note that this can only be used to select a new primary interface for an instance. Requests to change the primary interface into a secondary will return an error.'
+          default: false
+          type: boolean
+        transit_ips:
+          description: A set of additional networks that this interface may send and receive traffic on
+          default: []
+          type: array
+          items:
+            $ref: '#/components/schemas/IpNet'
+    AntiAffinityGroupResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/AntiAffinityGroup'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    InstanceResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/Instance'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    DiskSource:
+      description: Different sources for a Distributed Disk
+      oneOf:
+      - description: Create a blank disk
+        type: object
+        properties:
+          block_size:
+            description: 'Size of blocks for this disk. Valid values are: 512, 2048, or 4096.'
+            allOf:
+            - $ref: '#/components/schemas/BlockSize'
+          type:
+            type: string
+            enum:
+            - blank
+        required:
+        - block_size
+        - type
+      - description: Create a disk from a disk snapshot
+        type: object
+        properties:
+          read_only:
+            description: If `true`, the disk created from this snapshot will be read-only.
+            default: false
+            type: boolean
+          snapshot_id:
+            type: string
+            format: uuid
+          type:
+            type: string
+            enum:
+            - snapshot
+        required:
+        - snapshot_id
+        - type
+      - description: Create a disk from an image
+        type: object
+        properties:
+          image_id:
+            type: string
+            format: uuid
+          read_only:
+            description: If `true`, the disk created from this image will be read-only.
+            default: false
+            type: boolean
+          type:
+            type: string
+            enum:
+            - image
+        required:
+        - image_id
+        - type
+      - description: Create a blank disk that will accept bulk writes or pull blocks from an external source.
+        type: object
+        properties:
+          block_size:
+            $ref: '#/components/schemas/BlockSize'
+          type:
+            type: string
+            enum:
+            - importing_blocks
+        required:
+        - block_size
+        - type
+    DiskBackend:
+      description: The source of a `Disk`'s blocks
+      oneOf:
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - local
+        required:
+        - type
+      - type: object
+        properties:
+          disk_source:
+            description: The initial source for this disk
+            allOf:
+            - $ref: '#/components/schemas/DiskSource'
+          type:
+            type: string
+            enum:
+            - distributed
+        required:
+        - disk_source
+        - type
+    InstanceCreate:
+      description: Create-time parameters for an `Instance`
+      type: object
+      properties:
+        anti_affinity_groups:
+          description: Anti-affinity groups to which this instance should be added.
+          default: []
+          type: array
+          items:
+            $ref: '#/components/schemas/NameOrId'
+        auto_restart_policy:
+          description: 'The auto-restart policy for this instance.
+
+
+            This policy determines whether the instance should be automatically restarted by the control plane on failure. If this is `null`, no auto-restart policy will be explicitly configured for this instance, and the control plane will select the default policy when determining whether the instance can be automatically restarted.
+
+
+            Currently, the global default auto-restart policy is "best-effort", so instances with `null` auto-restart policies will be automatically restarted. However, in the future, the default policy may be configurable through other mechanisms, such as on a per-project basis. In that case, any configured default policy will be used if this is `null`.'
+          default: null
+          allOf:
+          - $ref: '#/components/schemas/InstanceAutoRestartPolicy'
+        boot_disk:
+          description: 'The disk the instance is configured to boot from.
+
+
+            This disk can either be attached if it already exists or created along with the instance.
+
+
+            Specifying a boot disk is optional but recommended to ensure predictable boot behavior. The boot disk can be set during instance creation or later if the instance is stopped. The boot disk counts against the disk attachment limit.
+
+
+            An instance that does not have a boot disk set will use the boot options specified in its UEFI settings, which are controlled by both the instance''s UEFI firmware and the guest operating system. Boot options can change as disks are attached and detached, which may result in an instance that only boots to the EFI shell until a boot disk is set.'
+          default: null
+          allOf:
+          - $ref: '#/components/schemas/InstanceDiskAttachment'
+        cpu_platform:
+          description: The CPU platform to be used for this instance. If this is `null`, the instance requires no particular CPU platform; when it is started the instance will have the most general CPU platform supported by the sled it is initially placed on.
+          default: null
+          allOf:
+          - $ref: '#/components/schemas/InstanceCpuPlatform'
+        description:
+          type: string
+        disks:
+          description: 'A list of disks to be attached to the instance.
+
+
+            Disk attachments of type "create" will be created, while those of type "attach" must already exist.
+
+
+            The order of this list does not guarantee a boot order for the instance. Use the boot_disk attribute to specify a boot disk. When boot_disk is specified it will count against the disk attachment limit.'
+          default: []
+          type: array
+          items:
+            $ref: '#/components/schemas/InstanceDiskAttachment'
+        enable_jumbo_frames:
+          description: Enable jumbo frames (8500 byte MTU) on the instance's primary OPTE interface. Requires the fleet-wide jumbo-frames opt-in to be enabled by an operator; otherwise this field must be `false`. Changes only take effect on the next instance restart.
+          default: false
+          type: boolean
+        external_ips:
+          description: 'The external IP addresses provided to this instance.
+
+
+            By default, all instances have outbound connectivity, but no inbound connectivity. These external addresses can be used to provide a fixed, known IP address for making inbound connections to the instance.'
+          default: []
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalIpCreate'
+        hostname:
+          description: The hostname to be assigned to the instance
+          allOf:
+          - $ref: '#/components/schemas/Hostname'
+        memory:
+          description: The amount of RAM (in bytes) to be allocated to the instance
+          allOf:
+          - $ref: '#/components/schemas/ByteCount'
+        multicast_groups:
+          description: 'Multicast groups this instance should join at creation.
+
+
+            Groups can be specified by name, UUID, or IP address. Non-existent groups are created automatically.'
+          default: []
+          type: array
+          items:
+            $ref: '#/components/schemas/MulticastGroupJoinSpec'
+        name:
+          $ref: '#/components/schemas/Name'
+        ncpus:
+          description: The number of vCPUs to be allocated to the instance
+          allOf:
+          - $ref: '#/components/schemas/InstanceCpuCount'
+        network_interfaces:
+          description: The network interfaces to be created for this instance.
+          default:
+            type: default_dual_stack
+          allOf:
+          - $ref: '#/components/schemas/InstanceNetworkInterfaceAttachment'
+        ssh_public_keys:
+          description: 'An allowlist of SSH public keys to be transferred to the instance via cloud-init during instance creation.
+
+
+            If not provided, all SSH public keys from the user''s profile will be sent. If an empty list is provided, no public keys will be transmitted to the instance.'
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/NameOrId'
+        start:
+          description: Should this instance be started upon creation; true by default.
+          default: true
+          type: boolean
+        user_data:
+          description: User data for instance initialization systems (such as cloud-init). Must be a Base64-encoded string, as specified in RFC 4648 § 4 (+ and / characters with padding). Maximum 32 KiB unencoded data.
+          default: ''
+          type: string
+          format: byte
+      required:
+      - description
+      - hostname
+      - memory
+      - name
+      - ncpus
+    PrivateIpv4Stack:
+      description: The VPC-private IPv4 stack for a network interface
+      type: object
+      properties:
+        ip:
+          description: The VPC-private IPv4 address for the interface.
+          type: string
+          format: ipv4
+        transit_ips:
+          description: A set of additional IPv4 networks that this interface may send and receive traffic on.
+          type: array
+          items:
+            $ref: '#/components/schemas/Ipv4Net'
+      required:
+      - ip
+      - transit_ips
+    InstanceUpdate:
+      description: Parameters of an `Instance` that can be reconfigured after creation.
+      type: object
+      properties:
+        auto_restart_policy:
+          description: 'The auto-restart policy for this instance.
+
+
+            This policy determines whether the instance should be automatically restarted by the control plane on failure. If this is `null`, any explicitly configured auto-restart policy will be unset, and the control plane will select the default policy when determining whether the instance can be automatically restarted.
+
+
+            Currently, the global default auto-restart policy is "best-effort", so instances with `null` auto-restart policies will be automatically restarted. However, in the future, the default policy may be configurable through other mechanisms, such as on a per-project basis. In that case, any configured default policy will be used if this is `null`.'
+          allOf:
+          - $ref: '#/components/schemas/InstanceAutoRestartPolicy'
+        boot_disk:
+          description: 'The disk the instance is configured to boot from.
+
+
+            Setting a boot disk is optional but recommended to ensure predictable boot behavior. The boot disk can be set during instance creation or later if the instance is stopped. The boot disk counts against the disk attachment limit.
+
+
+            An instance that does not have a boot disk set will use the boot options specified in its UEFI settings, which are controlled by both the instance''s UEFI firmware and the guest operating system. Boot options can change as disks are attached and detached, which may result in an instance that only boots to the EFI shell until a boot disk is set.'
+          allOf:
+          - $ref: '#/components/schemas/NameOrId'
+        cpu_platform:
+          description: The CPU platform to be used for this instance. If this is `null`, the instance requires no particular CPU platform; when it is started the instance will have the most general CPU platform supported by the sled it is initially placed on.
+          allOf:
+          - $ref: '#/components/schemas/InstanceCpuPlatform'
+        enable_jumbo_frames:
+          description: Update the per-instance jumbo-frames opt-in. Setting this to `true` requires the fleet-wide jumbo-frames opt-in to be enabled. Changes only take effect on the next instance restart.
+          type: boolean
+        memory:
+          description: The amount of RAM (in bytes) to be allocated to the instance
+          allOf:
+          - $ref: '#/components/schemas/ByteCount'
+        multicast_groups:
+          description: 'Multicast groups this instance should join.
+
+
+            When specified, this replaces the instance''s current multicast group membership with the new set of groups. The instance will leave any groups not listed here and join any new groups that are specified.
+
+
+            Each entry can specify the group by name, UUID, or IP address, along with optional source IP filtering for SSM (Source-Specific Multicast). When a group doesn''t exist, it will be implicitly created using the default multicast pool (or you can specify `ip_version` to disambiguate if needed).
+
+
+            If not provided, the instance''s multicast group membership will not be changed.'
+          default: null
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/MulticastGroupJoinSpec'
+        ncpus:
+          description: The number of vCPUs to be allocated to the instance
+          allOf:
+          - $ref: '#/components/schemas/InstanceCpuCount'
+      required:
+      - auto_restart_policy
+      - boot_disk
+      - cpu_platform
+      - enable_jumbo_frames
+      - memory
+      - ncpus
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

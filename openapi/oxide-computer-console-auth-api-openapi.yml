@@ -1,0 +1,152 @@
+openapi: 3.2.0
+info:
+  title: Oxide Region Console Auth API
+  description: API for interacting with the Oxide control plane
+  contact:
+    url: https://oxide.computer
+    email: api@oxide.computer
+  version: 2026081901.0.0
+tags:
+- name: console-auth
+  description: API for console authentication
+  externalDocs:
+    url: http://docs.oxide.computer/api/console-auth
+paths:
+  /device/auth:
+    post:
+      tags:
+      - console-auth
+      summary: Start an OAuth 2.0 Device Authorization Grant
+      description: This endpoint is designed to be accessed from an *unauthenticated* API client. It generates and records a `device_code` and `user_code` which must be verified and confirmed prior to a token being granted.
+      operationId: device_auth_request
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeviceAuthRequest'
+        required: true
+      responses:
+        default:
+          description: ''
+          content:
+            '*/*':
+              schema: {}
+  /device/confirm:
+    post:
+      tags:
+      - console-auth
+      summary: Confirm an OAuth 2.0 Device Authorization Grant
+      description: 'This endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/device/token`.
+
+
+        Some special logic applies when authenticating this request with an existing device token instead of a console session: the requested TTL must not produce an expiration time later than the authenticating token''s expiration. If no TTL was specified in the initial grant request, the expiration will be the lesser of the silo max and the authenticating token''s expiration time. To get the longest allowed lifetime, omit the TTL and authenticate with a web console session.'
+      operationId: device_auth_confirm
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceAuthVerify'
+        required: true
+      responses:
+        '204':
+          description: resource updated
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /device/token:
+    post:
+      tags:
+      - console-auth
+      summary: Request a device access token
+      description: This endpoint should be polled by the client until the user code is verified and the grant is confirmed.
+      operationId: device_access_token
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeviceAccessTokenRequest'
+        required: true
+      responses:
+        default:
+          description: ''
+          content:
+            '*/*':
+              schema: {}
+  /v1/logout:
+    post:
+      tags:
+      - console-auth
+      summary: Log user out of web console by deleting session on client and server
+      operationId: logout
+      responses:
+        '204':
+          description: resource updated
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+components:
+  schemas:
+    DeviceAccessTokenRequest:
+      type: object
+      properties:
+        client_id:
+          type: string
+          format: uuid
+        device_code:
+          type: string
+        grant_type:
+          type: string
+      required:
+      - client_id
+      - device_code
+      - grant_type
+    DeviceAuthRequest:
+      type: object
+      properties:
+        client_id:
+          type: string
+          format: uuid
+        ttl_seconds:
+          description: 'Optional lifetime for the access token in seconds.
+
+
+            This value will be validated during the confirmation step. If not specified, it defaults to the silo''s max TTL, which can be seen at `/v1/auth-settings`.  If specified, must not exceed the silo''s max TTL.
+
+
+            Some special logic applies when authenticating the confirmation request with an existing device token: the requested TTL must not produce an expiration time later than the authenticating token''s expiration. If no TTL is specified, the expiration will be the lesser of the silo max and the authenticating token''s expiration time. To get the longest allowed lifetime, omit the TTL and authenticate with a web console session.'
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      required:
+      - client_id
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    DeviceAuthVerify:
+      type: object
+      properties:
+        user_code:
+          type: string
+      required:
+      - user_code
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

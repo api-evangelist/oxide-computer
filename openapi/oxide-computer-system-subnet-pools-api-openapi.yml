@@ -1,0 +1,750 @@
+openapi: 3.2.0
+info:
+  title: Oxide Region System/subnet Pools API
+  description: API for interacting with the Oxide control plane
+  contact:
+    url: https://oxide.computer
+    email: api@oxide.computer
+  version: 2026081901.0.0
+tags:
+- name: system/subnet-pools
+  description: Subnet pools are collections of external subnets. Linking a pool to a silo makes it available for allocation by users in that silo.
+  externalDocs:
+    url: http://docs.oxide.computer/api/system-subnet-pools
+paths:
+  /v1/system/subnet-pools:
+    get:
+      tags:
+      - system/subnet-pools
+      summary: List subnet pools
+      operationId: system_subnet_pool_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubnetPoolResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+    post:
+      tags:
+      - system/subnet-pools
+      summary: Create subnet pool
+      operationId: system_subnet_pool_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubnetPoolCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubnetPool'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/subnet-pools/{pool}:
+    get:
+      tags:
+      - system/subnet-pools
+      summary: Fetch subnet pool
+      operationId: system_subnet_pool_view
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the subnet pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubnetPool'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+      - system/subnet-pools
+      summary: Update subnet pool
+      operationId: system_subnet_pool_update
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the subnet pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubnetPoolUpdate'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubnetPool'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - system/subnet-pools
+      summary: Delete subnet pool
+      operationId: system_subnet_pool_delete
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the subnet pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/subnet-pools/{pool}/members:
+    get:
+      tags:
+      - system/subnet-pools
+      summary: List members in subnet pool
+      operationId: system_subnet_pool_member_list
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the subnet pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubnetPoolMemberResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+  /v1/system/subnet-pools/{pool}/members/add:
+    post:
+      tags:
+      - system/subnet-pools
+      summary: Add member to subnet pool
+      operationId: system_subnet_pool_member_add
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the subnet pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubnetPoolMemberAdd'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubnetPoolMember'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/subnet-pools/{pool}/members/remove:
+    post:
+      tags:
+      - system/subnet-pools
+      summary: Remove member from subnet pool
+      operationId: system_subnet_pool_member_remove
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the subnet pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubnetPoolMemberRemove'
+        required: true
+      responses:
+        '204':
+          description: resource updated
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/subnet-pools/{pool}/silos:
+    get:
+      tags:
+      - system/subnet-pools
+      summary: List silos linked to subnet pool
+      operationId: system_subnet_pool_silo_list
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the subnet pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/IdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubnetPoolSiloLinkResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+    post:
+      tags:
+      - system/subnet-pools
+      summary: Link subnet pool to silo
+      operationId: system_subnet_pool_silo_link
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the subnet pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubnetPoolLinkSilo'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubnetPoolSiloLink'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/subnet-pools/{pool}/silos/{silo}:
+    put:
+      tags:
+      - system/subnet-pools
+      summary: Update subnet pool's link to silo
+      operationId: system_subnet_pool_silo_update
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the subnet pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: silo
+        description: Name or ID of the silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubnetPoolSiloUpdate'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubnetPoolSiloLink'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - system/subnet-pools
+      summary: Unlink subnet pool from silo
+      operationId: system_subnet_pool_silo_unlink
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the subnet pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: silo
+        description: Name or ID of the silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: resource updated
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/subnet-pools/{pool}/utilization:
+    get:
+      tags:
+      - system/subnet-pools
+      summary: Fetch subnet pool utilization
+      operationId: system_subnet_pool_utilization_view
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the subnet pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubnetPoolUtilization'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+components:
+  schemas:
+    SubnetPoolResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/SubnetPool'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    SubnetPoolMemberRemove:
+      description: Remove a subnet from a pool
+      type: object
+      properties:
+        subnet:
+          description: The subnet to remove from the pool. Must match an existing entry exactly.
+          allOf:
+          - $ref: '#/components/schemas/IpNet'
+      required:
+      - subnet
+    SubnetPoolCreate:
+      description: Create a subnet pool
+      type: object
+      properties:
+        description:
+          type: string
+        ip_version:
+          description: The IP version for this pool (IPv4 or IPv6). All subnets in the pool must match this version.
+          allOf:
+          - $ref: '#/components/schemas/IpVersion'
+        name:
+          $ref: '#/components/schemas/Name'
+      required:
+      - description
+      - ip_version
+      - name
+    NameOrIdSortMode:
+      description: Supported set of sort modes for scanning by name or id
+      oneOf:
+      - description: Sort in increasing order of "name"
+        type: string
+        enum:
+        - name_ascending
+      - description: Sort in decreasing order of "name"
+        type: string
+        enum:
+        - name_descending
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    SubnetPoolUtilization:
+      description: 'Utilization of addresses in a subnet pool.
+
+
+        Note that both the count of remaining addresses and the total capacity are integers, reported as floating point numbers. This accommodates allocations larger than a 64-bit integer, which is common with IPv6 address spaces. With very large subnet pools (> 2**53 addresses), integer precision will be lost, in exchange for representing the entire range. In such a case the pool still has many available addresses.'
+      type: object
+      properties:
+        capacity:
+          description: The total number of addresses in the pool.
+          type: number
+          format: double
+        remaining:
+          description: The number of remaining addresses in the pool.
+          type: number
+          format: double
+      required:
+      - capacity
+      - remaining
+    IdSortMode:
+      description: 'Supported set of sort modes for scanning by id only.
+
+
+        Currently, we only support scanning in ascending order.'
+      oneOf:
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    SubnetPoolSiloUpdate:
+      description: Update a subnet pool's silo link
+      type: object
+      properties:
+        is_default:
+          description: Whether this is the default subnet pool for the silo
+          type: boolean
+      required:
+      - is_default
+    SubnetPoolSiloLink:
+      description: A link between a subnet pool and a silo
+      type: object
+      properties:
+        is_default:
+          type: boolean
+        silo_id:
+          type: string
+          format: uuid
+        subnet_pool_id:
+          type: string
+          format: uuid
+      required:
+      - is_default
+      - silo_id
+      - subnet_pool_id
+    SubnetPoolMemberResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/SubnetPoolMember'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    SubnetPool:
+      description: A pool of subnets for external subnet allocation
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        ip_version:
+          description: The IP version for this pool
+          allOf:
+          - $ref: '#/components/schemas/IpVersion'
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - id
+      - ip_version
+      - name
+      - time_created
+      - time_modified
+    SubnetPoolLinkSilo:
+      description: Link a subnet pool to a silo
+      type: object
+      properties:
+        is_default:
+          description: Whether this is the default subnet pool for the silo. When true, external subnet allocations that don't specify a pool use this one.
+          type: boolean
+        silo:
+          description: The silo to link
+          allOf:
+          - $ref: '#/components/schemas/NameOrId'
+      required:
+      - is_default
+      - silo
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
+    IpVersion:
+      description: The IP address version.
+      type: string
+      enum:
+      - v4
+      - v6
+    Ipv6Net:
+      example: fd12:3456::/64
+      title: An IPv6 subnet
+      description: An IPv6 subnet, including prefix and subnet mask
+      x-rust-type:
+        crate: oxnet
+        path: oxnet::Ipv6Net
+        version: 0.1.0
+      type: string
+      pattern: ^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))\/([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])$
+    Ipv4Net:
+      example: 192.168.1.0/24
+      title: An IPv4 subnet
+      description: An IPv4 subnet, including prefix and prefix length
+      x-rust-type:
+        crate: oxnet
+        path: oxnet::Ipv4Net
+        version: 0.1.0
+      type: string
+      pattern: ^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/([0-9]|1[0-9]|2[0-9]|3[0-2])$
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
+    IpNet:
+      x-rust-type:
+        crate: oxnet
+        path: oxnet::IpNet
+        version: 0.1.0
+      oneOf:
+      - title: v4
+        allOf:
+        - $ref: '#/components/schemas/Ipv4Net'
+      - title: v6
+        allOf:
+        - $ref: '#/components/schemas/Ipv6Net'
+    SubnetPoolSiloLinkResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/SubnetPoolSiloLink'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    SubnetPoolMemberAdd:
+      description: Add a member (subnet) to a subnet pool
+      type: object
+      properties:
+        max_prefix_length:
+          description: 'Maximum prefix length for allocations from this subnet; a larger prefix means smaller allocations are allowed (e.g. a /24 prefix yields smaller subnet allocations than a /16 prefix).
+
+
+            Valid values: 0-32 for IPv4, 0-128 for IPv6. Default if not specified is 32 for IPv4 and 128 for IPv6.'
+          type:
+          - integer
+          - 'null'
+          format: uint8
+          minimum: 0
+        min_prefix_length:
+          description: 'Minimum prefix length for allocations from this subnet; a smaller prefix means larger allocations are allowed (e.g. a /16 prefix yields larger subnet allocations than a /24 prefix).
+
+
+            Valid values: 0-32 for IPv4, 0-128 for IPv6. Default if not specified is equal to the subnet''s prefix length.'
+          type:
+          - integer
+          - 'null'
+          format: uint8
+          minimum: 0
+        subnet:
+          description: The subnet to add to the pool
+          allOf:
+          - $ref: '#/components/schemas/IpNet'
+      required:
+      - subnet
+    SubnetPoolMember:
+      description: A member (subnet) within a subnet pool
+      type: object
+      properties:
+        id:
+          description: ID of the pool member
+          type: string
+          format: uuid
+        max_prefix_length:
+          description: Maximum prefix length for allocations from this subnet; a larger prefix means smaller allocations are allowed (e.g. a /24 prefix yields smaller subnet allocations than a /16 prefix).
+          type: integer
+          format: uint8
+          minimum: 0
+        min_prefix_length:
+          description: Minimum prefix length for allocations from this subnet; a smaller prefix means larger allocations are allowed (e.g. a /16 prefix yields larger subnet allocations than a /24 prefix).
+          type: integer
+          format: uint8
+          minimum: 0
+        subnet:
+          description: The subnet CIDR
+          allOf:
+          - $ref: '#/components/schemas/IpNet'
+        subnet_pool_id:
+          description: ID of the parent subnet pool
+          type: string
+          format: uuid
+        time_created:
+          description: Time the pool member was created.
+          type: string
+          format: date-time
+      required:
+      - id
+      - max_prefix_length
+      - min_prefix_length
+      - subnet
+      - subnet_pool_id
+      - time_created
+    SubnetPoolUpdate:
+      description: Update a subnet pool
+      type: object
+      properties:
+        description:
+          type:
+          - string
+          - 'null'
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

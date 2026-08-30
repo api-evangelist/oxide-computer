@@ -1,0 +1,423 @@
+openapi: 3.2.0
+info:
+  title: Oxide Region System/support Bundles API
+  description: API for interacting with the Oxide control plane
+  contact:
+    url: https://oxide.computer
+    email: api@oxide.computer
+  version: 2026081901.0.0
+tags:
+- name: system/support-bundles
+  description: Support bundles collect debugging information from the rack for use by Oxide support.
+  externalDocs:
+    url: http://docs.oxide.computer/api/system-support-bundles
+paths:
+  /v1/system/support-bundles:
+    get:
+      tags:
+      - system/support-bundles
+      summary: List all support bundles
+      operationId: support_bundle_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/TimeAndIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportBundleInfoResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+    post:
+      tags:
+      - system/support-bundles
+      summary: Create support bundle
+      operationId: support_bundle_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupportBundleCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportBundleInfo'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/support-bundles/{bundle_id}:
+    get:
+      tags:
+      - system/support-bundles
+      summary: View support bundle
+      operationId: support_bundle_view
+      parameters:
+      - in: path
+        name: bundle_id
+        description: ID of the support bundle
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportBundleInfo'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+      - system/support-bundles
+      summary: Update support bundle
+      operationId: support_bundle_update
+      parameters:
+      - in: path
+        name: bundle_id
+        description: ID of the support bundle
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupportBundleUpdate'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportBundleInfo'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - system/support-bundles
+      summary: Delete support bundle
+      description: May also be used to cancel a support bundle which is currently being collected, or to remove metadata for a support bundle that has failed.
+      operationId: support_bundle_delete
+      parameters:
+      - in: path
+        name: bundle_id
+        description: ID of the support bundle
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/support-bundles/{bundle_id}/download:
+    get:
+      tags:
+      - system/support-bundles
+      summary: Download support bundle contents
+      operationId: support_bundle_download
+      parameters:
+      - in: header
+        name: range
+        description: 'A request to access a portion of the resource, such as `bytes=0-499`
+
+
+          See: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Range>'
+        schema:
+          type: string
+      - in: path
+        name: bundle_id
+        description: ID of the support bundle
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        default:
+          description: ''
+          content:
+            '*/*':
+              schema: {}
+    head:
+      tags:
+      - system/support-bundles
+      summary: Download support bundle metadata
+      operationId: support_bundle_head
+      parameters:
+      - in: header
+        name: range
+        description: 'A request to access a portion of the resource, such as `bytes=0-499`
+
+
+          See: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Range>'
+        schema:
+          type: string
+      - in: path
+        name: bundle_id
+        description: ID of the support bundle
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        default:
+          description: ''
+          content:
+            '*/*':
+              schema: {}
+  /v1/system/support-bundles/{bundle_id}/download/{file}:
+    get:
+      tags:
+      - system/support-bundles
+      summary: Download file from support bundle
+      operationId: support_bundle_download_file
+      parameters:
+      - in: header
+        name: range
+        description: 'A request to access a portion of the resource, such as `bytes=0-499`
+
+
+          See: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Range>'
+        schema:
+          type: string
+      - in: path
+        name: bundle_id
+        description: ID of the support bundle
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: path
+        name: file
+        description: The file within the bundle to download
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: ''
+          content:
+            '*/*':
+              schema: {}
+    head:
+      tags:
+      - system/support-bundles
+      summary: Download metadata of file in support bundle
+      operationId: support_bundle_head_file
+      parameters:
+      - in: header
+        name: range
+        description: 'A request to access a portion of the resource, such as `bytes=0-499`
+
+
+          See: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Range>'
+        schema:
+          type: string
+      - in: path
+        name: bundle_id
+        description: ID of the support bundle
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: path
+        name: file
+        description: The file within the bundle to download
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: ''
+          content:
+            '*/*':
+              schema: {}
+  /v1/system/support-bundles/{bundle_id}/index:
+    get:
+      tags:
+      - system/support-bundles
+      summary: Download support bundle index
+      operationId: support_bundle_index
+      parameters:
+      - in: header
+        name: range
+        description: 'A request to access a portion of the resource, such as `bytes=0-499`
+
+
+          See: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Range>'
+        schema:
+          type: string
+      - in: path
+        name: bundle_id
+        description: ID of the support bundle
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        default:
+          description: ''
+          content:
+            '*/*':
+              schema: {}
+components:
+  schemas:
+    SupportBundleState:
+      oneOf:
+      - description: 'Support Bundle still actively being collected.
+
+
+          This is the initial state for a Support Bundle, and it will automatically transition to either "Failing" or "Active".
+
+
+          If a user no longer wants to access a Support Bundle, they can request cancellation, which will transition to the "Destroying" state.'
+        type: string
+        enum:
+        - collecting
+      - description: 'Support Bundle is being destroyed.
+
+
+          Once backing storage has been freed, this bundle is destroyed.'
+        type: string
+        enum:
+        - destroying
+      - description: 'Support Bundle was not created successfully, or was created and has lost backing storage.
+
+
+          The record of the bundle still exists for readability, but the only valid operation on these bundles is to destroy them.'
+        type: string
+        enum:
+        - failed
+      - description: Support Bundle has been processed, and is ready for usage.
+        type: string
+        enum:
+        - active
+    TimeAndIdSortMode:
+      description: Supported set of sort modes for scanning by timestamp and ID
+      oneOf:
+      - description: Sort in increasing order of timestamp and ID, i.e., earliest first
+        type: string
+        enum:
+        - time_and_id_ascending
+      - description: Sort in increasing order of timestamp and ID, i.e., most recent first
+        type: string
+        enum:
+        - time_and_id_descending
+    SupportBundleInfoResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/SupportBundleInfo'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    SupportBundleUpdate:
+      type: object
+      properties:
+        user_comment:
+          description: User comment for the support bundle
+          type:
+          - string
+          - 'null'
+    SupportBundleInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        reason_for_creation:
+          type: string
+        reason_for_failure:
+          type:
+          - string
+          - 'null'
+        state:
+          $ref: '#/components/schemas/SupportBundleState'
+        time_created:
+          type: string
+          format: date-time
+        user_comment:
+          type:
+          - string
+          - 'null'
+      required:
+      - id
+      - reason_for_creation
+      - state
+      - time_created
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    SupportBundleCreate:
+      type: object
+      properties:
+        user_comment:
+          description: User comment for the support bundle
+          type:
+          - string
+          - 'null'
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

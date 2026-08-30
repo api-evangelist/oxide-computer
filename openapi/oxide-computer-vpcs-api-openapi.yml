@@ -1,0 +1,2697 @@
+openapi: 3.2.0
+info:
+  title: Oxide Region Vpcs API
+  description: API for interacting with the Oxide control plane
+  contact:
+    url: https://oxide.computer
+    email: api@oxide.computer
+  version: 2026081901.0.0
+tags:
+- name: vpcs
+  description: Virtual Private Clouds (VPCs) provide isolated network environments for managing and deploying services.
+  externalDocs:
+    url: http://docs.oxide.computer/api/vpcs
+paths:
+  /v1/internet-gateway-ip-addresses:
+    get:
+      tags:
+      - vpcs
+      summary: List IP addresses attached to internet gateway
+      operationId: internet_gateway_ip_address_list
+      parameters:
+      - in: query
+        name: gateway
+        description: Name or ID of the internet gateway
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC, only required if `gateway` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternetGatewayIpAddressResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required:
+        - gateway
+    post:
+      tags:
+      - vpcs
+      summary: Attach IP address to internet gateway
+      operationId: internet_gateway_ip_address_create
+      parameters:
+      - in: query
+        name: gateway
+        description: Name or ID of the internet gateway
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC, only required if `gateway` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InternetGatewayIpAddressCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternetGatewayIpAddress'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/internet-gateway-ip-addresses/{address}:
+    delete:
+      tags:
+      - vpcs
+      summary: Detach IP address from internet gateway
+      operationId: internet_gateway_ip_address_delete
+      parameters:
+      - in: path
+        name: address
+        description: Name or ID of the IP address
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: cascade
+        description: Detach attached IP pools/addresses and delete any routes targeting this gateway. Without `cascade`, delete fails if the gateway has any IP pools or IP addresses attached.
+        schema:
+          type: boolean
+      - in: query
+        name: gateway
+        description: Name or ID of the internet gateway
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC, only required if `gateway` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/internet-gateway-ip-pools:
+    get:
+      tags:
+      - vpcs
+      summary: List IP pools attached to internet gateway
+      operationId: internet_gateway_ip_pool_list
+      parameters:
+      - in: query
+        name: gateway
+        description: Name or ID of the internet gateway
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC, only required if `gateway` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternetGatewayIpPoolResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required:
+        - gateway
+    post:
+      tags:
+      - vpcs
+      summary: Attach IP pool to internet gateway
+      operationId: internet_gateway_ip_pool_create
+      parameters:
+      - in: query
+        name: gateway
+        description: Name or ID of the internet gateway
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC, only required if `gateway` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InternetGatewayIpPoolCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternetGatewayIpPool'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/internet-gateway-ip-pools/{pool}:
+    delete:
+      tags:
+      - vpcs
+      summary: Detach IP pool from internet gateway
+      operationId: internet_gateway_ip_pool_delete
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the IP pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: cascade
+        description: Detach attached IP pools/addresses and delete any routes targeting this gateway. Without `cascade`, delete fails if the gateway has any IP pools or IP addresses attached.
+        schema:
+          type: boolean
+      - in: query
+        name: gateway
+        description: Name or ID of the internet gateway
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC, only required if `gateway` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/internet-gateways:
+    get:
+      tags:
+      - vpcs
+      summary: List internet gateways
+      operationId: internet_gateway_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternetGatewayResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required:
+        - vpc
+    post:
+      tags:
+      - vpcs
+      summary: Create VPC internet gateway
+      operationId: internet_gateway_create
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InternetGatewayCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternetGateway'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/internet-gateways/{gateway}:
+    get:
+      tags:
+      - vpcs
+      summary: Fetch internet gateway
+      operationId: internet_gateway_view
+      parameters:
+      - in: path
+        name: gateway
+        description: Name or ID of the gateway
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternetGateway'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - vpcs
+      summary: Delete internet gateway
+      operationId: internet_gateway_delete
+      parameters:
+      - in: path
+        name: gateway
+        description: Name or ID of the gateway
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: cascade
+        description: Detach attached IP pools/addresses and delete any routes targeting this gateway. Without `cascade`, delete fails if the gateway has any IP pools or IP addresses attached.
+        schema:
+          type: boolean
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/vpc-firewall-rules:
+    get:
+      tags:
+      - vpcs
+      summary: List firewall rules
+      operationId: vpc_firewall_rules_view
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VpcFirewallRules'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+      - vpcs
+      summary: Replace firewall rules
+      description: 'The maximum number of rules per VPC is 1024.
+
+
+        Targets are used to specify the set of instances to which a firewall rule applies. You can target instances directly by name, or specify a VPC, VPC subnet, IP, or IP subnet, which will apply the rule to traffic going to all matching instances. Targets are additive: the rule applies to instances matching ANY target. The maximum number of targets is 256.
+
+
+        Filters reduce the scope of a firewall rule. Without filters, the rule applies to all packets to the targets (or from the targets, if it''s an outbound rule). With multiple filters, the rule applies only to packets matching ALL filters. The maximum number of each type of filter is 256.'
+      operationId: vpc_firewall_rules_update
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VpcFirewallRuleUpdateParams'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VpcFirewallRules'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/vpc-router-routes:
+    get:
+      tags:
+      - vpcs
+      summary: List routes
+      description: List the routes associated with a router in a particular VPC.
+      operationId: vpc_router_route_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: router
+        description: Name or ID of the router
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC, only required if `router` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouterRouteResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required:
+        - router
+    post:
+      tags:
+      - vpcs
+      summary: Create route
+      operationId: vpc_router_route_create
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: router
+        description: Name or ID of the router
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC, only required if `router` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RouterRouteCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouterRoute'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/vpc-router-routes/{route}:
+    get:
+      tags:
+      - vpcs
+      summary: Fetch route
+      operationId: vpc_router_route_view
+      parameters:
+      - in: path
+        name: route
+        description: Name or ID of the route
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: router
+        description: Name or ID of the router
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC, only required if `router` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouterRoute'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+      - vpcs
+      summary: Update route
+      operationId: vpc_router_route_update
+      parameters:
+      - in: path
+        name: route
+        description: Name or ID of the route
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: router
+        description: Name or ID of the router
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC, only required if `router` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RouterRouteUpdate'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouterRoute'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - vpcs
+      summary: Delete route
+      operationId: vpc_router_route_delete
+      parameters:
+      - in: path
+        name: route
+        description: Name or ID of the route
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: router
+        description: Name or ID of the router
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC, only required if `router` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/vpc-routers:
+    get:
+      tags:
+      - vpcs
+      summary: List routers
+      operationId: vpc_router_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VpcRouterResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required:
+        - vpc
+    post:
+      tags:
+      - vpcs
+      summary: Create VPC router
+      operationId: vpc_router_create
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VpcRouterCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VpcRouter'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/vpc-routers/{router}:
+    get:
+      tags:
+      - vpcs
+      summary: Fetch router
+      operationId: vpc_router_view
+      parameters:
+      - in: path
+        name: router
+        description: Name or ID of the router
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VpcRouter'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+      - vpcs
+      summary: Update router
+      operationId: vpc_router_update
+      parameters:
+      - in: path
+        name: router
+        description: Name or ID of the router
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VpcRouterUpdate'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VpcRouter'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - vpcs
+      summary: Delete router
+      operationId: vpc_router_delete
+      parameters:
+      - in: path
+        name: router
+        description: Name or ID of the router
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/vpc-subnets:
+    get:
+      tags:
+      - vpcs
+      summary: List subnets
+      operationId: vpc_subnet_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VpcSubnetResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required:
+        - vpc
+    post:
+      tags:
+      - vpcs
+      summary: Create subnet
+      operationId: vpc_subnet_create
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VpcSubnetCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VpcSubnet'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/vpc-subnets/{subnet}:
+    get:
+      tags:
+      - vpcs
+      summary: Fetch subnet
+      operationId: vpc_subnet_view
+      parameters:
+      - in: path
+        name: subnet
+        description: Name or ID of the subnet
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VpcSubnet'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+      - vpcs
+      summary: Update subnet
+      operationId: vpc_subnet_update
+      parameters:
+      - in: path
+        name: subnet
+        description: Name or ID of the subnet
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VpcSubnetUpdate'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VpcSubnet'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - vpcs
+      summary: Delete subnet
+      operationId: vpc_subnet_delete
+      parameters:
+      - in: path
+        name: subnet
+        description: Name or ID of the subnet
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/vpc-subnets/{subnet}/network-interfaces:
+    get:
+      tags:
+      - vpcs
+      summary: List network interfaces
+      operationId: vpc_subnet_list_network_interfaces
+      parameters:
+      - in: path
+        name: subnet
+        description: Name or ID of the subnet
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project, only required if `vpc` is provided as a `Name`
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      - in: query
+        name: vpc
+        description: Name or ID of the VPC
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstanceNetworkInterfaceResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+  /v1/vpcs:
+    get:
+      tags:
+      - vpcs
+      summary: List VPCs
+      operationId: vpc_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VpcResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required:
+        - project
+    post:
+      tags:
+      - vpcs
+      summary: Create VPC
+      operationId: vpc_create
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VpcCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vpc'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/vpcs/{vpc}:
+    get:
+      tags:
+      - vpcs
+      summary: Fetch VPC
+      operationId: vpc_view
+      parameters:
+      - in: path
+        name: vpc
+        description: Name or ID of the VPC
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vpc'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+      - vpcs
+      summary: Update VPC
+      operationId: vpc_update
+      parameters:
+      - in: path
+        name: vpc
+        description: Name or ID of the VPC
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VpcUpdate'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vpc'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - vpcs
+      summary: Delete VPC
+      operationId: vpc_delete
+      parameters:
+      - in: path
+        name: vpc
+        description: Name or ID of the VPC
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+components:
+  schemas:
+    VpcFirewallRuleStatus:
+      type: string
+      enum:
+      - disabled
+      - enabled
+    InternetGatewayIpAddressCreate:
+      description: Create-time identity-related parameters
+      type: object
+      properties:
+        address:
+          type: string
+          format: ip
+        description:
+          type: string
+        name:
+          $ref: '#/components/schemas/Name'
+      required:
+      - address
+      - description
+      - name
+    VpcSubnet:
+      description: A VPC subnet represents a logical grouping for instances that allows network traffic between them, within an IPv4 subnetwork or optionally an IPv6 subnetwork.
+      type: object
+      properties:
+        custom_router_id:
+          description: ID for an attached custom router.
+          type:
+          - string
+          - 'null'
+          format: uuid
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        ipv4_block:
+          description: The IPv4 subnet CIDR block.
+          allOf:
+          - $ref: '#/components/schemas/Ipv4Net'
+        ipv6_block:
+          description: The IPv6 subnet CIDR block.
+          allOf:
+          - $ref: '#/components/schemas/Ipv6Net'
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+        vpc_id:
+          description: The VPC to which the subnet belongs.
+          type: string
+          format: uuid
+      required:
+      - description
+      - id
+      - ipv4_block
+      - ipv6_block
+      - name
+      - time_created
+      - time_modified
+      - vpc_id
+    InstanceNetworkInterfaceResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/InstanceNetworkInterface'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    VpcResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/Vpc'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    VpcFirewallRuleUpdateParams:
+      description: Updated list of firewall rules. Will replace all existing rules.
+      type: object
+      properties:
+        rules:
+          default: []
+          type: array
+          items:
+            $ref: '#/components/schemas/VpcFirewallRuleUpdate'
+          maxItems: 1024
+    VpcFirewallRuleFilter:
+      description: Filters reduce the scope of a firewall rule. Without filters, the rule applies to all packets to the targets (or from the targets, if it's an outbound rule). With multiple filters, the rule applies only to packets matching ALL filters. The maximum number of each type of filter is 256.
+      type: object
+      properties:
+        hosts:
+          description: 'If present, host filters match the "other end" of traffic from the target’s perspective: for an inbound rule, they match the source of traffic. For an outbound rule, they match the destination.'
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/VpcFirewallRuleHostFilter'
+          maxItems: 256
+        ports:
+          description: If present, the destination ports or port ranges this rule applies to.
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/L4PortRange'
+          maxItems: 256
+        protocols:
+          description: If present, the networking protocols this rule applies to.
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/VpcFirewallRuleProtocol'
+          maxItems: 256
+    InternetGatewayIpPoolResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/InternetGatewayIpPool'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    L4PortRange:
+      example: '22'
+      title: A range of IP ports
+      description: An inclusive-inclusive range of IP ports. The second port may be omitted to represent a single port.
+      type: string
+      pattern: ^[0-9]{1,5}(-[0-9]{1,5})?$
+      minLength: 1
+      maxLength: 11
+    NameOrIdSortMode:
+      description: Supported set of sort modes for scanning by name or id
+      oneOf:
+      - description: Sort in increasing order of "name"
+        type: string
+        enum:
+        - name_ascending
+      - description: Sort in decreasing order of "name"
+        type: string
+        enum:
+        - name_descending
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    InternetGatewayCreate:
+      description: Create-time parameters for an `InternetGateway`
+      type: object
+      properties:
+        description:
+          type: string
+        name:
+          $ref: '#/components/schemas/Name'
+      required:
+      - description
+      - name
+    VpcSubnetUpdate:
+      description: Updateable properties of a `VpcSubnet`
+      type: object
+      properties:
+        custom_router:
+          description: An optional router, used to direct packets sent from hosts in this subnet to any destination address.
+          allOf:
+          - $ref: '#/components/schemas/NameOrId'
+        description:
+          type:
+          - string
+          - 'null'
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+    MacAddr:
+      example: ff:ff:ff:ff:ff:ff
+      title: A MAC address
+      description: A Media Access Control address, in EUI-48 format
+      type: string
+      pattern: ^([0-9a-fA-F]{0,2}:){5}[0-9a-fA-F]{0,2}$
+      minLength: 5
+      maxLength: 17
+    IcmpParamRange:
+      example: '3'
+      title: A range of ICMP(v6) types or codes
+      description: An inclusive-inclusive range of ICMP(v6) types or codes. The second value may be omitted to represent a single parameter.
+      type: string
+      pattern: ^[0-9]{1,3}(-[0-9]{1,3})?$
+      minLength: 1
+      maxLength: 7
+    InternetGatewayIpPoolCreate:
+      description: Create-time identity-related parameters
+      type: object
+      properties:
+        description:
+          type: string
+        ip_pool:
+          $ref: '#/components/schemas/NameOrId'
+        name:
+          $ref: '#/components/schemas/Name'
+      required:
+      - description
+      - ip_pool
+      - name
+    VpcFirewallRuleHostFilter:
+      description: The `VpcFirewallRuleHostFilter` is used to filter traffic on the basis of its source or destination host.
+      oneOf:
+      - description: The rule applies to traffic from/to all instances in the VPC
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - vpc
+          value:
+            $ref: '#/components/schemas/Name'
+        required:
+        - type
+        - value
+      - description: The rule applies to traffic from/to all instances in the VPC Subnet
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - subnet
+          value:
+            $ref: '#/components/schemas/Name'
+        required:
+        - type
+        - value
+      - description: The rule applies to traffic from/to this specific instance
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - instance
+          value:
+            $ref: '#/components/schemas/Name'
+        required:
+        - type
+        - value
+      - description: The rule applies to traffic from/to a specific IP address
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - ip
+          value:
+            type: string
+            format: ip
+        required:
+        - type
+        - value
+      - description: The rule applies to traffic from/to a specific IP subnet
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - ip_net
+          value:
+            $ref: '#/components/schemas/IpNet'
+        required:
+        - type
+        - value
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    VpcFirewallRuleTarget:
+      description: 'A `VpcFirewallRuleTarget` is used to specify the set of instances to which a firewall rule applies. You can target instances directly by name, or specify a VPC, VPC subnet, IP, or IP subnet, which will apply the rule to traffic going to all matching instances. Targets are additive: the rule applies to instances matching ANY target.'
+      oneOf:
+      - description: The rule applies to all instances in the VPC
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - vpc
+          value:
+            $ref: '#/components/schemas/Name'
+        required:
+        - type
+        - value
+      - description: The rule applies to all instances in the VPC Subnet
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - subnet
+          value:
+            $ref: '#/components/schemas/Name'
+        required:
+        - type
+        - value
+      - description: The rule applies to this specific instance
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - instance
+          value:
+            $ref: '#/components/schemas/Name'
+        required:
+        - type
+        - value
+      - description: The rule applies to a specific IP address
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - ip
+          value:
+            type: string
+            format: ip
+        required:
+        - type
+        - value
+      - description: The rule applies to a specific IP subnet
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - ip_net
+          value:
+            $ref: '#/components/schemas/IpNet'
+        required:
+        - type
+        - value
+    InternetGateway:
+      description: An internet gateway provides a path between VPC networks and external networks.
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+        vpc_id:
+          description: The VPC to which the gateway belongs.
+          type: string
+          format: uuid
+      required:
+      - description
+      - id
+      - name
+      - time_created
+      - time_modified
+      - vpc_id
+    InternetGatewayIpAddressResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/InternetGatewayIpAddress'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    InternetGatewayIpAddress:
+      description: An IP address that is attached to an internet gateway
+      type: object
+      properties:
+        address:
+          description: The associated IP address
+          type: string
+          format: ip
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        internet_gateway_id:
+          description: The associated internet gateway
+          type: string
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - address
+      - description
+      - id
+      - internet_gateway_id
+      - name
+      - time_created
+      - time_modified
+    VpcSubnetResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/VpcSubnet'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    VpcRouterCreate:
+      description: Create-time parameters for a `VpcRouter`
+      type: object
+      properties:
+        description:
+          type: string
+        name:
+          $ref: '#/components/schemas/Name'
+      required:
+      - description
+      - name
+    RouteDestination:
+      description: 'A `RouteDestination` is used to match traffic with a routing rule based on the destination of that traffic.
+
+
+        When traffic is to be sent to a destination that is within a given `RouteDestination`, the corresponding `RouterRoute` applies, and traffic will be forward to the `RouteTarget` for that rule.'
+      oneOf:
+      - description: Route applies to traffic destined for the specified IP address
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - ip
+          value:
+            type: string
+            format: ip
+        required:
+        - type
+        - value
+      - description: Route applies to traffic destined for the specified IP subnet
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - ip_net
+          value:
+            $ref: '#/components/schemas/IpNet'
+        required:
+        - type
+        - value
+      - description: Route applies to traffic destined for the specified VPC
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - vpc
+          value:
+            $ref: '#/components/schemas/Name'
+        required:
+        - type
+        - value
+      - description: Route applies to traffic destined for the specified VPC subnet
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - subnet
+          value:
+            $ref: '#/components/schemas/Name'
+        required:
+        - type
+        - value
+    VpcUpdate:
+      description: Updateable properties of a `Vpc`
+      type: object
+      properties:
+        description:
+          type:
+          - string
+          - 'null'
+        dns_name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+    RouterRouteResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/RouterRoute'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    VpcFirewallIcmpFilter:
+      type: object
+      properties:
+        code:
+          allOf:
+          - $ref: '#/components/schemas/IcmpParamRange'
+        icmp_type:
+          type: integer
+          format: uint8
+          minimum: 0
+      required:
+      - icmp_type
+    VpcRouterKind:
+      type: string
+      enum:
+      - system
+      - custom
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
+    RouteTarget:
+      description: A `RouteTarget` describes the possible locations that traffic matching a route destination can be sent.
+      oneOf:
+      - description: Forward traffic to a particular IP address.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - ip
+          value:
+            type: string
+            format: ip
+        required:
+        - type
+        - value
+      - description: Forward traffic to a VPC
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - vpc
+          value:
+            $ref: '#/components/schemas/Name'
+        required:
+        - type
+        - value
+      - description: Forward traffic to a VPC Subnet
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - subnet
+          value:
+            $ref: '#/components/schemas/Name'
+        required:
+        - type
+        - value
+      - description: Forward traffic to a specific instance
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - instance
+          value:
+            $ref: '#/components/schemas/Name'
+        required:
+        - type
+        - value
+      - description: Forward traffic to an internet gateway
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - internet_gateway
+          value:
+            $ref: '#/components/schemas/Name'
+        required:
+        - type
+        - value
+      - description: Drop matching traffic
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - drop
+        required:
+        - type
+    RouterRoute:
+      description: A route defines a rule that governs where traffic should be sent based on its destination.
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        destination:
+          description: Selects which traffic this routing rule will apply to
+          allOf:
+          - $ref: '#/components/schemas/RouteDestination'
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        kind:
+          description: Describes the kind of router. Set at creation. `read-only`
+          allOf:
+          - $ref: '#/components/schemas/RouterRouteKind'
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        target:
+          description: The location that matched packets should be forwarded to
+          allOf:
+          - $ref: '#/components/schemas/RouteTarget'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+        vpc_router_id:
+          description: The ID of the VPC Router to which the route belongs
+          type: string
+          format: uuid
+      required:
+      - description
+      - destination
+      - id
+      - kind
+      - name
+      - target
+      - time_created
+      - time_modified
+      - vpc_router_id
+    RouterRouteUpdate:
+      description: Updateable properties of a `RouterRoute`
+      type: object
+      properties:
+        description:
+          type:
+          - string
+          - 'null'
+        destination:
+          description: Selects which traffic this routing rule will apply to.
+          allOf:
+          - $ref: '#/components/schemas/RouteDestination'
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        target:
+          description: The location that matched packets should be forwarded to.
+          allOf:
+          - $ref: '#/components/schemas/RouteTarget'
+      required:
+      - destination
+      - target
+    RouterRouteKind:
+      description: 'The kind of a `RouterRoute`
+
+
+        The kind determines certain attributes such as if the route is modifiable and describes how or where the route was created.'
+      oneOf:
+      - description: 'Determines the default destination of traffic, such as whether it goes to the internet or not.
+
+
+          `Destination: An Internet Gateway` `Modifiable: true`'
+        type: string
+        enum:
+        - default
+      - description: 'Automatically added for each VPC Subnet in the VPC
+
+
+          `Destination: A VPC Subnet` `Modifiable: false`'
+        type: string
+        enum:
+        - vpc_subnet
+      - description: 'Automatically added when VPC peering is established
+
+
+          `Destination: A different VPC` `Modifiable: false`'
+        type: string
+        enum:
+        - vpc_peering
+      - description: 'Created by a user; see `RouteTarget`
+
+
+          `Destination: User defined` `Modifiable: true`'
+        type: string
+        enum:
+        - custom
+    RouterRouteCreate:
+      description: Create-time parameters for a `RouterRoute`
+      type: object
+      properties:
+        description:
+          type: string
+        destination:
+          description: Selects which traffic this routing rule will apply to.
+          allOf:
+          - $ref: '#/components/schemas/RouteDestination'
+        name:
+          $ref: '#/components/schemas/Name'
+        target:
+          description: The location that matched packets should be forwarded to.
+          allOf:
+          - $ref: '#/components/schemas/RouteTarget'
+      required:
+      - description
+      - destination
+      - name
+      - target
+    VpcRouter:
+      description: A VPC router defines a series of rules that indicate where traffic should be sent depending on its destination.
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        kind:
+          $ref: '#/components/schemas/VpcRouterKind'
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+        vpc_id:
+          description: The VPC to which the router belongs.
+          type: string
+          format: uuid
+      required:
+      - description
+      - id
+      - kind
+      - name
+      - time_created
+      - time_modified
+      - vpc_id
+    Ipv6Net:
+      example: fd12:3456::/64
+      title: An IPv6 subnet
+      description: An IPv6 subnet, including prefix and subnet mask
+      x-rust-type:
+        crate: oxnet
+        path: oxnet::Ipv6Net
+        version: 0.1.0
+      type: string
+      pattern: ^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))\/([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])$
+    InternetGatewayIpPool:
+      description: An IP pool that is attached to an internet gateway
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        internet_gateway_id:
+          description: The associated internet gateway.
+          type: string
+          format: uuid
+        ip_pool_id:
+          description: The associated IP pool.
+          type: string
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - id
+      - internet_gateway_id
+      - ip_pool_id
+      - name
+      - time_created
+      - time_modified
+    VpcFirewallRuleUpdate:
+      description: A single rule in a VPC firewall
+      type: object
+      properties:
+        action:
+          description: Whether traffic matching the rule should be allowed or dropped
+          allOf:
+          - $ref: '#/components/schemas/VpcFirewallRuleAction'
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        direction:
+          description: Whether this rule is for incoming or outgoing traffic
+          allOf:
+          - $ref: '#/components/schemas/VpcFirewallRuleDirection'
+        filters:
+          description: Reductions on the scope of the rule
+          allOf:
+          - $ref: '#/components/schemas/VpcFirewallRuleFilter'
+        name:
+          description: Name of the rule, unique to this VPC
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        priority:
+          description: The relative priority of this rule
+          type: integer
+          format: uint16
+          minimum: 0
+        status:
+          description: Whether this rule is in effect
+          allOf:
+          - $ref: '#/components/schemas/VpcFirewallRuleStatus'
+        targets:
+          description: Determine the set of instances that the rule applies to
+          type: array
+          items:
+            $ref: '#/components/schemas/VpcFirewallRuleTarget'
+          maxItems: 256
+      required:
+      - action
+      - description
+      - direction
+      - filters
+      - name
+      - priority
+      - status
+      - targets
+    VpcFirewallRuleProtocol:
+      description: The protocols that may be specified in a firewall rule's filter
+      oneOf:
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - tcp
+        required:
+        - type
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - udp
+        required:
+        - type
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - icmp
+          value:
+            allOf:
+            - $ref: '#/components/schemas/VpcFirewallIcmpFilter'
+        required:
+        - type
+        - value
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - icmp6
+          value:
+            allOf:
+            - $ref: '#/components/schemas/VpcFirewallIcmpFilter'
+        required:
+        - type
+        - value
+    Ipv4Net:
+      example: 192.168.1.0/24
+      title: An IPv4 subnet
+      description: An IPv4 subnet, including prefix and prefix length
+      x-rust-type:
+        crate: oxnet
+        path: oxnet::Ipv4Net
+        version: 0.1.0
+      type: string
+      pattern: ^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/([0-9]|1[0-9]|2[0-9]|3[0-2])$
+    PrivateIpStack:
+      description: The VPC-private IP stack for a network interface.
+      oneOf:
+      - description: The interface has only an IPv4 stack.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - v4
+          value:
+            $ref: '#/components/schemas/PrivateIpv4Stack'
+        required:
+        - type
+        - value
+      - description: The interface has only an IPv6 stack.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - v6
+          value:
+            $ref: '#/components/schemas/PrivateIpv6Stack'
+        required:
+        - type
+        - value
+      - description: The interface is dual-stack IPv4 and IPv6.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - dual_stack
+          value:
+            type: object
+            properties:
+              v4:
+                $ref: '#/components/schemas/PrivateIpv4Stack'
+              v6:
+                $ref: '#/components/schemas/PrivateIpv6Stack'
+            required:
+            - v4
+            - v6
+        required:
+        - type
+        - value
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
+    InstanceNetworkInterface:
+      description: An `InstanceNetworkInterface` represents a virtual network interface device attached to an instance.
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        instance_id:
+          description: The Instance to which the interface belongs.
+          type: string
+          format: uuid
+        ip_stack:
+          description: The VPC-private IP stack for this interface.
+          allOf:
+          - $ref: '#/components/schemas/PrivateIpStack'
+        mac:
+          description: The MAC address assigned to this interface.
+          allOf:
+          - $ref: '#/components/schemas/MacAddr'
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        primary:
+          description: True if this interface is the primary for the instance to which it's attached.
+          type: boolean
+        subnet_id:
+          description: The subnet to which the interface belongs.
+          type: string
+          format: uuid
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+        vpc_id:
+          description: The VPC to which the interface belongs.
+          type: string
+          format: uuid
+      required:
+      - description
+      - id
+      - instance_id
+      - ip_stack
+      - mac
+      - name
+      - primary
+      - subnet_id
+      - time_created
+      - time_modified
+      - vpc_id
+    IpNet:
+      x-rust-type:
+        crate: oxnet
+        path: oxnet::IpNet
+        version: 0.1.0
+      oneOf:
+      - title: v4
+        allOf:
+        - $ref: '#/components/schemas/Ipv4Net'
+      - title: v6
+        allOf:
+        - $ref: '#/components/schemas/Ipv6Net'
+    PrivateIpv6Stack:
+      description: The VPC-private IPv6 stack for a network interface
+      type: object
+      properties:
+        ip:
+          description: The VPC-private IPv6 address for the interface.
+          type: string
+          format: ipv6
+        transit_ips:
+          description: A set of additional IPv6 networks that this interface may send and receive traffic on.
+          type: array
+          items:
+            $ref: '#/components/schemas/Ipv6Net'
+      required:
+      - ip
+      - transit_ips
+    VpcFirewallRule:
+      description: A single rule in a VPC firewall
+      type: object
+      properties:
+        action:
+          description: Whether traffic matching the rule should be allowed or dropped
+          allOf:
+          - $ref: '#/components/schemas/VpcFirewallRuleAction'
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        direction:
+          description: Whether this rule is for incoming or outgoing traffic
+          allOf:
+          - $ref: '#/components/schemas/VpcFirewallRuleDirection'
+        filters:
+          description: Reductions on the scope of the rule
+          allOf:
+          - $ref: '#/components/schemas/VpcFirewallRuleFilter'
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        priority:
+          description: The relative priority of this rule
+          type: integer
+          format: uint16
+          minimum: 0
+        status:
+          description: Whether this rule is in effect
+          allOf:
+          - $ref: '#/components/schemas/VpcFirewallRuleStatus'
+        targets:
+          description: Determine the set of instances that the rule applies to
+          type: array
+          items:
+            $ref: '#/components/schemas/VpcFirewallRuleTarget'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+        vpc_id:
+          description: The VPC to which this rule belongs
+          type: string
+          format: uuid
+      required:
+      - action
+      - description
+      - direction
+      - filters
+      - id
+      - name
+      - priority
+      - status
+      - targets
+      - time_created
+      - time_modified
+      - vpc_id
+    InternetGatewayResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/InternetGateway'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    VpcFirewallRuleAction:
+      type: string
+      enum:
+      - allow
+      - deny
+    VpcRouterUpdate:
+      description: Updateable properties of a `VpcRouter`
+      type: object
+      properties:
+        description:
+          type:
+          - string
+          - 'null'
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+    VpcFirewallRuleDirection:
+      type: string
+      enum:
+      - inbound
+      - outbound
+    VpcSubnetCreate:
+      description: Create-time parameters for a `VpcSubnet`
+      type: object
+      properties:
+        custom_router:
+          description: 'An optional router, used to direct packets sent from hosts in this subnet to any destination address.
+
+
+            Custom routers apply in addition to the VPC-wide *system* router, and have higher priority than the system router for an otherwise equal-prefix-length match.'
+          allOf:
+          - $ref: '#/components/schemas/NameOrId'
+        description:
+          type: string
+        ipv4_block:
+          description: 'The IPv4 address range for this subnet.
+
+
+            It must be allocated from an RFC 1918 private address range, and must not overlap with any other existing subnet in the VPC.'
+          allOf:
+          - $ref: '#/components/schemas/Ipv4Net'
+        ipv6_block:
+          description: 'The IPv6 address range for this subnet.
+
+
+            It must be allocated from the RFC 4193 Unique Local Address range, with the prefix equal to the parent VPC''s prefix. A random `/64` block will be assigned if one is not provided. It must not overlap with any existing subnet in the VPC.'
+          allOf:
+          - $ref: '#/components/schemas/Ipv6Net'
+        name:
+          $ref: '#/components/schemas/Name'
+      required:
+      - description
+      - ipv4_block
+      - name
+    VpcRouterResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/VpcRouter'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    VpcFirewallRules:
+      description: Collection of a Vpc's firewall rules
+      type: object
+      properties:
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/VpcFirewallRule'
+      required:
+      - rules
+    Vpc:
+      description: View of a VPC
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        dns_name:
+          description: The name used for the VPC in DNS.
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        ipv6_prefix:
+          description: The unique local IPv6 address range for subnets in this VPC
+          allOf:
+          - $ref: '#/components/schemas/Ipv6Net'
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        project_id:
+          description: ID for the project containing this VPC
+          type: string
+          format: uuid
+        system_router_id:
+          description: ID for the system router where subnet default routes are registered
+          type: string
+          format: uuid
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - dns_name
+      - id
+      - ipv6_prefix
+      - name
+      - project_id
+      - system_router_id
+      - time_created
+      - time_modified
+    VpcCreate:
+      description: Create-time parameters for a `Vpc`
+      type: object
+      properties:
+        description:
+          type: string
+        dns_name:
+          $ref: '#/components/schemas/Name'
+        ipv6_prefix:
+          description: 'The IPv6 prefix for this VPC
+
+
+            All IPv6 subnets created from this VPC must be taken from this range, which should be a Unique Local Address in the range `fd00::/48`. The default VPC Subnet will have the first `/64` range from this prefix.'
+          allOf:
+          - $ref: '#/components/schemas/Ipv6Net'
+        name:
+          $ref: '#/components/schemas/Name'
+      required:
+      - description
+      - dns_name
+      - name
+    PrivateIpv4Stack:
+      description: The VPC-private IPv4 stack for a network interface
+      type: object
+      properties:
+        ip:
+          description: The VPC-private IPv4 address for the interface.
+          type: string
+          format: ipv4
+        transit_ips:
+          description: A set of additional IPv4 networks that this interface may send and receive traffic on.
+          type: array
+          items:
+            $ref: '#/components/schemas/Ipv4Net'
+      required:
+      - ip
+      - transit_ips
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

@@ -1,0 +1,659 @@
+openapi: 3.2.0
+info:
+  title: Oxide Region Disks API
+  description: API for interacting with the Oxide control plane
+  contact:
+    url: https://oxide.computer
+    email: api@oxide.computer
+  version: 2026081901.0.0
+tags:
+- name: disks
+  description: Virtual disks are used to store instance-local data which includes the operating system.
+  externalDocs:
+    url: http://docs.oxide.computer/api/disks
+paths:
+  /v1/disks:
+    get:
+      tags:
+      - disks
+      summary: List disks
+      operationId: disk_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiskResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required:
+        - project
+    post:
+      tags:
+      - disks
+      summary: Create disk
+      operationId: disk_create
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiskCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Disk'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/disks/{disk}:
+    get:
+      tags:
+      - disks
+      summary: Fetch disk
+      operationId: disk_view
+      parameters:
+      - in: path
+        name: disk
+        description: Name or ID of the disk
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Disk'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - disks
+      summary: Delete disk
+      operationId: disk_delete
+      parameters:
+      - in: path
+        name: disk
+        description: Name or ID of the disk
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/disks/{disk}/bulk-write:
+    post:
+      tags:
+      - disks
+      summary: Import blocks into disk
+      operationId: disk_bulk_write_import
+      parameters:
+      - in: path
+        name: disk
+        description: Name or ID of the disk
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportBlocksBulkWrite'
+        required: true
+      responses:
+        '204':
+          description: resource updated
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/disks/{disk}/bulk-write-start:
+    post:
+      tags:
+      - disks
+      summary: Start importing blocks into disk
+      description: Start the process of importing blocks into a disk
+      operationId: disk_bulk_write_import_start
+      parameters:
+      - in: path
+        name: disk
+        description: Name or ID of the disk
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: resource updated
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/disks/{disk}/bulk-write-stop:
+    post:
+      tags:
+      - disks
+      summary: Stop importing blocks into disk
+      description: Stop the process of importing blocks into a disk
+      operationId: disk_bulk_write_import_stop
+      parameters:
+      - in: path
+        name: disk
+        description: Name or ID of the disk
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: resource updated
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/disks/{disk}/finalize:
+    post:
+      tags:
+      - disks
+      summary: Confirm disk block import completion
+      operationId: disk_finalize_import
+      parameters:
+      - in: path
+        name: disk
+        description: Name or ID of the disk
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinalizeDisk'
+        required: true
+      responses:
+        '204':
+          description: resource updated
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+components:
+  schemas:
+    Disk:
+      description: View of a Disk
+      type: object
+      properties:
+        block_size:
+          $ref: '#/components/schemas/BlockSize'
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        device_path:
+          type: string
+        disk_type:
+          $ref: '#/components/schemas/DiskType'
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        image_id:
+          description: ID of image from which disk was created, if any
+          type:
+          - string
+          - 'null'
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        project_id:
+          type: string
+          format: uuid
+        read_only:
+          description: Whether or not this disk is read-only.
+          type: boolean
+        size:
+          $ref: '#/components/schemas/ByteCount'
+        snapshot_id:
+          description: ID of snapshot from which disk was created, if any
+          type:
+          - string
+          - 'null'
+          format: uuid
+        state:
+          $ref: '#/components/schemas/DiskState'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - block_size
+      - description
+      - device_path
+      - disk_type
+      - id
+      - name
+      - project_id
+      - read_only
+      - size
+      - state
+      - time_created
+      - time_modified
+    DiskSource:
+      description: Different sources for a Distributed Disk
+      oneOf:
+      - description: Create a blank disk
+        type: object
+        properties:
+          block_size:
+            description: 'Size of blocks for this disk. Valid values are: 512, 2048, or 4096.'
+            allOf:
+            - $ref: '#/components/schemas/BlockSize'
+          type:
+            type: string
+            enum:
+            - blank
+        required:
+        - block_size
+        - type
+      - description: Create a disk from a disk snapshot
+        type: object
+        properties:
+          read_only:
+            description: If `true`, the disk created from this snapshot will be read-only.
+            default: false
+            type: boolean
+          snapshot_id:
+            type: string
+            format: uuid
+          type:
+            type: string
+            enum:
+            - snapshot
+        required:
+        - snapshot_id
+        - type
+      - description: Create a disk from an image
+        type: object
+        properties:
+          image_id:
+            type: string
+            format: uuid
+          read_only:
+            description: If `true`, the disk created from this image will be read-only.
+            default: false
+            type: boolean
+          type:
+            type: string
+            enum:
+            - image
+        required:
+        - image_id
+        - type
+      - description: Create a blank disk that will accept bulk writes or pull blocks from an external source.
+        type: object
+        properties:
+          block_size:
+            $ref: '#/components/schemas/BlockSize'
+          type:
+            type: string
+            enum:
+            - importing_blocks
+        required:
+        - block_size
+        - type
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
+    DiskResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/Disk'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
+    ImportBlocksBulkWrite:
+      description: Parameters for importing blocks with a bulk write
+      type: object
+      properties:
+        base64_encoded_data:
+          type: string
+        offset:
+          type: integer
+          format: uint64
+          minimum: 0
+      required:
+      - base64_encoded_data
+      - offset
+    ByteCount:
+      description: Byte count to express memory or storage capacity.
+      type: integer
+      format: uint64
+      minimum: 0
+    DiskCreate:
+      description: Create-time parameters for a `Disk`
+      type: object
+      properties:
+        description:
+          type: string
+        disk_backend:
+          description: The source for this `Disk`'s blocks
+          allOf:
+          - $ref: '#/components/schemas/DiskBackend'
+        name:
+          $ref: '#/components/schemas/Name'
+        size:
+          description: The total size of the Disk (in bytes)
+          allOf:
+          - $ref: '#/components/schemas/ByteCount'
+      required:
+      - description
+      - disk_backend
+      - name
+      - size
+    DiskType:
+      type: string
+      enum:
+      - distributed
+      - local
+    FinalizeDisk:
+      description: Parameters for finalizing a disk
+      type: object
+      properties:
+        snapshot_name:
+          description: If specified a snapshot of the disk will be created with the given name during finalization. If not specified, a snapshot for the disk will _not_ be created. A snapshot can be manually created once the disk transitions into the `Detached` state.
+          allOf:
+          - $ref: '#/components/schemas/Name'
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    DiskBackend:
+      description: The source of a `Disk`'s blocks
+      oneOf:
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - local
+        required:
+        - type
+      - type: object
+        properties:
+          disk_source:
+            description: The initial source for this disk
+            allOf:
+            - $ref: '#/components/schemas/DiskSource'
+          type:
+            type: string
+            enum:
+            - distributed
+        required:
+        - disk_source
+        - type
+    NameOrIdSortMode:
+      description: Supported set of sort modes for scanning by name or id
+      oneOf:
+      - description: Sort in increasing order of "name"
+        type: string
+        enum:
+        - name_ascending
+      - description: Sort in decreasing order of "name"
+        type: string
+        enum:
+        - name_descending
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    DiskState:
+      description: State of a Disk
+      oneOf:
+      - description: Disk is being initialized
+        type: object
+        properties:
+          state:
+            type: string
+            enum:
+            - creating
+        required:
+        - state
+      - description: Disk is ready but detached from any Instance
+        type: object
+        properties:
+          state:
+            type: string
+            enum:
+            - detached
+        required:
+        - state
+      - description: Disk is ready to receive blocks from an external source
+        type: object
+        properties:
+          state:
+            type: string
+            enum:
+            - import_ready
+        required:
+        - state
+      - description: Disk is importing blocks from a URL
+        type: object
+        properties:
+          state:
+            type: string
+            enum:
+            - importing_from_url
+        required:
+        - state
+      - description: Disk is importing blocks from bulk writes
+        type: object
+        properties:
+          state:
+            type: string
+            enum:
+            - importing_from_bulk_writes
+        required:
+        - state
+      - description: Disk is being finalized to state Detached
+        type: object
+        properties:
+          state:
+            type: string
+            enum:
+            - finalizing
+        required:
+        - state
+      - description: Disk is undergoing maintenance
+        type: object
+        properties:
+          state:
+            type: string
+            enum:
+            - maintenance
+        required:
+        - state
+      - description: Disk is being attached to the given Instance
+        type: object
+        properties:
+          instance:
+            type: string
+            format: uuid
+          state:
+            type: string
+            enum:
+            - attaching
+        required:
+        - instance
+        - state
+      - description: Disk is attached to the given Instance
+        type: object
+        properties:
+          instance:
+            type: string
+            format: uuid
+          state:
+            type: string
+            enum:
+            - attached
+        required:
+        - instance
+        - state
+      - description: Disk is being detached from the given Instance
+        type: object
+        properties:
+          instance:
+            type: string
+            format: uuid
+          state:
+            type: string
+            enum:
+            - detaching
+        required:
+        - instance
+        - state
+      - description: Disk has been destroyed
+        type: object
+        properties:
+          state:
+            type: string
+            enum:
+            - destroyed
+        required:
+        - state
+      - description: Disk is unavailable
+        type: object
+        properties:
+          state:
+            type: string
+            enum:
+            - faulted
+        required:
+        - state
+    BlockSize:
+      title: Block size in bytes
+      description: 'Valid values are: 512, 2048, or 4096.'
+      type: integer
+      enum:
+      - 512
+      - 2048
+      - 4096
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

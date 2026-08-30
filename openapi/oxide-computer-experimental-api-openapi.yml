@@ -1,0 +1,2199 @@
+openapi: 3.2.0
+info:
+  title: Oxide Region Experimental API
+  description: API for interacting with the Oxide control plane
+  contact:
+    url: https://oxide.computer
+    email: api@oxide.computer
+  version: 2026081901.0.0
+tags:
+- name: experimental
+  description: Experimental, unstable interfaces, primarily for use by Oxide personnel
+  externalDocs:
+    url: http://docs.oxide.computer/api/experimental
+paths:
+  /experimental/v1/probes:
+    get:
+      tags:
+      - experimental
+      summary: List instrumentation probes
+      operationId: probe_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProbeInfoResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required:
+        - project
+    post:
+      tags:
+      - experimental
+      summary: Create instrumentation probe
+      operationId: probe_create
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProbeCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Probe'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /experimental/v1/probes/{probe}:
+    get:
+      tags:
+      - experimental
+      summary: View instrumentation probe
+      operationId: probe_view
+      parameters:
+      - in: path
+        name: probe
+        description: Name or ID of the probe
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProbeInfo'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - experimental
+      summary: Delete instrumentation probe
+      operationId: probe_delete
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: probe
+        description: Name or ID of the probe
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/affinity-groups:
+    get:
+      tags:
+      - experimental
+      summary: List affinity groups
+      operationId: affinity_group_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AffinityGroupResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required:
+        - project
+    post:
+      tags:
+      - experimental
+      summary: Create affinity group
+      operationId: affinity_group_create
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AffinityGroupCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AffinityGroup'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/affinity-groups/{affinity_group}:
+    get:
+      tags:
+      - experimental
+      summary: Fetch affinity group
+      operationId: affinity_group_view
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: affinity_group
+        description: Name or ID of the affinity group
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AffinityGroup'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+      - experimental
+      summary: Update affinity group
+      operationId: affinity_group_update
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: affinity_group
+        description: Name or ID of the affinity group
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AffinityGroupUpdate'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AffinityGroup'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - experimental
+      summary: Delete affinity group
+      operationId: affinity_group_delete
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: affinity_group
+        description: Name or ID of the affinity group
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/affinity-groups/{affinity_group}/members:
+    get:
+      tags:
+      - experimental
+      summary: List affinity group members
+      operationId: affinity_group_member_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      - in: path
+        name: affinity_group
+        description: Name or ID of the affinity group
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AffinityGroupMemberResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+  /v1/affinity-groups/{affinity_group}/members/instance/{instance}:
+    get:
+      tags:
+      - experimental
+      summary: Fetch affinity group member
+      operationId: affinity_group_member_instance_view
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: affinity_group
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AffinityGroupMember'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    post:
+      tags:
+      - experimental
+      summary: Add member to affinity group
+      operationId: affinity_group_member_instance_add
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: affinity_group
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AffinityGroupMember'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - experimental
+      summary: Remove member from affinity group
+      operationId: affinity_group_member_instance_delete
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: affinity_group
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/instances/{instance}/affinity-groups:
+    get:
+      tags:
+      - experimental
+      summary: List affinity groups containing instance
+      operationId: instance_affinity_group_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      - in: path
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AffinityGroupResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+  /v1/instances/{instance}/multicast-groups:
+    get:
+      tags:
+      - experimental
+      summary: List multicast groups for an instance
+      operationId: instance_multicast_group_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/IdSortMode'
+      - in: path
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MulticastGroupMemberResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+  /v1/instances/{instance}/multicast-groups/{multicast_group}:
+    put:
+      tags:
+      - experimental
+      summary: Join multicast group by name, IP address, or UUID
+      description: 'Groups can be referenced by name, IP address, or UUID. If the group doesn''t exist, it''s implicitly created with an auto-allocated IP from a multicast pool linked to the caller''s silo. When referencing by UUID, the group must already exist.
+
+
+        Source IPs are optional for ASM addresses but required for SSM addresses (232.0.0.0/8 for IPv4, ff3x::/32 for IPv6). Duplicate IPs in the request are automatically deduplicated, with a maximum of 64 source IPs allowed.'
+      operationId: instance_multicast_group_join
+      parameters:
+      - in: path
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: multicast_group
+        description: Name, ID, or IP address of the multicast group
+        required: true
+        schema:
+          $ref: '#/components/schemas/MulticastGroupIdentifier'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstanceMulticastGroupJoin'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MulticastGroupMember'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - experimental
+      summary: Leave multicast group by name, IP address, or UUID
+      operationId: instance_multicast_group_leave
+      parameters:
+      - in: path
+        name: instance
+        description: Name or ID of the instance
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: multicast_group
+        description: Name, ID, or IP address of the multicast group
+        required: true
+        schema:
+          $ref: '#/components/schemas/MulticastGroupIdentifier'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/multicast-groups:
+    get:
+      tags:
+      - experimental
+      summary: List multicast groups
+      operationId: multicast_group_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MulticastGroupResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+  /v1/multicast-groups/{multicast_group}:
+    get:
+      tags:
+      - experimental
+      summary: Fetch multicast group
+      description: The group can be specified by name, UUID, or multicast IP address. (e.g., "224.1.2.3" or "ff38::1").
+      operationId: multicast_group_view
+      parameters:
+      - in: path
+        name: multicast_group
+        description: Name, ID, or IP address of the multicast group
+        required: true
+        schema:
+          $ref: '#/components/schemas/MulticastGroupIdentifier'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MulticastGroup'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/multicast-groups/{multicast_group}/members:
+    get:
+      tags:
+      - experimental
+      summary: List members of multicast group
+      description: The group can be specified by name, UUID, or multicast IP address.
+      operationId: multicast_group_member_list
+      parameters:
+      - in: path
+        name: multicast_group
+        description: Name, ID, or IP address of the multicast group
+        required: true
+        schema:
+          $ref: '#/components/schemas/MulticastGroupIdentifier'
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/IdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MulticastGroupMemberResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+  /v1/system/hardware/racks/{rack_id}/membership:
+    get:
+      tags:
+      - experimental
+      summary: Fetch rack cluster membership status
+      description: Returns the status for the most recent change, or a specific version if one is specified.
+      operationId: rack_membership_status
+      parameters:
+      - in: path
+        name: rack_id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: version
+        schema:
+          $ref: '#/components/schemas/RackMembershipVersion'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RackMembershipStatus'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/hardware/racks/{rack_id}/membership/abort:
+    post:
+      tags:
+      - experimental
+      summary: Abort the latest rack membership change
+      description: This operation is synchronous. Upon returning from the API call, a success response indicates that the prior membership change was aborted. An error response indicates that there is no active membership change in progress (previous changes have completed) or that the current membership change could not be aborted.
+      operationId: rack_membership_abort
+      parameters:
+      - in: path
+        name: rack_id
+        description: ID of the rack
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RackMembershipStatus'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/hardware/racks/{rack_id}/membership/add:
+    post:
+      tags:
+      - experimental
+      summary: Add new sleds to rack membership
+      operationId: rack_membership_add_sleds
+      parameters:
+      - in: path
+        name: rack_id
+        description: ID of the rack
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RackMembershipAddSledsRequest'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RackMembershipStatus'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/timeseries/query:
+    post:
+      tags:
+      - experimental
+      summary: Run project-scoped timeseries query
+      description: Queries are written in OxQL. Project must be specified by name or ID in URL query parameter. The OxQL query will only return timeseries data from the specified project.
+      operationId: timeseries_query
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeseriesQuery'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OxqlQueryResult'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+components:
+  schemas:
+    AffinityGroup:
+      description: View of an Affinity Group
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        failure_domain:
+          $ref: '#/components/schemas/FailureDomain'
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        policy:
+          $ref: '#/components/schemas/AffinityPolicy'
+        project_id:
+          type: string
+          format: uuid
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - failure_domain
+      - id
+      - name
+      - policy
+      - project_id
+      - time_created
+      - time_modified
+    ProbeInfo:
+      type: object
+      properties:
+        external_ips:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProbeExternalIp'
+        id:
+          type: string
+          format: uuid
+        interface:
+          $ref: '#/components/schemas/NetworkInterface'
+        name:
+          $ref: '#/components/schemas/Name'
+        sled:
+          type: string
+          format: uuid
+      required:
+      - external_ips
+      - id
+      - interface
+      - name
+      - sled
+    BaseboardId:
+      description: 'A representation of a Baseboard ID as used in the inventory subsystem.
+
+
+        This type is essentially the same as a `Baseboard` except it doesn''t have a revision or HW type (Gimlet, PC, Unknown).'
+      type: object
+      properties:
+        part_number:
+          description: Oxide Part Number
+          type: string
+        serial_number:
+          description: Serial number (unique for a given part number)
+          type: string
+      required:
+      - part_number
+      - serial_number
+    NetworkInterfaceKind:
+      description: The type of network interface
+      oneOf:
+      - description: A vNIC attached to a guest instance
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+          type:
+            type: string
+            enum:
+            - instance
+        required:
+        - id
+        - type
+      - description: A vNIC associated with an internal service
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+          type:
+            type: string
+            enum:
+            - service
+        required:
+        - id
+        - type
+      - description: A vNIC associated with a probe
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+          type:
+            type: string
+            enum:
+            - probe
+        required:
+        - id
+        - type
+    Values:
+      description: A single list of values, for one dimension of a timeseries.
+      type: object
+      properties:
+        metric_type:
+          description: The type of this metric.
+          allOf:
+          - $ref: '#/components/schemas/MetricType'
+        values:
+          description: The data values.
+          allOf:
+          - $ref: '#/components/schemas/ValueArray'
+      required:
+      - metric_type
+      - values
+    FailureDomain:
+      description: Describes the scope of affinity for the purposes of co-location.
+      oneOf:
+      - description: Instances are considered co-located if they are on the same sled
+        type: string
+        enum:
+        - sled
+    NetworkInterface:
+      description: Information required to construct a virtual network interface
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        ip_config:
+          $ref: '#/components/schemas/PrivateIpConfig'
+        kind:
+          $ref: '#/components/schemas/NetworkInterfaceKind'
+        mac:
+          $ref: '#/components/schemas/MacAddr'
+        name:
+          $ref: '#/components/schemas/Name'
+        primary:
+          type: boolean
+        slot:
+          type: integer
+          format: uint8
+          minimum: 0
+        vni:
+          $ref: '#/components/schemas/Vni'
+      required:
+      - id
+      - ip_config
+      - kind
+      - mac
+      - name
+      - primary
+      - slot
+      - vni
+    ProbeCreate:
+      description: Create time parameters for probes.
+      type: object
+      properties:
+        description:
+          type: string
+        name:
+          $ref: '#/components/schemas/Name'
+        pool_selector:
+          description: Pool to allocate from.
+          default:
+            ip_version: null
+            type: auto
+          allOf:
+          - $ref: '#/components/schemas/PoolSelector'
+        sled:
+          type: string
+          format: uuid
+      required:
+      - description
+      - name
+      - sled
+    MulticastGroupMember:
+      description: View of a Multicast Group Member (instance belonging to a multicast group)
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        instance_id:
+          description: The ID of the instance that is a member of this group.
+          type: string
+          format: uuid
+        multicast_group_id:
+          description: The ID of the multicast group this member belongs to.
+          type: string
+          format: uuid
+        multicast_ip:
+          description: The multicast IP address of the group this member belongs to.
+          type: string
+          format: ip
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        source_ips:
+          description: 'Source IP addresses for this member''s multicast subscription.
+
+
+            - **ASM**: Sources are optional. Empty array means any source is allowed. Non-empty array enables source filtering (IGMPv3/MLDv2). - **SSM**: Sources are required for SSM addresses (232/8, ff3x::/32).'
+          type: array
+          items:
+            type: string
+            format: ip
+        state:
+          description: Current state of the multicast group membership.
+          type: string
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - id
+      - instance_id
+      - multicast_group_id
+      - multicast_ip
+      - name
+      - source_ips
+      - state
+      - time_created
+      - time_modified
+    PoolSelector:
+      description: Specify which IP or external subnet pool to allocate from.
+      oneOf:
+      - description: Use the specified pool by name or ID.
+        type: object
+        properties:
+          pool:
+            description: The pool to allocate from.
+            allOf:
+            - $ref: '#/components/schemas/NameOrId'
+          type:
+            type: string
+            enum:
+            - explicit
+        required:
+        - pool
+        - type
+      - description: Use the default pool for the silo.
+        type: object
+        properties:
+          ip_version:
+            description: IP version to use when multiple default pools exist. Required if both IPv4 and IPv6 default pools are configured.
+            default: null
+            allOf:
+            - $ref: '#/components/schemas/IpVersion'
+          type:
+            type: string
+            enum:
+            - auto
+        required:
+        - type
+    RackMembershipVersion:
+      description: A unique, monotonically increasing number representing the set of active sleds in a rack at a given point in time.
+      type: integer
+      format: uint64
+      minimum: 0
+    NameOrIdSortMode:
+      description: Supported set of sort modes for scanning by name or id
+      oneOf:
+      - description: Sort in increasing order of "name"
+        type: string
+        enum:
+        - name_ascending
+      - description: Sort in decreasing order of "name"
+        type: string
+        enum:
+        - name_descending
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    MulticastGroupMemberResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/MulticastGroupMember'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    PrivateIpv6Config:
+      description: VPC-private IPv6 configuration for a network interface.
+      type: object
+      properties:
+        ip:
+          description: VPC-private IP address.
+          type: string
+          format: ipv6
+        subnet:
+          description: The IP subnet.
+          allOf:
+          - $ref: '#/components/schemas/Ipv6Net'
+        transit_ips:
+          description: Additional networks on which the interface can send / receive traffic.
+          type: array
+          items:
+            $ref: '#/components/schemas/Ipv6Net'
+      required:
+      - ip
+      - subnet
+      - transit_ips
+    RackMembershipStatus:
+      description: Status of the rack membership uniquely identified by the (rack_id, version) pair
+      type: object
+      properties:
+        members:
+          description: All members of the rack for this version
+          type: array
+          items:
+            $ref: '#/components/schemas/BaseboardId'
+          uniqueItems: true
+        rack_id:
+          type: string
+          format: uuid
+        state:
+          $ref: '#/components/schemas/RackMembershipChangeState'
+        time_aborted:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        time_committed:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        time_created:
+          type: string
+          format: date-time
+        unacknowledged_members:
+          description: All members that have not yet confirmed this membership version
+          type: array
+          items:
+            $ref: '#/components/schemas/BaseboardId'
+          uniqueItems: true
+        version:
+          description: Version that uniquely identifies the rack membership at a given point in time
+          allOf:
+          - $ref: '#/components/schemas/RackMembershipVersion'
+      required:
+      - members
+      - rack_id
+      - state
+      - time_created
+      - unacknowledged_members
+      - version
+    AffinityGroupResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/AffinityGroup'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    OxqlTable:
+      description: 'A table represents one or more timeseries with the same schema.
+
+
+        A table is the result of an OxQL query. It contains a name, usually the name of the timeseries schema from which the data is derived, and any number of timeseries, which contain the actual data.'
+      type: object
+      properties:
+        name:
+          description: The name of the table.
+          type: string
+        timeseries:
+          description: The set of timeseries in the table, ordered by key.
+          type: array
+          items:
+            $ref: '#/components/schemas/Timeseries'
+      required:
+      - name
+      - timeseries
+    MacAddr:
+      example: ff:ff:ff:ff:ff:ff
+      title: A MAC address
+      description: A Media Access Control address, in EUI-48 format
+      type: string
+      pattern: ^([0-9a-fA-F]{0,2}:){5}[0-9a-fA-F]{0,2}$
+      minLength: 5
+      maxLength: 17
+    IdSortMode:
+      description: 'Supported set of sort modes for scanning by id only.
+
+
+        Currently, we only support scanning in ascending order.'
+      oneOf:
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    PrivateIpConfig:
+      description: VPC-private IP address configuration for a network interface.
+      oneOf:
+      - description: The interface has only an IPv4 configuration.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - v4
+          value:
+            $ref: '#/components/schemas/PrivateIpv4Config'
+        required:
+        - type
+        - value
+      - description: The interface has only an IPv6 configuration.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - v6
+          value:
+            $ref: '#/components/schemas/PrivateIpv6Config'
+        required:
+        - type
+        - value
+      - description: The interface is dual-stack.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - dual_stack
+          value:
+            type: object
+            properties:
+              v4:
+                description: The interface's IPv4 configuration.
+                allOf:
+                - $ref: '#/components/schemas/PrivateIpv4Config'
+              v6:
+                description: The interface's IPv6 configuration.
+                allOf:
+                - $ref: '#/components/schemas/PrivateIpv6Config'
+            required:
+            - v4
+            - v6
+        required:
+        - type
+        - value
+    MulticastGroupIdentifier:
+      title: A multicast group identifier
+      description: Can be a UUID, a name, or an IP address
+      type: string
+    Timeseries:
+      description: 'A timeseries contains a timestamped set of values from one source.
+
+
+        This includes the typed key-value pairs that uniquely identify it, and the set of timestamps and data values from it.'
+      type: object
+      properties:
+        fields:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/FieldValue'
+        points:
+          $ref: '#/components/schemas/Points'
+      required:
+      - fields
+      - points
+    MulticastGroupResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/MulticastGroup'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    MulticastGroup:
+      description: View of a Multicast Group
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        has_any_source_member:
+          description: 'True if any member joined without specifying source IPs (any-source).
+
+
+            When true, at least one member receives traffic from any source rather than filtering to specific sources.'
+          type: boolean
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        ip_pool_id:
+          description: The ID of the IP pool this resource belongs to.
+          type: string
+          format: uuid
+        multicast_ip:
+          description: The multicast IP address held by this resource.
+          type: string
+          format: ip
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        source_ips:
+          description: 'Deduplicated union of source IPs specified by members.
+
+
+            Contains only sources from members that joined with explicit `source_ips`. Members using any-source multicast (empty `source_ips`) do not contribute, so a non-empty value does not imply all members use source filtering. For SSM addresses (232/8, ff3x::/32), this is always non-empty.'
+          type: array
+          items:
+            type: string
+            format: ip
+        state:
+          description: Current state of the multicast group.
+          type: string
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - has_any_source_member
+      - id
+      - ip_pool_id
+      - multicast_ip
+      - name
+      - source_ips
+      - state
+      - time_created
+      - time_modified
+    PrivateIpv4Config:
+      description: VPC-private IPv4 configuration for a network interface.
+      type: object
+      properties:
+        ip:
+          description: VPC-private IP address.
+          type: string
+          format: ipv4
+        subnet:
+          description: The IP subnet.
+          allOf:
+          - $ref: '#/components/schemas/Ipv4Net'
+        transit_ips:
+          description: Additional networks on which the interface can send / receive traffic.
+          default: []
+          type: array
+          items:
+            $ref: '#/components/schemas/Ipv4Net'
+      required:
+      - ip
+      - subnet
+    TimeseriesQuery:
+      description: A timeseries query string, written in the Oximeter query language.
+      type: object
+      properties:
+        query:
+          description: A timeseries query string, written in the Oximeter query language.
+          type: string
+      required:
+      - query
+    RackMembershipAddSledsRequest:
+      type: object
+      properties:
+        sled_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/BaseboardId'
+          uniqueItems: true
+      required:
+      - sled_ids
+    Points:
+      description: Timepoints and values for one timeseries.
+      type: object
+      properties:
+        start_times:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+            format: date-time
+        timestamps:
+          type: array
+          items:
+            type: string
+            format: date-time
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/Values'
+      required:
+      - timestamps
+      - values
+    ProbeInfoResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/ProbeInfo'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    Distributionint64:
+      description: 'A distribution is a sequence of bins and counts in those bins, and some statistical information tracked to compute the mean, standard deviation, and quantile estimates.
+
+
+        Min, max, and the p-* quantiles are treated as optional due to the possibility of distribution operations, like subtraction.'
+      type: object
+      properties:
+        bins:
+          type: array
+          items:
+            type: integer
+            format: int64
+        counts:
+          type: array
+          items:
+            type: integer
+            format: uint64
+            minimum: 0
+        max:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        min:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        p50:
+          type:
+          - number
+          - 'null'
+          format: double
+        p90:
+          type:
+          - number
+          - 'null'
+          format: double
+        p99:
+          type:
+          - number
+          - 'null'
+          format: double
+        squared_mean:
+          type: number
+          format: double
+        sum_of_samples:
+          type: integer
+          format: int64
+      required:
+      - bins
+      - counts
+      - squared_mean
+      - sum_of_samples
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    AffinityGroupMemberResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/AffinityGroupMember'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    ProbeExternalIp:
+      type: object
+      properties:
+        first_port:
+          type: integer
+          format: uint16
+          minimum: 0
+        ip:
+          type: string
+          format: ip
+        kind:
+          $ref: '#/components/schemas/ProbeExternalIpKind'
+        last_port:
+          type: integer
+          format: uint16
+          minimum: 0
+      required:
+      - first_port
+      - ip
+      - kind
+      - last_port
+    AffinityPolicy:
+      description: 'Affinity policy used to describe "what to do when a request cannot be satisfied"
+
+
+        Used for both Affinity and Anti-Affinity Groups'
+      oneOf:
+      - description: 'If the affinity request cannot be satisfied, allow it anyway.
+
+
+          This enables a "best-effort" attempt to satisfy the affinity policy.'
+        type: string
+        enum:
+        - allow
+      - description: If the affinity request cannot be satisfied, fail explicitly.
+        type: string
+        enum:
+        - fail
+    FieldValue:
+      description: The `FieldValue` contains the value of a target or metric field.
+      oneOf:
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - string
+          value:
+            type: string
+        required:
+        - type
+        - value
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - i8
+          value:
+            type: integer
+            format: int8
+        required:
+        - type
+        - value
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - u8
+          value:
+            type: integer
+            format: uint8
+            minimum: 0
+        required:
+        - type
+        - value
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - i16
+          value:
+            type: integer
+            format: int16
+        required:
+        - type
+        - value
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - u16
+          value:
+            type: integer
+            format: uint16
+            minimum: 0
+        required:
+        - type
+        - value
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - i32
+          value:
+            type: integer
+            format: int32
+        required:
+        - type
+        - value
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - u32
+          value:
+            type: integer
+            format: uint32
+            minimum: 0
+        required:
+        - type
+        - value
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - i64
+          value:
+            type: integer
+            format: int64
+        required:
+        - type
+        - value
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - u64
+          value:
+            type: integer
+            format: uint64
+            minimum: 0
+        required:
+        - type
+        - value
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - ip_addr
+          value:
+            type: string
+            format: ip
+        required:
+        - type
+        - value
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - uuid
+          value:
+            type: string
+            format: uuid
+        required:
+        - type
+        - value
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - bool
+          value:
+            type: boolean
+        required:
+        - type
+        - value
+    AffinityGroupUpdate:
+      description: Updateable properties of an `AffinityGroup`
+      type: object
+      properties:
+        description:
+          type:
+          - string
+          - 'null'
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+    AffinityGroupMember:
+      description: 'A member of an Affinity Group
+
+
+        Membership in a group is not exclusive - members may belong to multiple affinity / anti-affinity groups.
+
+
+        Affinity Groups can contain up to 32 members.'
+      oneOf:
+      - description: 'An instance belonging to this group
+
+
+          Instances can belong to up to 16 affinity groups.'
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - instance
+          value:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              name:
+                $ref: '#/components/schemas/Name'
+              run_state:
+                $ref: '#/components/schemas/InstanceState'
+            required:
+            - id
+            - name
+            - run_state
+        required:
+        - type
+        - value
+    MetricType:
+      description: The type of the metric itself, indicating what its values represent.
+      oneOf:
+      - description: The value represents an instantaneous measurement in time.
+        type: string
+        enum:
+        - gauge
+      - description: The value represents a difference between two points in time.
+        type: string
+        enum:
+        - delta
+      - description: The value represents an accumulation between two points in time.
+        type: string
+        enum:
+        - cumulative
+    ValueArray:
+      description: 'List of data values for one timeseries.
+
+
+        Each element is an option, where `None` represents a missing sample.'
+      oneOf:
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - integer
+          values:
+            type: array
+            items:
+              type:
+              - integer
+              - 'null'
+              format: int64
+        required:
+        - type
+        - values
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - double
+          values:
+            type: array
+            items:
+              type:
+              - number
+              - 'null'
+              format: double
+        required:
+        - type
+        - values
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - boolean
+          values:
+            type: array
+            items:
+              type:
+              - boolean
+              - 'null'
+        required:
+        - type
+        - values
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - string
+          values:
+            type: array
+            items:
+              type:
+              - string
+              - 'null'
+        required:
+        - type
+        - values
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - integer_distribution
+          values:
+            type: array
+            items:
+              allOf:
+              - $ref: '#/components/schemas/Distributionint64'
+        required:
+        - type
+        - values
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - double_distribution
+          values:
+            type: array
+            items:
+              allOf:
+              - $ref: '#/components/schemas/Distributiondouble'
+        required:
+        - type
+        - values
+    InstanceState:
+      description: 'Running state of an Instance (primarily: booted or stopped)
+
+
+        This typically reflects whether it''s starting, running, stopping, or stopped, but also includes states related to the Instance''s lifecycle'
+      oneOf:
+      - description: The instance is being created.
+        type: string
+        enum:
+        - creating
+      - description: The instance is currently starting up.
+        type: string
+        enum:
+        - starting
+      - description: The instance is currently running.
+        type: string
+        enum:
+        - running
+      - description: The instance has been requested to stop and a transition to "Stopped" is imminent.
+        type: string
+        enum:
+        - stopping
+      - description: The instance is currently stopped.
+        type: string
+        enum:
+        - stopped
+      - description: The instance is in the process of rebooting - it will remain in the "rebooting" state until the VM is starting once more.
+        type: string
+        enum:
+        - rebooting
+      - description: The instance is in the process of migrating - it will remain in the "migrating" state until the migration process is complete and the destination propolis is ready to continue execution.
+        type: string
+        enum:
+        - migrating
+      - description: The instance is attempting to recover from a failure.
+        type: string
+        enum:
+        - repairing
+      - description: The instance has encountered a failure.
+        type: string
+        enum:
+        - failed
+      - description: The instance has been deleted.
+        type: string
+        enum:
+        - destroyed
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
+    ProbeExternalIpKind:
+      type: string
+      enum:
+      - snat
+      - floating
+      - ephemeral
+    OxqlQueryResult:
+      description: The result of a successful OxQL query.
+      type: object
+      properties:
+        tables:
+          description: Tables resulting from the query, each containing timeseries.
+          type: array
+          items:
+            $ref: '#/components/schemas/OxqlTable'
+      required:
+      - tables
+    Distributiondouble:
+      description: 'A distribution is a sequence of bins and counts in those bins, and some statistical information tracked to compute the mean, standard deviation, and quantile estimates.
+
+
+        Min, max, and the p-* quantiles are treated as optional due to the possibility of distribution operations, like subtraction.'
+      type: object
+      properties:
+        bins:
+          type: array
+          items:
+            type: number
+            format: double
+        counts:
+          type: array
+          items:
+            type: integer
+            format: uint64
+            minimum: 0
+        max:
+          type:
+          - number
+          - 'null'
+          format: double
+        min:
+          type:
+          - number
+          - 'null'
+          format: double
+        p50:
+          type:
+          - number
+          - 'null'
+          format: double
+        p90:
+          type:
+          - number
+          - 'null'
+          format: double
+        p99:
+          type:
+          - number
+          - 'null'
+          format: double
+        squared_mean:
+          type: number
+          format: double
+        sum_of_samples:
+          type: number
+          format: double
+      required:
+      - bins
+      - counts
+      - squared_mean
+      - sum_of_samples
+    IpVersion:
+      description: The IP address version.
+      type: string
+      enum:
+      - v4
+      - v6
+    Ipv6Net:
+      example: fd12:3456::/64
+      title: An IPv6 subnet
+      description: An IPv6 subnet, including prefix and subnet mask
+      x-rust-type:
+        crate: oxnet
+        path: oxnet::Ipv6Net
+        version: 0.1.0
+      type: string
+      pattern: ^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))\/([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])$
+    Ipv4Net:
+      example: 192.168.1.0/24
+      title: An IPv4 subnet
+      description: An IPv4 subnet, including prefix and prefix length
+      x-rust-type:
+        crate: oxnet
+        path: oxnet::Ipv4Net
+        version: 0.1.0
+      type: string
+      pattern: ^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/([0-9]|1[0-9]|2[0-9]|3[0-2])$
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
+    RackMembershipChangeState:
+      type: string
+      enum:
+      - in_progress
+      - committed
+      - aborted
+    AffinityGroupCreate:
+      description: Create-time parameters for an `AffinityGroup`
+      type: object
+      properties:
+        description:
+          type: string
+        failure_domain:
+          $ref: '#/components/schemas/FailureDomain'
+        name:
+          $ref: '#/components/schemas/Name'
+        policy:
+          $ref: '#/components/schemas/AffinityPolicy'
+      required:
+      - description
+      - failure_domain
+      - name
+      - policy
+    Vni:
+      description: A Geneve Virtual Network Identifier
+      type: integer
+      format: uint32
+      minimum: 0
+    Probe:
+      description: A networking probe
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        sled:
+          type: string
+          format: uuid
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - id
+      - name
+      - sled
+      - time_created
+      - time_modified
+    InstanceMulticastGroupJoin:
+      description: 'Parameters for joining an instance to a multicast group.
+
+
+        When joining by IP address, the pool containing the multicast IP is auto-discovered from all linked multicast pools.'
+      type: object
+      properties:
+        ip_version:
+          description: IP version for pool selection when creating a group by name. Required if both IPv4 and IPv6 default multicast pools are linked.
+          default: null
+          allOf:
+          - $ref: '#/components/schemas/IpVersion'
+        source_ips:
+          description: Source IPs for source-filtered multicast (SSM). Optional for ASM groups, required for SSM groups (232.0.0.0/8, ff3x::/32).
+          default: null
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+            format: ip
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

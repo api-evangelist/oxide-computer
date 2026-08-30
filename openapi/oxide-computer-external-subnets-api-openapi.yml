@@ -1,0 +1,512 @@
+openapi: 3.2.0
+info:
+  title: Oxide Region External Subnets API
+  description: API for interacting with the Oxide control plane
+  contact:
+    url: https://oxide.computer
+    email: api@oxide.computer
+  version: 2026081901.0.0
+tags:
+- name: external-subnets
+  description: External subnets that can be attached to instances.
+  externalDocs:
+    url: http://docs.oxide.computer/api/external-subnets
+paths:
+  /v1/external-subnets:
+    get:
+      tags:
+      - external-subnets
+      summary: List external subnets
+      operationId: external_subnet_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalSubnetResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required:
+        - project
+    post:
+      tags:
+      - external-subnets
+      summary: Create external subnet
+      operationId: external_subnet_create
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalSubnetCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalSubnet'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/external-subnets/{external_subnet}:
+    get:
+      tags:
+      - external-subnets
+      summary: Fetch external subnet
+      operationId: external_subnet_view
+      parameters:
+      - in: path
+        name: external_subnet
+        description: Name or ID of the external subnet
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalSubnet'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+      - external-subnets
+      summary: Update external subnet
+      operationId: external_subnet_update
+      parameters:
+      - in: path
+        name: external_subnet
+        description: Name or ID of the external subnet
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalSubnetUpdate'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalSubnet'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - external-subnets
+      summary: Delete external subnet
+      operationId: external_subnet_delete
+      parameters:
+      - in: path
+        name: external_subnet
+        description: Name or ID of the external subnet
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/external-subnets/{external_subnet}/attach:
+    post:
+      tags:
+      - external-subnets
+      summary: Attach external subnet to instance
+      operationId: external_subnet_attach
+      parameters:
+      - in: path
+        name: external_subnet
+        description: Name or ID of the external subnet
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalSubnetAttach'
+        required: true
+      responses:
+        '202':
+          description: successfully enqueued operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalSubnet'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/external-subnets/{external_subnet}/detach:
+    post:
+      tags:
+      - external-subnets
+      summary: Detach external subnet from instance
+      operationId: external_subnet_detach
+      parameters:
+      - in: path
+        name: external_subnet
+        description: Name or ID of the external subnet
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '202':
+          description: successfully enqueued operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalSubnet'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+components:
+  schemas:
+    ExternalSubnetAttach:
+      description: Attach an external subnet to an instance
+      type: object
+      properties:
+        instance:
+          description: Name or ID of the instance to attach to
+          allOf:
+          - $ref: '#/components/schemas/NameOrId'
+      required:
+      - instance
+    ExternalSubnetResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalSubnet'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
+    ExternalSubnetCreate:
+      description: Create an external subnet
+      type: object
+      properties:
+        allocator:
+          description: Subnet allocation method.
+          allOf:
+          - $ref: '#/components/schemas/ExternalSubnetAllocator'
+        description:
+          type: string
+        name:
+          $ref: '#/components/schemas/Name'
+      required:
+      - allocator
+      - description
+      - name
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
+    ExternalSubnet:
+      description: An external subnet allocated from a subnet pool
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        instance_id:
+          description: The instance this subnet is attached to, if any
+          type:
+          - string
+          - 'null'
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        project_id:
+          description: The project this subnet belongs to
+          type: string
+          format: uuid
+        subnet:
+          description: The allocated subnet CIDR
+          allOf:
+          - $ref: '#/components/schemas/IpNet'
+        subnet_pool_id:
+          description: The subnet pool this was allocated from
+          type: string
+          format: uuid
+        subnet_pool_member_id:
+          description: The subnet pool member this subnet corresponds to
+          type: string
+          format: uuid
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - id
+      - name
+      - project_id
+      - subnet
+      - subnet_pool_id
+      - subnet_pool_member_id
+      - time_created
+      - time_modified
+    ExternalSubnetAllocator:
+      description: Specify how to allocate an external subnet.
+      oneOf:
+      - description: Reserve a specific subnet.
+        type: object
+        properties:
+          subnet:
+            description: The subnet CIDR to reserve. Must be available in the pool.
+            allOf:
+            - $ref: '#/components/schemas/IpNet'
+          type:
+            type: string
+            enum:
+            - explicit
+        required:
+        - subnet
+        - type
+      - description: Automatically allocate a subnet with the specified prefix length.
+        type: object
+        properties:
+          pool_selector:
+            description: 'Pool selection.
+
+
+              If omitted, this field uses the silo''s default pool. If the silo has default pools for both IPv4 and IPv6, the request will fail unless `ip_version` is specified in the pool selector.'
+            default:
+              ip_version: null
+              type: auto
+            allOf:
+            - $ref: '#/components/schemas/PoolSelector'
+          prefix_length:
+            description: The prefix length for the allocated subnet (e.g., 24 for a /24).
+            type: integer
+            format: uint8
+            minimum: 0
+          type:
+            type: string
+            enum:
+            - auto
+        required:
+        - prefix_length
+        - type
+    ExternalSubnetUpdate:
+      description: Update an external subnet
+      type: object
+      properties:
+        description:
+          type:
+          - string
+          - 'null'
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+    Ipv6Net:
+      example: fd12:3456::/64
+      title: An IPv6 subnet
+      description: An IPv6 subnet, including prefix and subnet mask
+      x-rust-type:
+        crate: oxnet
+        path: oxnet::Ipv6Net
+        version: 0.1.0
+      type: string
+      pattern: ^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))\/([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])$
+    IpVersion:
+      description: The IP address version.
+      type: string
+      enum:
+      - v4
+      - v6
+    PoolSelector:
+      description: Specify which IP or external subnet pool to allocate from.
+      oneOf:
+      - description: Use the specified pool by name or ID.
+        type: object
+        properties:
+          pool:
+            description: The pool to allocate from.
+            allOf:
+            - $ref: '#/components/schemas/NameOrId'
+          type:
+            type: string
+            enum:
+            - explicit
+        required:
+        - pool
+        - type
+      - description: Use the default pool for the silo.
+        type: object
+        properties:
+          ip_version:
+            description: IP version to use when multiple default pools exist. Required if both IPv4 and IPv6 default pools are configured.
+            default: null
+            allOf:
+            - $ref: '#/components/schemas/IpVersion'
+          type:
+            type: string
+            enum:
+            - auto
+        required:
+        - type
+    Ipv4Net:
+      example: 192.168.1.0/24
+      title: An IPv4 subnet
+      description: An IPv4 subnet, including prefix and prefix length
+      x-rust-type:
+        crate: oxnet
+        path: oxnet::Ipv4Net
+        version: 0.1.0
+      type: string
+      pattern: ^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/([0-9]|1[0-9]|2[0-9]|3[0-2])$
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    NameOrIdSortMode:
+      description: Supported set of sort modes for scanning by name or id
+      oneOf:
+      - description: Sort in increasing order of "name"
+        type: string
+        enum:
+        - name_ascending
+      - description: Sort in decreasing order of "name"
+        type: string
+        enum:
+        - name_descending
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    IpNet:
+      x-rust-type:
+        crate: oxnet
+        path: oxnet::IpNet
+        version: 0.1.0
+      oneOf:
+      - title: v4
+        allOf:
+        - $ref: '#/components/schemas/Ipv4Net'
+      - title: v6
+        allOf:
+        - $ref: '#/components/schemas/Ipv6Net'
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

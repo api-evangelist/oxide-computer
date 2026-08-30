@@ -1,0 +1,2939 @@
+openapi: 3.2.0
+info:
+  title: Oxide Region System/networking API
+  description: API for interacting with the Oxide control plane
+  contact:
+    url: https://oxide.computer
+    email: api@oxide.computer
+  version: 2026081901.0.0
+tags:
+- name: system/networking
+  description: This provides rack-level network configuration.
+  externalDocs:
+    url: http://docs.oxide.computer/api/system-networking
+paths:
+  /v1/system/hardware/rack-switch-port/{rack_id}/{switch_slot}/{port}/lldp/neighbors:
+    get:
+      tags:
+      - system/networking
+      summary: Fetch LLDP neighbors for switch port
+      operationId: networking_switch_port_lldp_neighbors
+      parameters:
+      - in: path
+        name: port
+        description: A name to use when selecting switch ports.
+        required: true
+        schema:
+          $ref: '#/components/schemas/Name'
+      - in: path
+        name: rack_id
+        description: A rack id to use when selecting switch ports.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: path
+        name: switch_slot
+        description: The slot of the switch within the rack to use when selecting switch ports.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SwitchSlot'
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/IdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LldpNeighborResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+  /v1/system/hardware/switch-port/{port}/lldp/config:
+    get:
+      tags:
+      - system/networking
+      summary: Fetch LLDP configuration for switch port
+      operationId: networking_switch_port_lldp_config_view
+      parameters:
+      - in: path
+        name: port
+        description: A name to use when selecting switch ports.
+        required: true
+        schema:
+          $ref: '#/components/schemas/Name'
+      - in: query
+        name: rack_id
+        description: A rack id to use when selecting switch ports.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: switch_slot
+        description: The slot of the switch within the rack to use when selecting switch ports.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SwitchSlot'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LldpLinkConfig'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    post:
+      tags:
+      - system/networking
+      summary: Update LLDP configuration for switch port
+      operationId: networking_switch_port_lldp_config_update
+      parameters:
+      - in: path
+        name: port
+        description: A name to use when selecting switch ports.
+        required: true
+        schema:
+          $ref: '#/components/schemas/Name'
+      - in: query
+        name: rack_id
+        description: A rack id to use when selecting switch ports.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: switch_slot
+        description: The slot of the switch within the rack to use when selecting switch ports.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SwitchSlot'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LldpLinkConfig'
+        required: true
+      responses:
+        '204':
+          description: resource updated
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/networking/address-lot:
+    get:
+      tags:
+      - system/networking
+      summary: List address lots
+      operationId: networking_address_lot_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressLotResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+    post:
+      tags:
+      - system/networking
+      summary: Create address lot
+      operationId: networking_address_lot_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddressLotCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressLotCreateResponse'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/networking/address-lot/{address_lot}:
+    get:
+      tags:
+      - system/networking
+      summary: Fetch address lot
+      operationId: networking_address_lot_view
+      parameters:
+      - in: path
+        name: address_lot
+        description: Name or ID of the address lot
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressLotViewResponse'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - system/networking
+      summary: Delete address lot
+      operationId: networking_address_lot_delete
+      parameters:
+      - in: path
+        name: address_lot
+        description: Name or ID of the address lot
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/networking/address-lot/{address_lot}/blocks:
+    get:
+      tags:
+      - system/networking
+      summary: List blocks in address lot
+      operationId: networking_address_lot_block_list
+      parameters:
+      - in: path
+        name: address_lot
+        description: Name or ID of the address lot
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/IdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressLotBlockResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+  /v1/system/networking/allow-list:
+    get:
+      tags:
+      - system/networking
+      summary: Get user-facing services IP allowlist
+      operationId: networking_allow_list_view
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllowList'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+      - system/networking
+      summary: Update user-facing services IP allowlist
+      operationId: networking_allow_list_update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AllowListUpdate'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllowList'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/networking/bfd-disable:
+    post:
+      tags:
+      - system/networking
+      summary: Disable BFD session
+      operationId: networking_bfd_disable
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BfdSessionDisable'
+        required: true
+      responses:
+        '204':
+          description: resource updated
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/networking/bfd-enable:
+    post:
+      tags:
+      - system/networking
+      summary: Enable BFD session
+      operationId: networking_bfd_enable
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BfdSessionEnable'
+        required: true
+      responses:
+        '204':
+          description: resource updated
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/networking/bfd-status:
+    get:
+      tags:
+      - system/networking
+      summary: Get BFD status
+      operationId: networking_bfd_status
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                title: Array_of_BfdStatus
+                type: array
+                items:
+                  $ref: '#/components/schemas/BfdStatus'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/networking/bgp:
+    get:
+      tags:
+      - system/networking
+      summary: List BGP configurations
+      operationId: networking_bgp_config_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BgpConfigResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+    put:
+      tags:
+      - system/networking
+      summary: Update the mutable fields of an existing BGP configuration
+      description: The asn field is not updatable; to change the autonomous system number, create a new BGP configuration object.
+      operationId: networking_bgp_config_update
+      parameters:
+      - in: query
+        name: name_or_id
+        description: A name or id to use when selecting BGP config.
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BgpConfigUpdate'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BgpConfig'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    post:
+      tags:
+      - system/networking
+      summary: Create BGP configuration
+      operationId: networking_bgp_config_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BgpConfigCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BgpConfig'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - system/networking
+      summary: Delete BGP configuration
+      operationId: networking_bgp_config_delete
+      parameters:
+      - in: query
+        name: name_or_id
+        description: A name or id to use when selecting BGP config.
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: resource updated
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/networking/bgp-announce-set:
+    get:
+      tags:
+      - system/networking
+      summary: List BGP announce sets
+      operationId: networking_bgp_announce_set_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                title: Array_of_BgpAnnounceSet
+                type: array
+                items:
+                  $ref: '#/components/schemas/BgpAnnounceSet'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+    put:
+      tags:
+      - system/networking
+      summary: Update BGP announce set
+      description: If the announce set exists, this endpoint replaces the existing announce set with the one specified.
+      operationId: networking_bgp_announce_set_update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BgpAnnounceSetCreate'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BgpAnnounceSet'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/networking/bgp-announce-set/{announce_set}:
+    delete:
+      tags:
+      - system/networking
+      summary: Delete BGP announce set
+      operationId: networking_bgp_announce_set_delete
+      parameters:
+      - in: path
+        name: announce_set
+        description: Name or ID of the announce set
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: resource updated
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/networking/bgp-announce-set/{announce_set}/announcement:
+    get:
+      tags:
+      - system/networking
+      summary: Get originated routes for a specified BGP announce set
+      operationId: networking_bgp_announcement_list
+      parameters:
+      - in: path
+        name: announce_set
+        description: Name or ID of the announce set
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                title: Array_of_BgpAnnouncement
+                type: array
+                items:
+                  $ref: '#/components/schemas/BgpAnnouncement'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/networking/bgp-exported:
+    get:
+      tags:
+      - system/networking
+      summary: List BGP exported routes
+      operationId: networking_bgp_exported
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                title: Array_of_BgpExported
+                type: array
+                items:
+                  $ref: '#/components/schemas/BgpExported'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/networking/bgp-imported:
+    get:
+      tags:
+      - system/networking
+      summary: Get imported IPv4 BGP routes
+      operationId: networking_bgp_imported
+      parameters:
+      - in: query
+        name: asn
+        description: The ASN to filter on. Required.
+        required: true
+        schema:
+          type: integer
+          format: uint32
+          minimum: 0
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                title: Array_of_BgpImported
+                type: array
+                items:
+                  $ref: '#/components/schemas/BgpImported'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/networking/bgp-message-history:
+    get:
+      tags:
+      - system/networking
+      summary: Get BGP router message history
+      operationId: networking_bgp_message_history
+      parameters:
+      - in: query
+        name: asn
+        description: The ASN to filter on. Required.
+        required: true
+        schema:
+          type: integer
+          format: uint32
+          minimum: 0
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AggregateBgpMessageHistory'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/networking/bgp-status:
+    get:
+      tags:
+      - system/networking
+      summary: Get BGP peer status
+      operationId: networking_bgp_status
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                title: Array_of_BgpPeerStatus
+                type: array
+                items:
+                  $ref: '#/components/schemas/BgpPeerStatus'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/networking/inbound-icmp:
+    get:
+      tags:
+      - system/networking
+      summary: Return whether API services can receive limited ICMP traffic
+      operationId: networking_inbound_icmp_view
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceIcmpConfig'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+      - system/networking
+      summary: Set whether API services can receive limited ICMP traffic
+      operationId: networking_inbound_icmp_update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceIcmpConfig'
+        required: true
+      responses:
+        '204':
+          description: resource updated
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/networking/loopback-address:
+    get:
+      tags:
+      - system/networking
+      summary: List loopback addresses
+      operationId: networking_loopback_address_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/IdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoopbackAddressResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+    post:
+      tags:
+      - system/networking
+      summary: Create loopback address
+      operationId: networking_loopback_address_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoopbackAddressCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoopbackAddress'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/networking/loopback-address/{rack_id}/{switch_slot}/{address}/{subnet_mask}:
+    delete:
+      tags:
+      - system/networking
+      summary: Delete loopback address
+      operationId: networking_loopback_address_delete
+      parameters:
+      - in: path
+        name: address
+        description: The IP address and subnet mask to use when selecting the loopback address.
+        required: true
+        schema:
+          type: string
+          format: ip
+      - in: path
+        name: rack_id
+        description: The rack to use when selecting the loopback address.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: path
+        name: subnet_mask
+        description: The IP address and subnet mask to use when selecting the loopback address.
+        required: true
+        schema:
+          type: integer
+          format: uint8
+          minimum: 0
+      - in: path
+        name: switch_slot
+        description: The slot of the switch within the rack to use when selecting the loopback address.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SwitchSlot'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/networking/settings:
+    get:
+      tags:
+      - system/networking
+      summary: Fetch fleet-wide networking settings
+      operationId: system_networking_settings_view
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemNetworkingSettings'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+      - system/networking
+      summary: Update fleet-wide networking settings
+      operationId: system_networking_settings_update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SystemNetworkingSettingsUpdate'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemNetworkingSettings'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/networking/switch-port-settings:
+    get:
+      tags:
+      - system/networking
+      summary: List switch port settings
+      operationId: networking_switch_port_settings_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: port_settings
+        description: An optional name or id to use when selecting port settings.
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SwitchPortSettingsIdentityResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+    post:
+      tags:
+      - system/networking
+      summary: Create switch port settings
+      operationId: networking_switch_port_settings_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SwitchPortSettingsCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SwitchPortSettings'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - system/networking
+      summary: Delete switch port settings
+      operationId: networking_switch_port_settings_delete
+      parameters:
+      - in: query
+        name: port_settings
+        description: An optional name or id to use when selecting port settings.
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/networking/switch-port-settings/{port}:
+    get:
+      tags:
+      - system/networking
+      summary: Get information about switch port
+      operationId: networking_switch_port_settings_view
+      parameters:
+      - in: path
+        name: port
+        description: A name or id to use when selecting switch port settings info objects.
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SwitchPortSettings'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+components:
+  schemas:
+    BgpImported:
+      description: A route imported from a BGP peer.
+      type: object
+      properties:
+        id:
+          description: BGP identifier of the originating router.
+          type: integer
+          format: uint32
+          minimum: 0
+        nexthop:
+          description: The nexthop the prefix is reachable through.
+          type: string
+          format: ip
+        prefix:
+          description: The destination network prefix.
+          allOf:
+          - $ref: '#/components/schemas/IpNet'
+        switch:
+          description: Switch the route is imported into.
+          allOf:
+          - $ref: '#/components/schemas/SwitchSlot'
+      required:
+      - id
+      - nexthop
+      - prefix
+      - switch
+    InterfaceNum:
+      oneOf:
+      - type: object
+        properties:
+          unknown:
+            type: integer
+            format: uint32
+            minimum: 0
+        required:
+        - unknown
+        additionalProperties: false
+      - type: object
+        properties:
+          if_index:
+            type: integer
+            format: uint32
+            minimum: 0
+        required:
+        - if_index
+        additionalProperties: false
+      - type: object
+        properties:
+          port_number:
+            type: integer
+            format: uint32
+            minimum: 0
+        required:
+        - port_number
+        additionalProperties: false
+    NetworkAddress:
+      oneOf:
+      - type: object
+        properties:
+          ip_addr:
+            type: string
+            format: ip
+        required:
+        - ip_addr
+        additionalProperties: false
+      - type: object
+        properties:
+          i_e_e_e802:
+            type: array
+            items:
+              type: integer
+              format: uint8
+              minimum: 0
+        required:
+        - i_e_e_e802
+        additionalProperties: false
+    LldpNeighborResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/LldpNeighbor'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    AddressLotBlockResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/AddressLotBlock'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    SystemNetworkingSettingsUpdate:
+      description: Parameters for updating the fleet-wide networking settings.
+      type: object
+      properties:
+        external_jumbo_frames_opt_in_enabled:
+          description: Toggle the fleet-wide external jumbo-frames opt-in.
+          default: false
+          type: boolean
+    LoopbackAddress:
+      description: A loopback address is an address that is assigned to a rack switch but is not associated with any particular port.
+      type: object
+      properties:
+        address:
+          description: The loopback IP address and prefix length.
+          allOf:
+          - $ref: '#/components/schemas/IpNet'
+        address_lot_block_id:
+          description: The address lot block this address came from.
+          type: string
+          format: uuid
+        id:
+          description: The id of the loopback address.
+          type: string
+          format: uuid
+        rack_id:
+          description: The id of the rack where this loopback address is assigned.
+          type: string
+          format: uuid
+        switch_slot:
+          description: The slot of the switch within the rack where this loopback address is assigned.
+          allOf:
+          - $ref: '#/components/schemas/SwitchSlot'
+      required:
+      - address
+      - address_lot_block_id
+      - id
+      - rack_id
+      - switch_slot
+    LoopbackAddressCreate:
+      description: Parameters for creating a loopback address on a particular rack switch.
+      type: object
+      properties:
+        address:
+          description: The address to create.
+          type: string
+          format: ip
+        address_lot:
+          description: The name or id of the address lot this loopback address will pull an address from.
+          allOf:
+          - $ref: '#/components/schemas/NameOrId'
+        anycast:
+          description: 'Address is an anycast address.
+
+
+            This allows the address to be assigned to multiple locations simultaneously.'
+          type: boolean
+        mask:
+          description: The subnet mask to use for the address.
+          type: integer
+          format: uint8
+          minimum: 0
+        rack_id:
+          description: The rack containing the switch this loopback address will be configured on.
+          type: string
+          format: uuid
+        switch_slot:
+          description: The slot of the switch within the rack this loopback address will be configured on.
+          allOf:
+          - $ref: '#/components/schemas/SwitchSlot'
+      required:
+      - address
+      - address_lot
+      - anycast
+      - mask
+      - rack_id
+      - switch_slot
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    BgpConfigUpdate:
+      description: 'Parameters for updating a BGP configuration
+
+
+        If a value is not specified, it will remain unchanged.'
+      type: object
+      properties:
+        bgp_announce_set_id:
+          description: Update the BGP announce set associated with this configuration.
+          allOf:
+          - $ref: '#/components/schemas/NameOrId'
+        description:
+          type:
+          - string
+          - 'null'
+        max_paths:
+          description: Update the maximum number of equal-cost paths.
+          allOf:
+          - $ref: '#/components/schemas/MaxPathConfig'
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+    LinkSpeed:
+      description: The speed of a link.
+      oneOf:
+      - description: Zero gigabits per second.
+        type: string
+        enum:
+        - speed0_g
+      - description: 1 gigabit per second.
+        type: string
+        enum:
+        - speed1_g
+      - description: 10 gigabits per second.
+        type: string
+        enum:
+        - speed10_g
+      - description: 25 gigabits per second.
+        type: string
+        enum:
+        - speed25_g
+      - description: 40 gigabits per second.
+        type: string
+        enum:
+        - speed40_g
+      - description: 50 gigabits per second.
+        type: string
+        enum:
+        - speed50_g
+      - description: 100 gigabits per second.
+        type: string
+        enum:
+        - speed100_g
+      - description: 200 gigabits per second.
+        type: string
+        enum:
+        - speed200_g
+      - description: 400 gigabits per second.
+        type: string
+        enum:
+        - speed400_g
+    Ipv4Net:
+      example: 192.168.1.0/24
+      title: An IPv4 subnet
+      description: An IPv4 subnet, including prefix and prefix length
+      x-rust-type:
+        crate: oxnet
+        path: oxnet::Ipv4Net
+        version: 0.1.0
+      type: string
+      pattern: ^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/([0-9]|1[0-9]|2[0-9]|3[0-2])$
+    SystemNetworkingSettings:
+      description: Fleet-wide networking settings. Only fleet viewers may view these settings. Only fleet admins can modify them.
+      type: object
+      properties:
+        external_jumbo_frames_opt_in_enabled:
+          description: When true, end users may opt in to jumbo frames (8500 byte MTU) on the primary interface of an instance. When false, instance-level opt-in is ignored and OPTE ports are created with the default MTU.
+          type: boolean
+      required:
+      - external_jumbo_frames_opt_in_enabled
+    AddressLotCreateResponse:
+      description: An address lot and associated blocks resulting from creating an address lot.
+      type: object
+      properties:
+        blocks:
+          description: The address lot blocks that were created.
+          type: array
+          items:
+            $ref: '#/components/schemas/AddressLotBlock'
+        lot:
+          description: The address lot that was created.
+          allOf:
+          - $ref: '#/components/schemas/AddressLot'
+      required:
+      - blocks
+      - lot
+    SwitchPortConfig:
+      description: A physical port configuration for a port settings object.
+      type: object
+      properties:
+        geometry:
+          description: The physical link geometry of the port.
+          allOf:
+          - $ref: '#/components/schemas/SwitchPortGeometry'
+        port_settings_id:
+          description: The id of the port settings object this configuration belongs to.
+          type: string
+          format: uuid
+      required:
+      - geometry
+      - port_settings_id
+    LinkConfigCreate:
+      description: Switch link configuration.
+      type: object
+      properties:
+        autoneg:
+          description: Whether or not to set autonegotiation.
+          type: boolean
+        fec:
+          description: The requested forward-error correction method.  If this is not specified, the standard FEC for the underlying media will be applied if it can be determined.
+          allOf:
+          - $ref: '#/components/schemas/LinkFec'
+        link_name:
+          description: Link name. On ports that are not broken out, this is always phy0. On a 2x breakout the options are phy0 and phy1, on 4x phy0-phy3, etc.
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        lldp:
+          description: The link-layer discovery protocol (LLDP) configuration for the link.
+          allOf:
+          - $ref: '#/components/schemas/LldpLinkConfigCreate'
+        mtu:
+          description: Maximum transmission unit for the link.
+          type: integer
+          format: uint16
+          minimum: 0
+        speed:
+          description: The speed of the link.
+          allOf:
+          - $ref: '#/components/schemas/LinkSpeed'
+        tx_eq:
+          description: Optional tx_eq settings.
+          allOf:
+          - $ref: '#/components/schemas/TxEqConfig'
+      required:
+      - autoneg
+      - link_name
+      - lldp
+      - mtu
+      - speed
+    AddressLotResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/AddressLot'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    BgpConfigResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/BgpConfig'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    RouterPeerType:
+      oneOf:
+      - type: object
+        properties:
+          router_lifetime:
+            description: Router lifetime in seconds for unnumbered BGP peers.
+            allOf:
+            - $ref: '#/components/schemas/RouterLifetimeConfig'
+          type:
+            type: string
+            enum:
+            - unnumbered
+        required:
+        - router_lifetime
+        - type
+      - type: object
+        properties:
+          src_addr:
+            description: Optional local IP address to bind when establishing outbound TCP connections to this peer. If `None`, the OS selects the source address.
+            default: null
+            type:
+            - string
+            - 'null'
+            format: ip
+          target_addr:
+            description: Target IP address for numbered BGP peers.
+            type: string
+            format: ip
+          type:
+            type: string
+            enum:
+            - numbered
+        required:
+        - target_addr
+        - type
+    ImportExportPolicy:
+      description: Define policy relating to the import and export of prefixes from a BGP peer.
+      oneOf:
+      - description: Do not perform any filtering.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - no_filtering
+        required:
+        - type
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - allow
+          value:
+            type: array
+            items:
+              $ref: '#/components/schemas/IpNet'
+        required:
+        - type
+        - value
+    BgpPeerConfig:
+      type: object
+      properties:
+        link_name:
+          description: Link that the peer is reachable on. On ports that are not broken out, this is always phy0. On a 2x breakout the options are phy0 and phy1, on 4x phy0-phy3, etc.
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        peers:
+          type: array
+          items:
+            $ref: '#/components/schemas/BgpPeer'
+      required:
+      - link_name
+      - peers
+    ManagementAddress:
+      type: object
+      properties:
+        addr:
+          $ref: '#/components/schemas/NetworkAddress'
+        interface_num:
+          $ref: '#/components/schemas/InterfaceNum'
+        oid:
+          type:
+          - array
+          - 'null'
+          items:
+            type: integer
+            format: uint8
+            minimum: 0
+      required:
+      - addr
+      - interface_num
+    LinkFec:
+      description: The forward error correction mode of a link.
+      oneOf:
+      - description: Firecode forward error correction.
+        type: string
+        enum:
+        - firecode
+      - description: No forward error correction.
+        type: string
+        enum:
+        - none
+      - description: Reed-Solomon forward error correction.
+        type: string
+        enum:
+        - rs
+    SwitchPortConfigCreate:
+      description: Physical switch port configuration.
+      type: object
+      properties:
+        geometry:
+          description: Link geometry for the switch port.
+          allOf:
+          - $ref: '#/components/schemas/SwitchPortGeometry'
+      required:
+      - geometry
+    MaxPathConfig:
+      type: integer
+      format: uint8
+      minimum: 1
+      maximum: 32
+    BgpConfig:
+      description: A base BGP configuration.
+      type: object
+      properties:
+        asn:
+          description: The autonomous system number of this BGP configuration.
+          type: integer
+          format: uint32
+          minimum: 0
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        max_paths:
+          description: Maximum number of paths to use when multiple "best paths" exist
+          allOf:
+          - $ref: '#/components/schemas/MaxPathConfig'
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+        vrf:
+          description: Optional virtual routing and forwarding identifier for this BGP configuration.
+          type:
+          - string
+          - 'null'
+      required:
+      - asn
+      - description
+      - id
+      - max_paths
+      - name
+      - time_created
+      - time_modified
+    SwitchPortRouteConfig:
+      description: A route configuration for a port settings object.
+      type: object
+      properties:
+        dst:
+          description: The route's destination network.
+          allOf:
+          - $ref: '#/components/schemas/IpNet'
+        gw:
+          description: The route's gateway address.
+          type: string
+          format: ip
+        interface_name:
+          description: The interface name this route configuration is assigned to.
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        port_settings_id:
+          description: The port settings object this route configuration belongs to.
+          type: string
+          format: uuid
+        rib_priority:
+          description: Route RIB priority. Higher priority indicates precedence within and across protocols.
+          type:
+          - integer
+          - 'null'
+          format: uint8
+          minimum: 0
+        vlan_id:
+          description: The VLAN identifier for the route. Use this if the gateway is reachable over an 802.1Q tagged L2 segment.
+          type:
+          - integer
+          - 'null'
+          format: uint16
+          minimum: 0
+      required:
+      - dst
+      - gw
+      - interface_name
+      - port_settings_id
+    BfdMode:
+      description: BFD connection mode.
+      type: string
+      enum:
+      - single_hop
+      - multi_hop
+    SwitchBgpHistory:
+      description: BGP message history for a particular switch.
+      type: object
+      properties:
+        history:
+          description: Message history indexed by peer address.
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/BgpMessageHistory'
+        switch:
+          description: Switch this message history is associated with.
+          allOf:
+          - $ref: '#/components/schemas/SwitchSlot'
+      required:
+      - history
+      - switch
+    BgpAnnounceSet:
+      description: Represents a BGP announce set by id. The id can be used with other API calls to view and manage the announce set.
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - id
+      - name
+      - time_created
+      - time_modified
+    AddressLotCreate:
+      description: Parameters for creating an address lot.
+      type: object
+      properties:
+        blocks:
+          description: The blocks to add along with the new address lot.
+          type: array
+          items:
+            $ref: '#/components/schemas/AddressLotBlockCreate'
+        description:
+          type: string
+        kind:
+          description: The kind of address lot to create.
+          allOf:
+          - $ref: '#/components/schemas/AddressLotKind'
+        name:
+          $ref: '#/components/schemas/Name'
+      required:
+      - blocks
+      - description
+      - kind
+      - name
+    Ipv6Net:
+      example: fd12:3456::/64
+      title: An IPv6 subnet
+      description: An IPv6 subnet, including prefix and subnet mask
+      x-rust-type:
+        crate: oxnet
+        path: oxnet::Ipv6Net
+        version: 0.1.0
+      type: string
+      pattern: ^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))\/([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])$
+    SwitchInterfaceConfig:
+      description: A switch port interface configuration for a port settings object.
+      type: object
+      properties:
+        id:
+          description: A unique identifier for this switch interface.
+          type: string
+          format: uuid
+        interface_name:
+          description: The name of this switch interface.
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        kind:
+          description: The switch interface kind.
+          allOf:
+          - $ref: '#/components/schemas/SwitchInterfaceKind'
+        port_settings_id:
+          description: The port settings object this switch interface configuration belongs to.
+          type: string
+          format: uuid
+        v6_enabled:
+          description: Whether or not IPv6 is enabled on this interface.
+          type: boolean
+      required:
+      - id
+      - interface_name
+      - kind
+      - port_settings_id
+      - v6_enabled
+    SwitchPortGeometry:
+      description: The link geometry associated with a switch port.
+      oneOf:
+      - description: The port contains a single QSFP28 link with four lanes.
+        type: string
+        enum:
+        - qsfp28x1
+      - description: The port contains two QSFP28 links each with two lanes.
+        type: string
+        enum:
+        - qsfp28x2
+      - description: The port contains four SFP28 links each with one lane.
+        type: string
+        enum:
+        - sfp28x4
+    BgpPeerStatus:
+      description: The current status of a BGP peer.
+      type: object
+      properties:
+        addr:
+          description: IP address of the peer.
+          type: string
+          format: ip
+        local_asn:
+          description: Local autonomous system number.
+          type: integer
+          format: uint32
+          minimum: 0
+        peer_id:
+          description: Interface name
+          type: string
+        remote_asn:
+          description: Remote autonomous system number.
+          type: integer
+          format: uint32
+          minimum: 0
+        state:
+          description: State of the peer.
+          allOf:
+          - $ref: '#/components/schemas/BgpPeerState'
+        state_duration_millis:
+          description: Time of last state change.
+          type: integer
+          format: uint64
+          minimum: 0
+        switch:
+          description: Switch with the peer session.
+          allOf:
+          - $ref: '#/components/schemas/SwitchSlot'
+      required:
+      - addr
+      - local_asn
+      - peer_id
+      - remote_asn
+      - state
+      - state_duration_millis
+      - switch
+    SwitchPortSettings:
+      description: This structure contains all port settings information in one place. It's a convenience data structure for getting a complete view of a particular port's settings.
+      type: object
+      properties:
+        addresses:
+          description: Layer 3 IP address settings.
+          type: array
+          items:
+            $ref: '#/components/schemas/SwitchPortAddressView'
+        bgp_peers:
+          description: BGP peer settings.
+          type: array
+          items:
+            $ref: '#/components/schemas/BgpPeer'
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        groups:
+          description: Switch port settings included from other switch port settings groups.
+          type: array
+          items:
+            $ref: '#/components/schemas/SwitchPortSettingsGroups'
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        interfaces:
+          description: Layer 3 interface settings.
+          type: array
+          items:
+            $ref: '#/components/schemas/SwitchInterfaceConfig'
+        links:
+          description: Layer 2 link settings.
+          type: array
+          items:
+            $ref: '#/components/schemas/SwitchPortLinkConfig'
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        port:
+          description: Layer 1 physical port settings.
+          allOf:
+          - $ref: '#/components/schemas/SwitchPortConfig'
+        routes:
+          description: IP route settings.
+          type: array
+          items:
+            $ref: '#/components/schemas/SwitchPortRouteConfig'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - addresses
+      - bgp_peers
+      - description
+      - groups
+      - id
+      - interfaces
+      - links
+      - name
+      - port
+      - routes
+      - time_created
+      - time_modified
+    Address:
+      description: An address tied to an address lot.
+      type: object
+      properties:
+        address:
+          description: The address and prefix length of this address.
+          allOf:
+          - $ref: '#/components/schemas/IpNet'
+        address_lot:
+          description: The address lot this address is drawn from.
+          allOf:
+          - $ref: '#/components/schemas/NameOrId'
+        vlan_id:
+          description: Optional VLAN ID for this address
+          type:
+          - integer
+          - 'null'
+          format: uint16
+          minimum: 0
+      required:
+      - address
+      - address_lot
+    AddressLotKind:
+      description: The kind associated with an address lot.
+      oneOf:
+      - description: Infrastructure address lots are used for network infrastructure like addresses assigned to rack switches.
+        type: string
+        enum:
+        - infra
+      - description: Pool address lots are used by IP pools.
+        type: string
+        enum:
+        - pool
+    SwitchInterfaceConfigCreate:
+      description: A layer-3 switch interface configuration. When IPv6 is enabled, a link local address will be created for the interface.
+      type: object
+      properties:
+        kind:
+          description: What kind of switch interface this configuration represents.
+          allOf:
+          - $ref: '#/components/schemas/SwitchInterfaceKind'
+        link_name:
+          description: Link name. On ports that are not broken out, this is always phy0. On a 2x breakout the options are phy0 and phy1, on 4x phy0-phy3, etc.
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        v6_enabled:
+          description: Whether or not IPv6 is enabled.
+          type: boolean
+      required:
+      - kind
+      - link_name
+      - v6_enabled
+    AggregateBgpMessageHistory:
+      description: BGP message history for rack switches.
+      type: object
+      properties:
+        switch_histories:
+          description: BGP history organized by switch.
+          type: array
+          items:
+            $ref: '#/components/schemas/SwitchBgpHistory'
+      required:
+      - switch_histories
+    LldpLinkConfigCreate:
+      description: The LLDP configuration associated with a port.
+      type: object
+      properties:
+        chassis_id:
+          description: The LLDP chassis identifier TLV.
+          type:
+          - string
+          - 'null'
+        enabled:
+          description: Whether or not LLDP is enabled.
+          type: boolean
+        link_description:
+          description: The LLDP link description TLV.
+          type:
+          - string
+          - 'null'
+        link_name:
+          description: The LLDP link name TLV.
+          type:
+          - string
+          - 'null'
+        management_ip:
+          description: The LLDP management IP TLV.
+          type:
+          - string
+          - 'null'
+          format: ip
+        system_description:
+          description: The LLDP system description TLV.
+          type:
+          - string
+          - 'null'
+        system_name:
+          description: The LLDP system name TLV.
+          type:
+          - string
+          - 'null'
+      required:
+      - enabled
+    NameOrIdSortMode:
+      description: Supported set of sort modes for scanning by name or id
+      oneOf:
+      - description: Sort in increasing order of "name"
+        type: string
+        enum:
+        - name_ascending
+      - description: Sort in decreasing order of "name"
+        type: string
+        enum:
+        - name_descending
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    SwitchPortSettingsGroups:
+      description: This structure maps a port settings object to a port settings groups. Port settings objects may inherit settings from groups. This mapping defines the relationship between settings objects and the groups they reference.
+      type: object
+      properties:
+        port_settings_group_id:
+          description: The id of a port settings group being referenced by a port settings object.
+          type: string
+          format: uuid
+        port_settings_id:
+          description: The id of a port settings object referencing a port settings group.
+          type: string
+          format: uuid
+      required:
+      - port_settings_group_id
+      - port_settings_id
+    BfdSessionEnable:
+      description: Information about a bidirectional forwarding detection (BFD) session.
+      type: object
+      properties:
+        detection_threshold:
+          description: The negotiated Control packet transmission interval, multiplied by this variable, will be the Detection Time for this session (as seen by the remote system)
+          type: integer
+          format: uint8
+          minimum: 0
+        local:
+          description: Address the Oxide switch will listen on for BFD traffic. If `None` then the unspecified address (0.0.0.0 or ::) is used.
+          type:
+          - string
+          - 'null'
+          format: ip
+        mode:
+          description: Select either single-hop (RFC 5881) or multi-hop (RFC 5883)
+          allOf:
+          - $ref: '#/components/schemas/BfdMode'
+        remote:
+          description: Address of the remote peer to establish a BFD session with.
+          type: string
+          format: ip
+        required_rx:
+          description: The minimum interval, in microseconds, between received BFD Control packets that this system requires
+          type: integer
+          format: uint64
+          minimum: 0
+        switch_slot:
+          description: The slot of the switch within the rack to enable this session on.
+          allOf:
+          - $ref: '#/components/schemas/SwitchSlot'
+      required:
+      - detection_threshold
+      - mode
+      - remote
+      - required_rx
+      - switch_slot
+    BgpPeerState:
+      description: The current state of a BGP peer.
+      oneOf:
+      - description: Initial state. Refuse all incoming BGP connections. No resources allocated to peer.
+        type: string
+        enum:
+        - idle
+      - description: Waiting for the TCP connection to be completed.
+        type: string
+        enum:
+        - connect
+      - description: Trying to acquire peer by listening for and accepting a TCP connection.
+        type: string
+        enum:
+        - active
+      - description: Waiting for open message from peer.
+        type: string
+        enum:
+        - open_sent
+      - description: Waiting for keepaliave or notification from peer.
+        type: string
+        enum:
+        - open_confirm
+      - description: There is an ongoing Connection Collision that hasn't yet been resolved. Two connections are maintained until one connection receives an Open or is able to progress into Established.
+        type: string
+        enum:
+        - connection_collision
+      - description: Synchronizing with peer.
+        type: string
+        enum:
+        - session_setup
+      - description: Session established. Able to exchange update, notification and keepalive messages with peers.
+        type: string
+        enum:
+        - established
+    Route:
+      description: A route to a destination network through a gateway address.
+      type: object
+      properties:
+        dst:
+          description: The route destination.
+          allOf:
+          - $ref: '#/components/schemas/IpNet'
+        gw:
+          description: The route gateway.
+          type: string
+          format: ip
+        rib_priority:
+          description: Route RIB priority. Higher priority indicates precedence within and across protocols.
+          type:
+          - integer
+          - 'null'
+          format: uint8
+          minimum: 0
+        vid:
+          description: VLAN id the gateway is reachable over.
+          type:
+          - integer
+          - 'null'
+          format: uint16
+          minimum: 0
+      required:
+      - dst
+      - gw
+    LoopbackAddressResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/LoopbackAddress'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    SwitchPortSettingsIdentityResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/SwitchPortSettingsIdentity'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    AddressLotBlock:
+      description: An address lot block is a part of an address lot and contains a range of addresses. The range is inclusive.
+      type: object
+      properties:
+        first_address:
+          description: The first address of the block (inclusive).
+          type: string
+          format: ip
+        id:
+          description: The id of the address lot block.
+          type: string
+          format: uuid
+        last_address:
+          description: The last address of the block (inclusive).
+          type: string
+          format: ip
+      required:
+      - first_address
+      - id
+      - last_address
+    TxEqConfig:
+      description: Per-port tx-eq overrides.  This can be used to fine-tune the transceiver equalization settings to improve signal integrity.
+      type: object
+      properties:
+        main:
+          description: Main tap
+          type:
+          - integer
+          - 'null'
+          format: int32
+        post1:
+          description: Post-cursor tap1
+          type:
+          - integer
+          - 'null'
+          format: int32
+        post2:
+          description: Post-cursor tap2
+          type:
+          - integer
+          - 'null'
+          format: int32
+        pre1:
+          description: Pre-cursor tap1
+          type:
+          - integer
+          - 'null'
+          format: int32
+        pre2:
+          description: Pre-cursor tap2
+          type:
+          - integer
+          - 'null'
+          format: int32
+    ServiceIcmpConfig:
+      description: Configuration of inbound ICMP allowed by API services.
+      type: object
+      properties:
+        enabled:
+          description: When enabled, Nexus is able to receive ICMP Destination Unreachable type 3 (port unreachable) and type 4 (fragmentation needed), Redirect, and Time Exceeded messages. These enable Nexus to perform Path MTU discovery and better cope with fragmentation issues. Otherwise all inbound ICMP traffic will be dropped.
+          type: boolean
+      required:
+      - enabled
+    BgpPeer:
+      description: A BGP peer configuration for an interface. Includes the set of announcements that will be advertised to the peer. The `bgp_config` parameter is a reference to global BGP parameters.
+      type: object
+      properties:
+        addr:
+          description: The address of the host to peer with, or specifying the configuration of an unnumbered BGP session.
+          allOf:
+          - $ref: '#/components/schemas/RouterPeerType'
+        allowed_export:
+          description: Define export policy for a peer.
+          allOf:
+          - $ref: '#/components/schemas/ImportExportPolicy'
+        allowed_import:
+          description: Define import policy for a peer.
+          allOf:
+          - $ref: '#/components/schemas/ImportExportPolicy'
+        bgp_config:
+          description: The global BGP configuration used for establishing a session with this peer.
+          allOf:
+          - $ref: '#/components/schemas/NameOrId'
+        communities:
+          description: Include the provided communities in updates sent to the peer.
+          type: array
+          items:
+            type: integer
+            format: uint32
+            minimum: 0
+        connect_retry:
+          description: How long to wait between TCP connection retries (seconds).
+          type: integer
+          format: uint32
+          minimum: 0
+        delay_open:
+          description: How long to delay sending an open request after establishing a TCP session (seconds).
+          type: integer
+          format: uint32
+          minimum: 0
+        enforce_first_as:
+          description: Enforce that the first AS in paths received from this peer is the peer's AS.
+          type: boolean
+        hold_time:
+          description: How long to hold peer connections between keepalives (seconds).
+          type: integer
+          format: uint32
+          minimum: 0
+        idle_hold_time:
+          description: How long to hold a peer in idle before attempting a new session (seconds).
+          type: integer
+          format: uint32
+          minimum: 0
+        keepalive:
+          description: How often to send keepalive requests (seconds).
+          type: integer
+          format: uint32
+          minimum: 0
+        local_pref:
+          description: Apply a local preference to routes received from this peer.
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 0
+        md5_auth_key:
+          description: Use the given key for TCP-MD5 authentication with the peer.
+          type:
+          - string
+          - 'null'
+        min_ttl:
+          description: Require messages from a peer have a minimum IP time to live field.
+          type:
+          - integer
+          - 'null'
+          format: uint8
+          minimum: 0
+        multi_exit_discriminator:
+          description: Apply the provided multi-exit discriminator (MED) updates sent to the peer.
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 0
+        remote_asn:
+          description: Require that a peer has a specified ASN.
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 0
+        vlan_id:
+          description: Associate a VLAN ID with a peer.
+          type:
+          - integer
+          - 'null'
+          format: uint16
+          minimum: 0
+      required:
+      - addr
+      - allowed_export
+      - allowed_import
+      - bgp_config
+      - communities
+      - connect_retry
+      - delay_open
+      - enforce_first_as
+      - hold_time
+      - idle_hold_time
+      - keepalive
+    BgpExported:
+      description: Route exported to a peer.
+      type: object
+      properties:
+        peer_id:
+          description: Identifier for the BGP peer.
+          type: string
+        prefix:
+          description: The destination network prefix.
+          allOf:
+          - $ref: '#/components/schemas/IpNet'
+        switch:
+          description: Switch the route is exported from.
+          allOf:
+          - $ref: '#/components/schemas/SwitchSlot'
+      required:
+      - peer_id
+      - prefix
+      - switch
+    SwitchPortSettingsIdentity:
+      description: A switch port settings identity whose id may be used to view additional details.
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - id
+      - name
+      - time_created
+      - time_modified
+    AddressLotViewResponse:
+      description: An address lot and associated blocks resulting from viewing an address lot.
+      type: object
+      properties:
+        blocks:
+          description: The address lot blocks.
+          type: array
+          items:
+            $ref: '#/components/schemas/AddressLotBlock'
+        lot:
+          description: The address lot.
+          allOf:
+          - $ref: '#/components/schemas/AddressLot'
+      required:
+      - blocks
+      - lot
+    SwitchPortLinkConfig:
+      description: A link configuration for a port settings object.
+      type: object
+      properties:
+        autoneg:
+          description: Whether or not the link has autonegotiation enabled.
+          type: boolean
+        fec:
+          description: The requested forward-error correction method.  If this is not specified, the standard FEC for the underlying media will be applied if it can be determined.
+          allOf:
+          - $ref: '#/components/schemas/LinkFec'
+        link_name:
+          description: The name of this link.
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        lldp_link_config:
+          description: The link-layer discovery protocol service configuration for this link.
+          allOf:
+          - $ref: '#/components/schemas/LldpLinkConfig'
+        mtu:
+          description: The maximum transmission unit for this link.
+          type: integer
+          format: uint16
+          minimum: 0
+        port_settings_id:
+          description: The port settings this link configuration belongs to.
+          type: string
+          format: uuid
+        speed:
+          description: The configured speed of the link.
+          allOf:
+          - $ref: '#/components/schemas/LinkSpeed'
+        tx_eq_config:
+          description: The tx_eq configuration for this link.
+          allOf:
+          - $ref: '#/components/schemas/TxEqConfig'
+      required:
+      - autoneg
+      - link_name
+      - mtu
+      - port_settings_id
+      - speed
+    SwitchSlot:
+      description: Identifies switch physical location
+      oneOf:
+      - description: Switch in upper slot
+        type: string
+        enum:
+        - switch0
+      - description: Switch in lower slot
+        type: string
+        enum:
+        - switch1
+    SwitchPortAddressView:
+      description: An IP address configuration for a port settings object.
+      type: object
+      properties:
+        address:
+          description: The IP address and prefix.
+          allOf:
+          - $ref: '#/components/schemas/IpNet'
+        address_lot_block_id:
+          description: The id of the address lot block this address is drawn from.
+          type: string
+          format: uuid
+        address_lot_id:
+          description: The id of the address lot this address is drawn from.
+          type: string
+          format: uuid
+        address_lot_name:
+          description: The name of the address lot this address is drawn from.
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        interface_name:
+          description: The interface name this address belongs to.
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        port_settings_id:
+          description: The port settings object this address configuration belongs to.
+          type: string
+          format: uuid
+        vlan_id:
+          description: An optional VLAN ID
+          type:
+          - integer
+          - 'null'
+          format: uint16
+          minimum: 0
+      required:
+      - address
+      - address_lot_block_id
+      - address_lot_id
+      - address_lot_name
+      - interface_name
+      - port_settings_id
+    AllowList:
+      description: Allowlist of IPs or subnets that can make requests to user-facing services.
+      type: object
+      properties:
+        allowed_ips:
+          description: The allowlist of IPs or subnets.
+          allOf:
+          - $ref: '#/components/schemas/AllowedSourceIps'
+        time_created:
+          description: Time the list was created.
+          type: string
+          format: date-time
+        time_modified:
+          description: Time the list was last modified.
+          type: string
+          format: date-time
+      required:
+      - allowed_ips
+      - time_created
+      - time_modified
+    BfdSessionDisable:
+      description: Information needed to disable a BFD session
+      type: object
+      properties:
+        remote:
+          description: Address of the remote peer to disable a BFD session for.
+          type: string
+          format: ip
+        switch_slot:
+          description: The slot of the switch within the rack to disable this session on.
+          allOf:
+          - $ref: '#/components/schemas/SwitchSlot'
+      required:
+      - remote
+      - switch_slot
+    BgpConfigCreate:
+      description: Parameters for creating a BGP configuration. This includes an autonomous system number (ASN) and a virtual routing and forwarding (VRF) identifier.
+      type: object
+      properties:
+        asn:
+          description: The autonomous system number of this BGP configuration.
+          type: integer
+          format: uint32
+          minimum: 0
+        bgp_announce_set_id:
+          $ref: '#/components/schemas/NameOrId'
+        description:
+          type: string
+        max_paths:
+          description: Maximum number of paths to use when multiple "best paths" exist
+          default: 1
+          allOf:
+          - $ref: '#/components/schemas/MaxPathConfig'
+        name:
+          $ref: '#/components/schemas/Name'
+        vrf:
+          description: Optional virtual routing and forwarding identifier for this BGP configuration.
+          allOf:
+          - $ref: '#/components/schemas/Name'
+      required:
+      - asn
+      - bgp_announce_set_id
+      - description
+      - name
+    BfdStatus:
+      type: object
+      properties:
+        detection_threshold:
+          type: integer
+          format: uint8
+          minimum: 0
+        local:
+          type:
+          - string
+          - 'null'
+          format: ip
+        mode:
+          $ref: '#/components/schemas/BfdMode'
+        peer:
+          type: string
+          format: ip
+        required_rx:
+          type: integer
+          format: uint64
+          minimum: 0
+        state:
+          $ref: '#/components/schemas/BfdState'
+        switch_slot:
+          $ref: '#/components/schemas/SwitchSlot'
+      required:
+      - detection_threshold
+      - mode
+      - peer
+      - required_rx
+      - state
+      - switch_slot
+    BgpAnnouncement:
+      description: A BGP announcement tied to an address lot block.
+      type: object
+      properties:
+        address_lot_block_id:
+          description: The address block the IP network being announced is drawn from.
+          type: string
+          format: uuid
+        announce_set_id:
+          description: The id of the set this announcement is a part of.
+          type: string
+          format: uuid
+        network:
+          description: The IP network being announced.
+          allOf:
+          - $ref: '#/components/schemas/IpNet'
+      required:
+      - address_lot_block_id
+      - announce_set_id
+      - network
+    LldpLinkConfig:
+      description: A link layer discovery protocol (LLDP) service configuration.
+      type: object
+      properties:
+        chassis_id:
+          description: The LLDP chassis identifier TLV.
+          type:
+          - string
+          - 'null'
+        enabled:
+          description: Whether or not the LLDP service is enabled.
+          type: boolean
+        id:
+          description: The id of this LLDP service instance.
+          type: string
+          format: uuid
+        link_description:
+          description: The LLDP link description TLV.
+          type:
+          - string
+          - 'null'
+        link_name:
+          description: The LLDP link name TLV.
+          type:
+          - string
+          - 'null'
+        management_ip:
+          description: The LLDP management IP TLV.
+          type:
+          - string
+          - 'null'
+          format: ip
+        system_description:
+          description: The LLDP system description TLV.
+          type:
+          - string
+          - 'null'
+        system_name:
+          description: The LLDP system name TLV.
+          type:
+          - string
+          - 'null'
+      required:
+      - enabled
+      - id
+    AllowedSourceIps:
+      description: Description of source IPs allowed to reach rack services.
+      oneOf:
+      - description: Allow traffic from any external IP address.
+        type: object
+        properties:
+          allow:
+            type: string
+            enum:
+            - any
+        required:
+        - allow
+      - description: 'Restrict access to a specific set of source IP addresses or subnets.
+
+
+          All others are prevented from reaching rack services.'
+        type: object
+        properties:
+          allow:
+            type: string
+            enum:
+            - list
+          ips:
+            type: array
+            items:
+              $ref: '#/components/schemas/IpNet'
+        required:
+        - allow
+        - ips
+    RouterLifetimeConfig:
+      description: Router lifetime in seconds for unnumbered BGP peers
+      type: integer
+      format: uint16
+      minimum: 0
+      maximum: 9000
+    IdSortMode:
+      description: 'Supported set of sort modes for scanning by id only.
+
+
+        Currently, we only support scanning in ascending order.'
+      oneOf:
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    SwitchInterfaceKind:
+      description: Indicates the kind for a switch interface.
+      oneOf:
+      - description: Primary interfaces are associated with physical links. There is exactly one primary interface per physical link.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - primary
+        required:
+        - type
+      - description: VLAN interfaces allow physical interfaces to be multiplexed onto multiple logical links, each distinguished by a 12-bit 802.1Q Ethernet tag.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - vlan
+          vid:
+            description: The virtual network id (VID) that distinguishes this interface and is used for producing and consuming 802.1Q Ethernet tags. This field has a maximum value of 4095 as 802.1Q tags are twelve bits.
+            type: integer
+            format: uint16
+            minimum: 0
+        required:
+        - type
+        - vid
+      - description: Loopback interfaces are anchors for IP addresses that are not specific to any particular port.
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - loopback
+        required:
+        - type
+    BgpAnnounceSetCreate:
+      description: Parameters for creating a named set of BGP announcements.
+      type: object
+      properties:
+        announcement:
+          description: The announcements in this set.
+          type: array
+          items:
+            $ref: '#/components/schemas/BgpAnnouncementCreate'
+        description:
+          type: string
+        name:
+          $ref: '#/components/schemas/Name'
+      required:
+      - announcement
+      - description
+      - name
+    AddressConfig:
+      description: A set of addresses associated with a port configuration.
+      type: object
+      properties:
+        addresses:
+          description: The set of addresses assigned to the port configuration.
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+        link_name:
+          description: Link to assign the addresses to. On ports that are not broken out, this is always phy0. On a 2x breakout the options are phy0 and phy1, on 4x phy0-phy3, etc.
+          allOf:
+          - $ref: '#/components/schemas/Name'
+      required:
+      - addresses
+      - link_name
+    BfdState:
+      oneOf:
+      - description: A stable down state. Non-responsive to incoming messages.
+        type: string
+        enum:
+        - admin_down
+      - description: The initial state.
+        type: string
+        enum:
+        - down
+      - description: The peer has detected a remote peer in the down state.
+        type: string
+        enum:
+        - init
+      - description: The peer has detected a remote peer in the up or init state while in the init state.
+        type: string
+        enum:
+        - up
+    AddressLot:
+      description: Represents an address lot object, containing the id of the lot that can be used in other API calls.
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        kind:
+          description: Desired use of `AddressLot`
+          allOf:
+          - $ref: '#/components/schemas/AddressLotKind'
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - id
+      - kind
+      - name
+      - time_created
+      - time_modified
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
+    AddressLotBlockCreate:
+      description: Parameters for creating an address lot block. First and last addresses are inclusive.
+      type: object
+      properties:
+        first_address:
+          description: The first address in the lot (inclusive).
+          type: string
+          format: ip
+        last_address:
+          description: The last address in the lot (inclusive).
+          type: string
+          format: ip
+      required:
+      - first_address
+      - last_address
+    AllowListUpdate:
+      description: Parameters for updating allowed source IPs
+      type: object
+      properties:
+        allowed_ips:
+          description: The new list of allowed source IPs.
+          allOf:
+          - $ref: '#/components/schemas/AllowedSourceIps'
+      required:
+      - allowed_ips
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
+    IpNet:
+      x-rust-type:
+        crate: oxnet
+        path: oxnet::IpNet
+        version: 0.1.0
+      oneOf:
+      - title: v4
+        allOf:
+        - $ref: '#/components/schemas/Ipv4Net'
+      - title: v6
+        allOf:
+        - $ref: '#/components/schemas/Ipv6Net'
+    LldpNeighbor:
+      description: Information about LLDP advertisements from other network entities directly connected to a switch port.  This structure contains both metadata about when and where the neighbor was seen, as well as the specific information the neighbor was advertising.
+      type: object
+      properties:
+        chassis_id:
+          description: The LLDP chassis identifier advertised by the neighbor
+          type: string
+        first_seen:
+          description: Initial sighting of this LldpNeighbor
+          type: string
+          format: date-time
+        last_seen:
+          description: Most recent sighting of this LldpNeighbor
+          type: string
+          format: date-time
+        link_description:
+          description: The LLDP link description advertised by the neighbor
+          type:
+          - string
+          - 'null'
+        link_name:
+          description: The LLDP link name advertised by the neighbor
+          type: string
+        local_port:
+          description: The port on which the neighbor was seen
+          type: string
+        management_ip:
+          description: The LLDP management IP(s) advertised by the neighbor
+          type: array
+          items:
+            $ref: '#/components/schemas/ManagementAddress'
+        system_description:
+          description: The LLDP system description advertised by the neighbor
+          type:
+          - string
+          - 'null'
+        system_name:
+          description: The LLDP system name advertised by the neighbor
+          type:
+          - string
+          - 'null'
+      required:
+      - chassis_id
+      - first_seen
+      - last_seen
+      - link_name
+      - local_port
+      - management_ip
+    SwitchPortSettingsCreate:
+      description: Parameters for creating switch port settings. Switch port settings are the central data structure for setting up external networking. Switch port settings include link, interface, route, address and dynamic network protocol configuration.
+      type: object
+      properties:
+        addresses:
+          description: Address configurations.
+          type: array
+          items:
+            $ref: '#/components/schemas/AddressConfig'
+        bgp_peers:
+          description: BGP peer configurations.
+          default: []
+          type: array
+          items:
+            $ref: '#/components/schemas/BgpPeerConfig'
+        description:
+          type: string
+        groups:
+          default: []
+          type: array
+          items:
+            $ref: '#/components/schemas/NameOrId'
+        interfaces:
+          description: Interface configurations.
+          default: []
+          type: array
+          items:
+            $ref: '#/components/schemas/SwitchInterfaceConfigCreate'
+        links:
+          description: Link configurations.
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkConfigCreate'
+        name:
+          $ref: '#/components/schemas/Name'
+        port_config:
+          $ref: '#/components/schemas/SwitchPortConfigCreate'
+        routes:
+          description: Route configurations.
+          default: []
+          type: array
+          items:
+            $ref: '#/components/schemas/RouteConfig'
+      required:
+      - addresses
+      - description
+      - links
+      - name
+      - port_config
+    BgpAnnouncementCreate:
+      description: A BGP announcement tied to a particular address lot block.
+      type: object
+      properties:
+        address_lot_block:
+          description: Address lot this announcement is drawn from.
+          allOf:
+          - $ref: '#/components/schemas/NameOrId'
+        network:
+          description: The network being announced.
+          allOf:
+          - $ref: '#/components/schemas/IpNet'
+      required:
+      - address_lot_block
+      - network
+    BgpMessageHistory: {}
+    RouteConfig:
+      description: Route configuration data associated with a switch port configuration.
+      type: object
+      properties:
+        link_name:
+          description: Link name. On ports that are not broken out, this is always phy0. On a 2x breakout the options are phy0 and phy1, on 4x phy0-phy3, etc.
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        routes:
+          description: The set of routes assigned to a switch port.
+          type: array
+          items:
+            $ref: '#/components/schemas/Route'
+      required:
+      - link_name
+      - routes
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

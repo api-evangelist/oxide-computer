@@ -1,0 +1,814 @@
+openapi: 3.2.0
+info:
+  title: Oxide Region System/ip Pools API
+  description: API for interacting with the Oxide control plane
+  contact:
+    url: https://oxide.computer
+    email: api@oxide.computer
+  version: 2026081901.0.0
+tags:
+- name: system/ip-pools
+  description: IP pools are collections of external IPs. Linking a pool to a silo makes it available for allocation by users in that silo.
+  externalDocs:
+    url: http://docs.oxide.computer/api/system-ip-pools
+paths:
+  /v1/system/ip-pools:
+    get:
+      tags:
+      - system/ip-pools
+      summary: List IP pools
+      operationId: system_ip_pool_list
+      parameters:
+      - in: query
+        name: assignment
+        schema:
+          $ref: '#/components/schemas/IpPoolAssignment'
+      - in: query
+        name: ip_version
+        schema:
+          $ref: '#/components/schemas/IpVersion'
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: pool_type
+        schema:
+          $ref: '#/components/schemas/IpPoolType'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IpPoolResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+    post:
+      tags:
+      - system/ip-pools
+      summary: Create IP pool
+      operationId: system_ip_pool_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IpPoolCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IpPool'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/ip-pools/{pool}:
+    get:
+      tags:
+      - system/ip-pools
+      summary: Fetch IP pool
+      operationId: system_ip_pool_view
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the IP pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IpPool'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+      - system/ip-pools
+      summary: Update IP pool
+      operationId: system_ip_pool_update
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the IP pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IpPoolUpdate'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IpPool'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - system/ip-pools
+      summary: Delete IP pool
+      operationId: system_ip_pool_delete
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the IP pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/ip-pools/{pool}/assignment:
+    post:
+      tags:
+      - system/ip-pools
+      summary: Assign IP pool
+      operationId: system_ip_pool_assign
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the IP pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IpPoolAssignParam'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IpPool'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/ip-pools/{pool}/ranges:
+    get:
+      tags:
+      - system/ip-pools
+      summary: List ranges for IP pool
+      description: Ranges are ordered by their first address.
+      operationId: system_ip_pool_range_list
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the IP pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IpPoolRangeResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+  /v1/system/ip-pools/{pool}/ranges/add:
+    post:
+      tags:
+      - system/ip-pools
+      summary: Add range to IP pool
+      description: 'For multicast pools, all ranges must be either Any-Source Multicast (ASM) or Source-Specific Multicast (SSM), but not both. Mixing ASM and SSM ranges in the same pool is not allowed.
+
+
+        ASM: IPv4 addresses outside 232.0.0.0/8, IPv6 addresses with flag field != 3 SSM: IPv4 addresses in 232.0.0.0/8, IPv6 addresses with flag field = 3'
+      operationId: system_ip_pool_range_add
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the IP pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IpRange'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IpPoolRange'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/ip-pools/{pool}/ranges/remove:
+    post:
+      tags:
+      - system/ip-pools
+      summary: Remove range from IP pool
+      operationId: system_ip_pool_range_remove
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the IP pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IpRange'
+        required: true
+      responses:
+        '204':
+          description: resource updated
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/ip-pools/{pool}/silos:
+    get:
+      tags:
+      - system/ip-pools
+      summary: List IP pool's linked silos
+      operationId: system_ip_pool_silo_list
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the IP pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/IdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IpPoolSiloLinkResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+    post:
+      tags:
+      - system/ip-pools
+      summary: Link IP pool to silo
+      description: Users in linked silos can allocate external IPs from this pool for their instances. A silo can have at most one default pool. IPs are allocated from the default pool when users ask for one without specifying a pool.
+      operationId: system_ip_pool_silo_link
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the IP pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IpPoolLinkSilo'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IpPoolSiloLink'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/ip-pools/{pool}/silos/{silo}:
+    put:
+      tags:
+      - system/ip-pools
+      summary: Make IP pool default for silo
+      description: When a user asks for an IP (e.g., at instance create time) without specifying a pool, the IP comes from the default pool if a default is configured. When a pool is made the default for a silo, any existing default will remain linked to the silo, but will no longer be the default.
+      operationId: system_ip_pool_silo_update
+      parameters:
+      - in: path
+        name: pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IpPoolSiloUpdate'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IpPoolSiloLink'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - system/ip-pools
+      summary: Unlink IP pool from silo
+      description: Will fail if there are any outstanding IPs allocated in the silo.
+      operationId: system_ip_pool_silo_unlink
+      parameters:
+      - in: path
+        name: pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: path
+        name: silo
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: resource updated
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/system/ip-pools/{pool}/utilization:
+    get:
+      tags:
+      - system/ip-pools
+      summary: Fetch IP pool utilization
+      operationId: system_ip_pool_utilization_view
+      parameters:
+      - in: path
+        name: pool
+        description: Name or ID of the IP pool
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IpPoolUtilization'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+components:
+  schemas:
+    IpPoolSiloLinkResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/IpPoolSiloLink'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    IpPoolRangeResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/IpPoolRange'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    IpPoolCreate:
+      description: 'Create-time parameters for an `IpPool`.
+
+
+        For multicast pools, all ranges must be either Any-Source Multicast (ASM) or Source-Specific Multicast (SSM), but not both. Mixing ASM and SSM ranges in the same pool is not allowed.
+
+
+        ASM: IPv4 addresses outside 232.0.0.0/8, IPv6 addresses with flag field != 3 SSM: IPv4 addresses in 232.0.0.0/8, IPv6 addresses with flag field = 3'
+      type: object
+      properties:
+        assignment:
+          description: What this pool is assigned to (defaults to Silos).
+          default: silos
+          allOf:
+          - $ref: '#/components/schemas/IpPoolAssignment'
+        description:
+          type: string
+        ip_version:
+          description: 'The IP version of the pool.
+
+
+            The default is IPv4.'
+          default: v4
+          allOf:
+          - $ref: '#/components/schemas/IpVersion'
+        name:
+          $ref: '#/components/schemas/Name'
+        pool_type:
+          description: Type of IP pool (defaults to Unicast)
+          default: unicast
+          allOf:
+          - $ref: '#/components/schemas/IpPoolType'
+      required:
+      - description
+      - name
+    IpPoolSiloLink:
+      description: A link between an IP pool and a silo that allows one to allocate IPs from the pool within the silo
+      type: object
+      properties:
+        ip_pool_id:
+          type: string
+          format: uuid
+        is_default:
+          description: 'When a pool is the default for a silo, floating IPs and instance ephemeral IPs will come from that pool when no other pool is specified.
+
+
+            A silo can have at most one default pool per combination of pool type (unicast or multicast) and IP version (IPv4 or IPv6), allowing up to 4 default pools total.'
+          type: boolean
+        silo_id:
+          type: string
+          format: uuid
+      required:
+      - ip_pool_id
+      - is_default
+      - silo_id
+    Ipv4Range:
+      description: 'A non-decreasing IPv4 address range, inclusive of both ends.
+
+
+        The first address must be less than or equal to the last address.'
+      type: object
+      properties:
+        first:
+          type: string
+          format: ipv4
+        last:
+          type: string
+          format: ipv4
+      required:
+      - first
+      - last
+    NameOrIdSortMode:
+      description: Supported set of sort modes for scanning by name or id
+      oneOf:
+      - description: Sort in increasing order of "name"
+        type: string
+        enum:
+        - name_ascending
+      - description: Sort in decreasing order of "name"
+        type: string
+        enum:
+        - name_descending
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    IpPoolAssignment:
+      description: Assignment of an IP pool to resources and services.
+      oneOf:
+      - description: Pool is available to be linked to customer silos.
+        type: string
+        enum:
+        - silos
+      - description: Pool is reserved for Oxide-operated rack services (NTP, DNS, etc.).
+        type: string
+        enum:
+        - system_services
+    IdSortMode:
+      description: 'Supported set of sort modes for scanning by id only.
+
+
+        Currently, we only support scanning in ascending order.'
+      oneOf:
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    IpPoolUtilization:
+      description: 'The utilization of IP addresses in a pool.
+
+
+        Note that both the count of remaining addresses and the total capacity are integers, reported as floating point numbers. This accommodates allocations larger than a 64-bit integer, which is common with IPv6 address spaces. With very large IP Pools (> 2**53 addresses), integer precision will be lost, in exchange for representing the entire range. In such a case the pool still has many available addresses.'
+      type: object
+      properties:
+        capacity:
+          description: The total number of addresses in the pool.
+          type: number
+          format: double
+        remaining:
+          description: The number of remaining addresses in the pool.
+          type: number
+          format: double
+      required:
+      - capacity
+      - remaining
+    IpPool:
+      description: A collection of IP ranges.
+      type: object
+      properties:
+        assignment:
+          description: What this pool is currently assigned to.
+          allOf:
+          - $ref: '#/components/schemas/IpPoolAssignment'
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        ip_version:
+          description: The IP version for the pool.
+          allOf:
+          - $ref: '#/components/schemas/IpVersion'
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        pool_type:
+          description: Type of IP pool (unicast or multicast).
+          allOf:
+          - $ref: '#/components/schemas/IpPoolType'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - assignment
+      - description
+      - id
+      - ip_version
+      - name
+      - pool_type
+      - time_created
+      - time_modified
+    IpPoolRange:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        ip_pool_id:
+          type: string
+          format: uuid
+        range:
+          $ref: '#/components/schemas/IpRange'
+        time_created:
+          type: string
+          format: date-time
+      required:
+      - id
+      - ip_pool_id
+      - range
+      - time_created
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    IpPoolType:
+      description: Type of IP pool.
+      oneOf:
+      - description: Unicast IP pool for standard IP allocations.
+        type: string
+        enum:
+        - unicast
+      - description: 'Multicast IP pool for multicast group allocations.
+
+
+          All ranges in a multicast pool must be either ASM or SSM (not mixed).'
+        type: string
+        enum:
+        - multicast
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
+    IpRange:
+      oneOf:
+      - title: v4
+        allOf:
+        - $ref: '#/components/schemas/Ipv4Range'
+      - title: v6
+        allOf:
+        - $ref: '#/components/schemas/Ipv6Range'
+    IpPoolSiloUpdate:
+      type: object
+      properties:
+        is_default:
+          description: 'When a pool is the default for a silo, floating IPs and instance ephemeral IPs will come from that pool when no other pool is specified.
+
+
+            A silo can have at most one default pool per combination of pool type (unicast or multicast) and IP version (IPv4 or IPv6), allowing up to 4 default pools total. When a pool is made default, an existing default of the same type and version will remain linked but will no longer be the default.'
+          type: boolean
+      required:
+      - is_default
+    IpVersion:
+      description: The IP address version.
+      type: string
+      enum:
+      - v4
+      - v6
+    Ipv6Range:
+      description: 'A non-decreasing IPv6 address range, inclusive of both ends.
+
+
+        The first address must be less than or equal to the last address.'
+      type: object
+      properties:
+        first:
+          type: string
+          format: ipv6
+        last:
+          type: string
+          format: ipv6
+      required:
+      - first
+      - last
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
+    IpPoolResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/IpPool'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    IpPoolUpdate:
+      description: Parameters for updating an IP Pool
+      type: object
+      properties:
+        description:
+          type:
+          - string
+          - 'null'
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+    IpPoolAssignParam:
+      description: Body parameters for reassigning an IP pool.
+      type: object
+      properties:
+        assignment:
+          $ref: '#/components/schemas/IpPoolAssignment'
+      required:
+      - assignment
+    IpPoolLinkSilo:
+      type: object
+      properties:
+        is_default:
+          description: 'When a pool is the default for a silo, floating IPs and instance ephemeral IPs will come from that pool when no other pool is specified.
+
+
+            A silo can have at most one default pool per combination of pool type (unicast or multicast) and IP version (IPv4 or IPv6), allowing up to 4 default pools total.'
+          type: boolean
+        silo:
+          $ref: '#/components/schemas/NameOrId'
+      required:
+      - is_default
+      - silo
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

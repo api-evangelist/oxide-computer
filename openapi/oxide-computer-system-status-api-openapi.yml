@@ -1,0 +1,67 @@
+openapi: 3.2.0
+info:
+  title: Oxide Region System/status API
+  description: API for interacting with the Oxide control plane
+  contact:
+    url: https://oxide.computer
+    email: api@oxide.computer
+  version: 2026081901.0.0
+tags:
+- name: system/status
+  description: Endpoints related to system health
+  externalDocs:
+    url: http://docs.oxide.computer/api/system-status
+paths:
+  /v1/ping:
+    get:
+      tags:
+      - system/status
+      summary: Ping API
+      description: Always responds with Ok if it responds at all.
+      operationId: ping
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ping'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+components:
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    PingStatus:
+      type: string
+      enum:
+      - ok
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    Ping:
+      type: object
+      properties:
+        status:
+          description: Whether the external API is reachable. Will always be Ok if the endpoint returns anything at all.
+          allOf:
+          - $ref: '#/components/schemas/PingStatus'
+      required:
+      - status

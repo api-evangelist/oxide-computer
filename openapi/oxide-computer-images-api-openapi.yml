@@ -1,0 +1,399 @@
+openapi: 3.2.0
+info:
+  title: Oxide Region Images API
+  description: API for interacting with the Oxide control plane
+  contact:
+    url: https://oxide.computer
+    email: api@oxide.computer
+  version: 2026081901.0.0
+tags:
+- name: images
+  description: Images are read-only virtual disks that may be used to boot virtual machines.
+  externalDocs:
+    url: http://docs.oxide.computer/api/images
+paths:
+  /v1/images:
+    get:
+      tags:
+      - images
+      summary: List images
+      description: List images which are global or scoped to the specified project. The images are returned sorted by creation date, with the most recent images appearing first.
+      operationId: image_list
+      parameters:
+      - in: query
+        name: limit
+        description: Maximum number of items returned by a single call
+        schema:
+          type:
+          - integer
+          - 'null'
+          format: uint32
+          minimum: 1
+      - in: query
+        name: page_token
+        description: Token returned by previous call to retrieve the subsequent page
+        schema:
+          type:
+          - string
+          - 'null'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/NameOrIdSortMode'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageResultsPage'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+      x-dropshot-pagination:
+        required: []
+    post:
+      tags:
+      - images
+      summary: Create image
+      description: Create a new image in a project.
+      operationId: image_create
+      parameters:
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageCreate'
+        required: true
+      responses:
+        '201':
+          description: successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Image'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/images/{image}:
+    get:
+      tags:
+      - images
+      summary: Fetch image
+      description: Fetch the details for a specific image in a project.
+      operationId: image_view
+      parameters:
+      - in: path
+        name: image
+        description: Name or ID of the image
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Image'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+      - images
+      summary: Delete image
+      description: Permanently delete an image from a project. This operation cannot be undone. Any instances in the project using the image will continue to run, however new instances can not be created with this image.
+      operationId: image_delete
+      parameters:
+      - in: path
+        name: image
+        description: Name or ID of the image
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '204':
+          description: successful deletion
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/images/{image}/demote:
+    post:
+      tags:
+      - images
+      summary: Demote silo image
+      description: Demote silo image to be visible only to a specified project
+      operationId: image_demote
+      parameters:
+      - in: path
+        name: image
+        description: Name or ID of the image
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '202':
+          description: successfully enqueued operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Image'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+  /v1/images/{image}/promote:
+    post:
+      tags:
+      - images
+      summary: Promote project image
+      description: Promote project image to be visible to all projects in the silo
+      operationId: image_promote
+      parameters:
+      - in: path
+        name: image
+        description: Name or ID of the image
+        required: true
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      - in: query
+        name: project
+        description: Name or ID of the project
+        schema:
+          $ref: '#/components/schemas/NameOrId'
+      responses:
+        '202':
+          description: successfully enqueued operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Image'
+        4XX:
+          $ref: '#/components/responses/Error'
+        5XX:
+          $ref: '#/components/responses/Error'
+components:
+  schemas:
+    Image:
+      description: 'View of an image
+
+
+        If `project_id` is present then the image is only visible inside that project. If it''s not present then the image is visible to all projects in the silo.'
+      type: object
+      properties:
+        block_size:
+          description: Size of blocks in bytes
+          allOf:
+          - $ref: '#/components/schemas/BlockSize'
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        digest:
+          description: Hash of the image contents, if applicable
+          allOf:
+          - $ref: '#/components/schemas/Digest'
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        os:
+          description: The family of the operating system like Debian, Ubuntu, etc.
+          type: string
+        project_id:
+          description: ID of the parent project if the image is a project image
+          type:
+          - string
+          - 'null'
+          format: uuid
+        size:
+          description: Total size in bytes
+          allOf:
+          - $ref: '#/components/schemas/ByteCount'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+        version:
+          description: Version of the operating system
+          type: string
+      required:
+      - block_size
+      - description
+      - id
+      - name
+      - os
+      - size
+      - time_created
+      - time_modified
+      - version
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
+    ImageSource:
+      description: The source of the underlying image.
+      oneOf:
+      - type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+          type:
+            type: string
+            enum:
+            - snapshot
+        required:
+        - id
+        - type
+    ByteCount:
+      description: Byte count to express memory or storage capacity.
+      type: integer
+      format: uint64
+      minimum: 0
+    Digest:
+      oneOf:
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - sha256
+          value:
+            type: string
+        required:
+        - type
+        - value
+    ImageResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/Image'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    NameOrIdSortMode:
+      description: Supported set of sort modes for scanning by name or id
+      oneOf:
+      - description: Sort in increasing order of "name"
+        type: string
+        enum:
+        - name_ascending
+      - description: Sort in decreasing order of "name"
+        type: string
+        enum:
+        - name_descending
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    ImageCreate:
+      description: Create-time parameters for an `Image`
+      type: object
+      properties:
+        description:
+          type: string
+        name:
+          $ref: '#/components/schemas/Name'
+        os:
+          description: The family of the operating system (e.g. Debian, Ubuntu, etc.)
+          type: string
+        source:
+          description: The source of the image's contents.
+          allOf:
+          - $ref: '#/components/schemas/ImageSource'
+        version:
+          description: The version of the operating system (e.g. 18.04, 20.04, etc.)
+          type: string
+      required:
+      - description
+      - name
+      - os
+      - source
+      - version
+    BlockSize:
+      title: Block size in bytes
+      description: 'Valid values are: 512, 2048, or 4096.'
+      type: integer
+      enum:
+      - 512
+      - 2048
+      - 4096
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
