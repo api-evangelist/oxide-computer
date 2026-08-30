@@ -3,7 +3,7 @@ provider: Oxide
 generated_by: planning/capability-mapping/scripts/classify_capabilities.py
 model: claude-opus-5
 frame:
-- Telecommunications
+- Electrical Components & Equipment
 min_confidence: 0.7
 capability_model:
   source: https://github.com/vincentmakes/turbo-ea-capabilities
@@ -11,163 +11,186 @@ capability_model:
   attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
     CC BY 4.0
   notice: NOTICE
-edge_count: 15
+edge_count: 18
 edges:
+- tag: instances
+  spec_file: oxide-computer-instances-api-openapi.yml
+  capability_id: BC-600.50
+  capability_id_l1: BC-600
+  capability_name: IT Infrastructure Management
+  confidence: 0.9
+  evidence: POST /v1/instances instance_create 'Create instance'; POST /v1/instances/{instance}/disks/attach
+    'Attach disk to instance'
+  reason: Lifecycle of virtual compute instances (create, update, delete, attach disks and IPs) — squarely
+    cloud compute infrastructure management.
 - tag: system/hardware
   spec_file: oxide-computer-system-hardware-api-openapi.yml
   capability_id: BC-600.50
   capability_id_l1: BC-600
   capability_name: IT Infrastructure Management
-  confidence: 0.88
-  evidence: GET /v1/system/hardware/racks rack_list "List racks"; GET /v1/system/hardware/sleds/{sled_id}
-    sled_view "Fetch sled"; GET /v1/system/hardware/disks physical_disk_list "List physical disks"
-  reason: Inventory and lifecycle control of physical racks, compute sleds, switches and physical disks
-    — compute/storage/network infrastructure management for a data-centre platform.
+  confidence: 0.87
+  evidence: GET /v1/system/hardware/racks  rack_list  List racks; GET /v1/system/hardware/sleds  sled_list  List
+    sleds; GET /v1/system/hardware/disks  physical_disk_list  List physical disks
+  reason: Operations inventory and manage physical compute/storage hardware (racks, sleds, switches, physical
+    disks, provision policy) — squarely compute/storage/network infrastructure management.
+- tag: system/networking
+  spec_file: oxide-computer-system-networking-api-openapi.yml
+  capability_id: BC-600.50
+  capability_id_l1: BC-600
+  capability_name: IT Infrastructure Management
+  confidence: 0.87
+  evidence: POST /v1/system/networking/bfd-enable  networking_bfd_enable  Enable BFD session; GET /v1/system/networking/address-lot;
+    networking_switch_port_lldp_config_update  Update LLDP configuration for switch port; schemas BgpConfigUpdate,
+    SwitchPortConfig
+  reason: Switch port, LLDP, BFD, BGP and address-lot configuration of the rack network fabric — network
+    infrastructure management.
 - tag: disks
   spec_file: oxide-computer-disks-api-openapi.yml
   capability_id: BC-600.50
   capability_id_l1: BC-600
   capability_name: IT Infrastructure Management
   confidence: 0.85
-  evidence: POST /v1/disks disk_create Create disk; POST /v1/disks/{disk}/bulk-write Import blocks into
-    disk; schema BlockSize, DiskState
-  reason: Provisioning and lifecycle of block storage volumes in a private-cloud control plane — IT infrastructure
-    (storage) management.
-- tag: instances
-  spec_file: oxide-computer-instances-api-openapi.yml
+  evidence: POST /v1/disks disk_create 'Create disk'; POST /v1/disks/{disk}/bulk-write 'Import blocks
+    into disk'; schemas DiskState, BlockSize, ByteCount
+  reason: Provisioning and lifecycle of block storage volumes in the Oxide cloud — compute/storage infrastructure
+    management.
+- tag: external-subnets
+  spec_file: oxide-computer-external-subnets-api-openapi.yml
   capability_id: BC-600.50
   capability_id_l1: BC-600
   capability_name: IT Infrastructure Management
   confidence: 0.85
-  evidence: POST /v1/instances instance_create Create instance; POST /v1/instances/{instance}/disks/attach
-    Attach disk to instance
-  reason: Virtual machine lifecycle and resource attachment in a private-cloud control plane — compute
-    infrastructure management.
+  evidence: POST /v1/external-subnets 'Create external subnet'; POST /v1/external-subnets/{external_subnet}/attach
+    'Attach external subnet to instance'; schemas Ipv4Net, Ipv6Net, IpNet
+  reason: Network subnet provisioning and attachment to instances — cloud network infrastructure management.
+- tag: floating-ips
+  spec_file: oxide-computer-floating-ips-api-openapi.yml
+  capability_id: BC-600.50
+  capability_id_l1: BC-600
+  capability_name: IT Infrastructure Management
+  confidence: 0.85
+  evidence: POST /v1/floating-ips 'Create floating IP'; POST /v1/floating-ips/{floating_ip}/attach 'Attach
+    floating IP'; schemas AddressAllocator, PoolSelector
+  reason: IP address allocation and attachment for cloud instances — network infrastructure management.
+- tag: vpcs
+  spec_file: oxide-computer-vpcs-api-openapi.yml
+  capability_id: BC-600.50
+  capability_id_l1: BC-600
+  capability_name: IT Infrastructure Management
+  confidence: 0.85
+  evidence: POST /v1/internet-gateways  internet_gateway_create  Create VPC internet gateway; PUT /v1/vpc-firewall-rules  vpc_firewall_rules_update  Replace
+    firewall rules
+  reason: VPC, subnet, gateway and firewall-rule administration is cloud network infrastructure management.
 - tag: policy
   spec_file: oxide-computer-policy-api-openapi.yml
   capability_id: BC-620.20
   capability_id_l1: BC-620
   capability_name: Identity & Access Management
   confidence: 0.82
-  evidence: GET /v1/system/policy system_policy_view "Fetch top-level IAM policy"; schemas FleetRolePolicy,
+  evidence: GET /v1/system/policy  system_policy_view  Fetch top-level IAM policy; schemas FleetRolePolicy,
     FleetRoleRoleAssignment
-  reason: The two operations read and write the fleet-level IAM policy with role assignments — access
-    control administration, i.e. Identity & Access Management, not corporate policy management.
-- tag: external-subnets
-  spec_file: oxide-computer-external-subnets-api-openapi.yml
-  capability_id: BC-600.50
-  capability_id_l1: BC-600
-  capability_name: IT Infrastructure Management
-  confidence: 0.8
-  evidence: POST /v1/external-subnets external_subnet_create Create external subnet; POST .../attach Attach
-    external subnet to instance; schemas Ipv4Net, Ipv6Net
-  reason: Virtual network subnet provisioning inside a cloud infrastructure control plane — IT infrastructure
-    networking, not carrier network operations.
-- tag: floating-ips
-  spec_file: oxide-computer-floating-ips-api-openapi.yml
-  capability_id: BC-600.50
-  capability_id_l1: BC-600
-  capability_name: IT Infrastructure Management
-  confidence: 0.8
-  evidence: POST /v1/floating-ips floating_ip_create Create floating IP; POST /v1/floating-ips/{floating_ip}/attach
-    Attach floating IP
-  reason: IP address allocation and attachment for cloud compute instances — IT infrastructure networking
-    management.
-- tag: vpcs
-  spec_file: oxide-computer-vpcs-api-openapi.yml
-  capability_id: BC-600.50
-  capability_id_l1: BC-600
-  capability_name: IT Infrastructure Management
-  confidence: 0.8
-  evidence: POST /v1/internet-gateways  internet_gateway_create  Create VPC internet gateway ... PUT /v1/vpc-firewall-rules  vpc_firewall_rules_update  Replace
-    firewall rules
-  reason: VPC subnets, firewall rules, internet gateways and IP pool attachment — software-defined networking
-    configuration inside a private cloud platform. Cross-industry IT infrastructure (network) management;
-    not telecom carrier network operations.
-- tag: system/ip-pools
-  spec_file: oxide-computer-system-ip-pools-api-openapi.yml
-  capability_id: BC-600.50
-  capability_id_l1: BC-600
-  capability_name: IT Infrastructure Management
-  confidence: 0.78
-  evidence: POST /v1/system/ip-pools system_ip_pool_create "Create IP pool"; POST /v1/system/ip-pools/{pool}/ranges/add
-    "Add range to IP pool"; POST /v1/system/ip-pools/{pool}/silos "Link IP pool to silo"
-  reason: Administration of IP address pools and ranges and their assignment to silos — IP address resource
-    management inside the private-cloud network infrastructure, i.e. enterprise IT infrastructure rather
-    than carrier numbering resources.
-- tag: system/networking
-  spec_file: oxide-computer-system-networking-api-openapi.yml
-  capability_id: BC-600.50
-  capability_id_l1: BC-600
-  capability_name: IT Infrastructure Management
-  confidence: 0.75
-  evidence: POST /v1/system/hardware/switch-port/{port}/lldp/config "Update LLDP configuration for switch
-    port"; POST /v1/system/networking/bfd-enable "Enable BFD session"; schemas BgpConfigUpdate, AddressLotCreateResponse,
-    LinkSpeed
-  reason: Configuration of rack switch ports, LLDP, BGP, BFD and address lots — network element configuration
-    for the data-centre fabric. This is enterprise/data-centre IT network infrastructure, so telecom network-operations
-    capabilities would be the wrong frame.
-- tag: system/subnet-pools
-  spec_file: oxide-computer-system-subnet-pools-api-openapi.yml
-  capability_id: BC-600.50
-  capability_id_l1: BC-600
-  capability_name: IT Infrastructure Management
-  confidence: 0.75
-  evidence: 'POST /v1/system/subnet-pools  system_subnet_pool_create  Create subnet pool ... schemas:
-    SubnetPool, Ipv6Net, Ipv4Net, SubnetPoolUtilization'
-  reason: Management of IP subnet address pools and their linkage to tenant silos within a private-cloud
-    control plane. This is cloud/datacentre network infrastructure administration, i.e. cross-industry
-    IT infrastructure management, not carrier network configuration.
-- tag: affinity
-  spec_file: oxide-computer-affinity-api-openapi.yml
-  capability_id: BC-600.50
-  capability_id_l1: BC-600
-  capability_name: IT Infrastructure Management
-  confidence: 0.72
-  evidence: POST /v1/anti-affinity-groups anti_affinity_group_create Create anti-affinity group; Add member
-    to anti-affinity group (instance)
-  reason: Placement/scheduling policy for compute instances on a rack-scale cloud infrastructure control
-    plane — IT infrastructure (compute) management, not a telecom or line-of-business capability.
-- tag: ip-pools
-  spec_file: oxide-computer-ip-pools-api-openapi.yml
-  capability_id: BC-600.50
-  capability_id_l1: BC-600
-  capability_name: IT Infrastructure Management
-  confidence: 0.72
-  evidence: GET /v1/ip-pools ip_pool_list List IP pools; schemas SiloIpPool, IpVersion
-  reason: Read-only view of IP address pools available to a silo — cloud infrastructure address resource
-    management; not telecom numbering resources.
+  reason: The two operations read and write the fleet-level IAM policy with role assignments, which is
+    identity and access management for the cloud control plane, not corporate policy lifecycle (BC-130.20).
 - tag: images
   spec_file: oxide-computer-images-api-openapi.yml
   capability_id: BC-600.50
   capability_id_l1: BC-600
   capability_name: IT Infrastructure Management
+  confidence: 0.8
+  evidence: POST /v1/images image_create 'Create image'; POST /v1/images/{image}/promote 'Promote project
+    image'; schemas ImageSource, BlockSize, Digest
+  reason: Machine/VM disk image lifecycle in the cloud control plane — compute infrastructure asset management,
+    not product catalogue.
+- tag: ip-pools
+  spec_file: oxide-computer-ip-pools-api-openapi.yml
+  capability_id: BC-600.50
+  capability_id_l1: BC-600
+  capability_name: IT Infrastructure Management
+  confidence: 0.8
+  evidence: GET /v1/ip-pools 'List IP pools'; schemas SiloIpPool, IpPoolType, IpVersion
+  reason: Read access to IP address pools available to a silo — network address resource management within
+    cloud infrastructure.
+- tag: system/ip-pools
+  spec_file: oxide-computer-system-ip-pools-api-openapi.yml
+  capability_id: BC-600.50
+  capability_id_l1: BC-600
+  capability_name: IT Infrastructure Management
+  confidence: 0.8
+  evidence: POST /v1/system/ip-pools  system_ip_pool_create  Create IP pool; POST /v1/system/ip-pools/{pool}/ranges/add  Add
+    range to IP pool
+  reason: Creation and allocation of IP address pools and ranges and their linkage to silos — network
+    address infrastructure management in the cloud platform.
+- tag: system/subnet-pools
+  spec_file: oxide-computer-system-subnet-pools-api-openapi.yml
+  capability_id: BC-600.50
+  capability_id_l1: BC-600
+  capability_name: IT Infrastructure Management
+  confidence: 0.8
+  evidence: POST /v1/system/subnet-pools  system_subnet_pool_create  Create subnet pool; schemas Ipv6Net,
+    Ipv4Net, IpNet
+  reason: Management of IP subnet pools and their linkage to silos is network infrastructure administration
+    within the private-cloud control plane, i.e. IT Infrastructure Management.
+- tag: affinity
+  spec_file: oxide-computer-affinity-api-openapi.yml
+  capability_id: BC-600.50
+  capability_id_l1: BC-600
+  capability_name: IT Infrastructure Management
+  confidence: 0.75
+  evidence: POST /v1/anti-affinity-groups anti_affinity_group_create — 'Create anti-affinity group'; schemas
+    AffinityPolicy, FailureDomain, InstanceState
+  reason: Anti-affinity groups govern placement of compute instances across failure domains in Oxide's
+    rack-scale cloud — cloud/compute infrastructure management, an IT capability, not any electrical-industry
+    capability.
+- tag: system/silos
+  spec_file: oxide-computer-system-silos-api-openapi.yml
+  capability_id: BC-620.20
+  capability_id_l1: BC-620
+  capability_name: Identity & Access Management
+  confidence: 0.72
+  evidence: POST /v1/system/identity-providers/saml  saml_identity_provider_create  Create SAML identity
+    provider; POST /v1/system/scim/tokens  scim_token_create; local_idp_user_set_password  Set or invalidate
+    user's password
+  reason: Dominant operations create identity providers (SAML), SCIM provisioning tokens and local users
+    with password management — federation and user lifecycle, i.e. identity and access management. Silo
+    creation and quota operations add some ambiguity.
+- tag: metrics
+  spec_file: oxide-computer-metrics-api-openapi.yml
+  capability_id: BC-600.40
+  capability_id_l1: BC-600
+  capability_name: IT Operations Management
   confidence: 0.7
-  evidence: POST /v1/images image_create Create image; POST /v1/images/{image}/promote Promote project
-    image; schema ImageSource, BlockSize
-  reason: Machine/disk image catalogue used to boot instances in the cloud platform — infrastructure asset
-    management, not product catalogue or software release.
+  evidence: GET /v1/metrics/{metric_name} silo_metric 'View metrics'; schemas Histogramuint32, Cumulativeint64,
+    Quantile
+  reason: Timeseries metric retrieval for monitoring the running rack/silo — IT operations monitoring.
+    Could alternatively be observability of a SaaS service, but Oxide is on-prem infrastructure so IT
+    Operations Management fits best.
 - tag: silos
   spec_file: oxide-computer-silos-api-openapi.yml
   capability_id: BC-620.20
   capability_id_l1: BC-620
   capability_name: Identity & Access Management
   confidence: 0.7
-  evidence: GET /v1/policy policy_view "Fetch current silo's IAM policy"; GET /v1/users user_list "List
-    users"; GET /v1/groups/{group_id} group_view "Fetch group"; schemas SiloRoleRoleAssignment, DeviceAccessToken,
-    ConsoleSession
-  reason: Operations centre on users, groups, IAM policy/role assignments, console sessions, device access
-    tokens and x.509 certificates for the current silo — identity and access administration of the control
-    plane.
-- tag: system/silos
-  spec_file: oxide-computer-system-silos-api-openapi.yml
+  evidence: GET /v1/auth-settings  auth_settings_view  Fetch current silo's auth settings; GET /v1/groups  group_list  List
+    groups; GET /v1/policy  policy_update  Update current silo's IAM policy; GET /v1/users  user_list
+  reason: Operations centre on users, groups, auth settings, console sessions, device access tokens and
+    silo IAM policy — identity and access administration for the tenant. Certificates add some ambiguity,
+    hence moderate confidence.
+- tag: system/update
+  spec_file: oxide-computer-system-update-api-openapi.yml
+  capability_id: BC-600.50
+  capability_id_l1: BC-600
+  capability_name: IT Infrastructure Management
+  confidence: 0.7
+  evidence: PUT /v1/system/update/repositories  system_update_repository_upload  Upload system release
+    repository; PUT /v1/system/update/target-release  Set target release
+  reason: Managing system software releases and trust roots for the rack's own infrastructure — infrastructure
+    lifecycle/patch management by the operator, not product firmware sold to customers.
+- tag: tokens
+  spec_file: oxide-computer-tokens-api-openapi.yml
   capability_id: BC-620.20
   capability_id_l1: BC-620
   capability_name: Identity & Access Management
   confidence: 0.7
-  evidence: POST /v1/system/identity-providers/saml "Create SAML identity provider"; POST /v1/system/identity-providers/local/users
-    "Create user"; POST /v1/system/scim/tokens "Create SCIM token"; POST .../set-password "Set or invalidate
-    user's password"
-  reason: Dominant surface is identity provider configuration (SAML), local user creation and password
-    management, and SCIM provisioning tokens — federation and joiner/mover/leaver identity administration.
-    Silo lifecycle and quota endpoints are present too, hence not full confidence.
+  evidence: GET /v1/me/access-tokens  current_user_access_token_list  List access tokens
+  reason: Access token listing and revocation for the current user is credential/identity and access management,
+    though it is also generic auth plumbing.
