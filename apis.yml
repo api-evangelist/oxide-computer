@@ -41,6 +41,17 @@ tags:
 - Hardware
 - On-Premise
 - Private Cloud
+- Open-Source
+tags_raw:
+- Cloud Computing
+- Infrastructure
+- Compute
+- Virtualization
+- Networking
+- Storage
+- Hardware
+- On-Premise
+- Private Cloud
 - Open Source
 apis:
 - aid: oxide-computer:oxide-computer-affinity-api
@@ -49,6 +60,8 @@ apis:
   humanURL: https://docs.oxide.computer/api
   baseURL: https://{oxide-control-plane-host}
   tags:
+  - Affinity
+  tags_raw:
   - affinity
   properties:
   - type: OpenAPI
@@ -93,6 +106,8 @@ apis:
   humanURL: https://docs.oxide.computer/api
   baseURL: https://{oxide-control-plane-host}
   tags:
+  - Current User
+  tags_raw:
   - current-user
   properties:
   - type: OpenAPI
@@ -115,6 +130,8 @@ apis:
   humanURL: https://docs.oxide.computer/api
   baseURL: https://{oxide-control-plane-host}
   tags:
+  - Disks
+  tags_raw:
   - disks
   properties:
   - type: OpenAPI
@@ -137,6 +154,8 @@ apis:
   humanURL: https://docs.oxide.computer/api
   baseURL: https://{oxide-control-plane-host}
   tags:
+  - Experimental
+  tags_raw:
   - experimental
   properties:
   - type: OpenAPI
@@ -181,6 +200,8 @@ apis:
   humanURL: https://docs.oxide.computer/api
   baseURL: https://{oxide-control-plane-host}
   tags:
+  - Floating IPs
+  tags_raw:
   - floating-ips
   properties:
   - type: OpenAPI
@@ -203,6 +224,8 @@ apis:
   humanURL: https://docs.oxide.computer/api
   baseURL: https://{oxide-control-plane-host}
   tags:
+  - Image
+  tags_raw:
   - images
   properties:
   - type: OpenAPI
@@ -227,6 +250,8 @@ apis:
   humanURL: https://docs.oxide.computer/api
   baseURL: https://{oxide-control-plane-host}
   tags:
+  - Instances
+  tags_raw:
   - instances
   properties:
   - type: OpenAPI
@@ -250,6 +275,8 @@ apis:
   humanURL: https://docs.oxide.computer/api
   baseURL: https://{oxide-control-plane-host}
   tags:
+  - IP Pools
+  tags_raw:
   - ip-pools
   properties:
   - type: OpenAPI
@@ -272,6 +299,8 @@ apis:
   humanURL: https://docs.oxide.computer/api
   baseURL: https://{oxide-control-plane-host}
   tags:
+  - Login
+  tags_raw:
   - login
   properties:
   - type: OpenAPI
@@ -294,6 +323,8 @@ apis:
   humanURL: https://docs.oxide.computer/api
   baseURL: https://{oxide-control-plane-host}
   tags:
+  - Metrics
+  tags_raw:
   - metrics
   properties:
   - type: OpenAPI
@@ -316,6 +347,8 @@ apis:
   humanURL: https://docs.oxide.computer/api
   baseURL: https://{oxide-control-plane-host}
   tags:
+  - Policy
+  tags_raw:
   - policy
   properties:
   - type: OpenAPI
@@ -340,6 +373,8 @@ apis:
   humanURL: https://docs.oxide.computer/api
   baseURL: https://{oxide-control-plane-host}
   tags:
+  - Project
+  tags_raw:
   - projects
   properties:
   - type: OpenAPI
@@ -384,6 +419,8 @@ apis:
   humanURL: https://docs.oxide.computer/api
   baseURL: https://{oxide-control-plane-host}
   tags:
+  - Snapshots
+  tags_raw:
   - snapshots
   properties:
   - type: OpenAPI
@@ -523,6 +560,8 @@ apis:
   humanURL: https://docs.oxide.computer/api
   baseURL: https://{oxide-control-plane-host}
   tags:
+  - System Metrics
+  tags_raw:
   - system/metrics
   properties:
   - type: OpenAPI
@@ -589,6 +628,8 @@ apis:
   humanURL: https://docs.oxide.computer/api
   baseURL: https://{oxide-control-plane-host}
   tags:
+  - System Status
+  tags_raw:
   - system/status
   properties:
   - type: OpenAPI
@@ -679,6 +720,8 @@ apis:
   humanURL: https://docs.oxide.computer/api
   baseURL: https://{oxide-control-plane-host}
   tags:
+  - Tokens
+  tags_raw:
   - tokens
   properties:
   - type: OpenAPI
@@ -702,6 +745,8 @@ apis:
   humanURL: https://docs.oxide.computer/api
   baseURL: https://{oxide-control-plane-host}
   tags:
+  - VPC
+  tags_raw:
   - vpcs
   properties:
   - type: OpenAPI
