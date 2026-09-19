@@ -53,7 +53,7 @@ tags:
 - Networking
 - Storage
 - Hardware
-- On-Premise
+- On-Premises
 - Private Cloud
 - Open-Source
 tags_raw:
@@ -759,6 +759,8 @@ apis:
   humanURL: https://docs.oxide.computer/api
   baseURL: https://{oxide-control-plane-host}
   tags:
+  - VPC
+  tags_raw:
   - vpcs
   properties:
   - type: OpenAPI
