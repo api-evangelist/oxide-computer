@@ -7,7 +7,7 @@ info:
     email: api@oxide.computer
   version: 2026081901.0.0
 tags:
-- name: metrics
+- name: Metrics
   description: Silo-scoped metrics
   externalDocs:
     url: http://docs.oxide.computer/api/metrics
@@ -15,7 +15,7 @@ paths:
   /v1/metrics/{metric_name}:
     get:
       tags:
-      - metrics
+      - Metrics
       summary: View metrics
       description: View CPU, memory, or storage utilization metrics at the silo or project level.
       operationId: silo_metric
@@ -80,1050 +80,6 @@ paths:
         - start_time
 components:
   schemas:
-    Binuint16:
-      description: Type storing bin edges and a count of samples within it.
-      type: object
-      properties:
-        count:
-          description: The total count of samples in this bin.
-          type: integer
-          format: uint64
-          minimum: 0
-        range:
-          description: The range of the support covered by this bin.
-          allOf:
-          - $ref: '#/components/schemas/BinRangeuint16'
-      required:
-      - count
-      - range
-    BinRangeint16:
-      description: 'A type storing a range over `T`.
-
-
-        This type supports ranges similar to the `RangeTo`, `Range` and `RangeFrom` types in the standard library. Those cover `(..end)`, `(start..end)`, and `(start..)` respectively.'
-      oneOf:
-      - description: A range unbounded below and exclusively above, `..end`.
-        type: object
-        properties:
-          end:
-            type: integer
-            format: int16
-          type:
-            type: string
-            enum:
-            - range_to
-        required:
-        - end
-        - type
-      - description: A range bounded inclusively below and exclusively above, `start..end`.
-        type: object
-        properties:
-          end:
-            type: integer
-            format: int16
-          start:
-            type: integer
-            format: int16
-          type:
-            type: string
-            enum:
-            - range
-        required:
-        - end
-        - start
-        - type
-      - description: A range bounded inclusively below and unbounded above, `start..`.
-        type: object
-        properties:
-          start:
-            type: integer
-            format: int16
-          type:
-            type: string
-            enum:
-            - range_from
-        required:
-        - start
-        - type
-    BinRangeint32:
-      description: 'A type storing a range over `T`.
-
-
-        This type supports ranges similar to the `RangeTo`, `Range` and `RangeFrom` types in the standard library. Those cover `(..end)`, `(start..end)`, and `(start..)` respectively.'
-      oneOf:
-      - description: A range unbounded below and exclusively above, `..end`.
-        type: object
-        properties:
-          end:
-            type: integer
-            format: int32
-          type:
-            type: string
-            enum:
-            - range_to
-        required:
-        - end
-        - type
-      - description: A range bounded inclusively below and exclusively above, `start..end`.
-        type: object
-        properties:
-          end:
-            type: integer
-            format: int32
-          start:
-            type: integer
-            format: int32
-          type:
-            type: string
-            enum:
-            - range
-        required:
-        - end
-        - start
-        - type
-      - description: A range bounded inclusively below and unbounded above, `start..`.
-        type: object
-        properties:
-          start:
-            type: integer
-            format: int32
-          type:
-            type: string
-            enum:
-            - range_from
-        required:
-        - start
-        - type
-    Binint64:
-      description: Type storing bin edges and a count of samples within it.
-      type: object
-      properties:
-        count:
-          description: The total count of samples in this bin.
-          type: integer
-          format: uint64
-          minimum: 0
-        range:
-          description: The range of the support covered by this bin.
-          allOf:
-          - $ref: '#/components/schemas/BinRangeint64'
-      required:
-      - count
-      - range
-    BinRangeuint8:
-      description: 'A type storing a range over `T`.
-
-
-        This type supports ranges similar to the `RangeTo`, `Range` and `RangeFrom` types in the standard library. Those cover `(..end)`, `(start..end)`, and `(start..)` respectively.'
-      oneOf:
-      - description: A range unbounded below and exclusively above, `..end`.
-        type: object
-        properties:
-          end:
-            type: integer
-            format: uint8
-            minimum: 0
-          type:
-            type: string
-            enum:
-            - range_to
-        required:
-        - end
-        - type
-      - description: A range bounded inclusively below and exclusively above, `start..end`.
-        type: object
-        properties:
-          end:
-            type: integer
-            format: uint8
-            minimum: 0
-          start:
-            type: integer
-            format: uint8
-            minimum: 0
-          type:
-            type: string
-            enum:
-            - range
-        required:
-        - end
-        - start
-        - type
-      - description: A range bounded inclusively below and unbounded above, `start..`.
-        type: object
-        properties:
-          start:
-            type: integer
-            format: uint8
-            minimum: 0
-          type:
-            type: string
-            enum:
-            - range_from
-        required:
-        - start
-        - type
-    Cumulativefloat:
-      description: A cumulative or counter data type.
-      type: object
-      properties:
-        start_time:
-          type: string
-          format: date-time
-        value:
-          type: number
-          format: float
-      required:
-      - start_time
-      - value
-    Binint8:
-      description: Type storing bin edges and a count of samples within it.
-      type: object
-      properties:
-        count:
-          description: The total count of samples in this bin.
-          type: integer
-          format: uint64
-          minimum: 0
-        range:
-          description: The range of the support covered by this bin.
-          allOf:
-          - $ref: '#/components/schemas/BinRangeint8'
-      required:
-      - count
-      - range
-    BinRangefloat:
-      description: 'A type storing a range over `T`.
-
-
-        This type supports ranges similar to the `RangeTo`, `Range` and `RangeFrom` types in the standard library. Those cover `(..end)`, `(start..end)`, and `(start..)` respectively.'
-      oneOf:
-      - description: A range unbounded below and exclusively above, `..end`.
-        type: object
-        properties:
-          end:
-            type: number
-            format: float
-          type:
-            type: string
-            enum:
-            - range_to
-        required:
-        - end
-        - type
-      - description: A range bounded inclusively below and exclusively above, `start..end`.
-        type: object
-        properties:
-          end:
-            type: number
-            format: float
-          start:
-            type: number
-            format: float
-          type:
-            type: string
-            enum:
-            - range
-        required:
-        - end
-        - start
-        - type
-      - description: A range bounded inclusively below and unbounded above, `start..`.
-        type: object
-        properties:
-          start:
-            type: number
-            format: float
-          type:
-            type: string
-            enum:
-            - range_from
-        required:
-        - start
-        - type
-    Binint16:
-      description: Type storing bin edges and a count of samples within it.
-      type: object
-      properties:
-        count:
-          description: The total count of samples in this bin.
-          type: integer
-          format: uint64
-          minimum: 0
-        range:
-          description: The range of the support covered by this bin.
-          allOf:
-          - $ref: '#/components/schemas/BinRangeint16'
-      required:
-      - count
-      - range
-    Binuint64:
-      description: Type storing bin edges and a count of samples within it.
-      type: object
-      properties:
-        count:
-          description: The total count of samples in this bin.
-          type: integer
-          format: uint64
-          minimum: 0
-        range:
-          description: The range of the support covered by this bin.
-          allOf:
-          - $ref: '#/components/schemas/BinRangeuint64'
-      required:
-      - count
-      - range
-    Cumulativeuint64:
-      description: A cumulative or counter data type.
-      type: object
-      properties:
-        start_time:
-          type: string
-          format: date-time
-        value:
-          type: integer
-          format: uint64
-          minimum: 0
-      required:
-      - start_time
-      - value
-    BinRangedouble:
-      description: 'A type storing a range over `T`.
-
-
-        This type supports ranges similar to the `RangeTo`, `Range` and `RangeFrom` types in the standard library. Those cover `(..end)`, `(start..end)`, and `(start..)` respectively.'
-      oneOf:
-      - description: A range unbounded below and exclusively above, `..end`.
-        type: object
-        properties:
-          end:
-            type: number
-            format: double
-          type:
-            type: string
-            enum:
-            - range_to
-        required:
-        - end
-        - type
-      - description: A range bounded inclusively below and exclusively above, `start..end`.
-        type: object
-        properties:
-          end:
-            type: number
-            format: double
-          start:
-            type: number
-            format: double
-          type:
-            type: string
-            enum:
-            - range
-        required:
-        - end
-        - start
-        - type
-      - description: A range bounded inclusively below and unbounded above, `start..`.
-        type: object
-        properties:
-          start:
-            type: number
-            format: double
-          type:
-            type: string
-            enum:
-            - range_from
-        required:
-        - start
-        - type
-    Cumulativeint64:
-      description: A cumulative or counter data type.
-      type: object
-      properties:
-        start_time:
-          type: string
-          format: date-time
-        value:
-          type: integer
-          format: int64
-      required:
-      - start_time
-      - value
-    Quantile:
-      description: 'Structure for estimating the p-quantile of a population.
-
-
-        This is based on the P² algorithm for estimating quantiles using constant space.
-
-
-        The algorithm consists of maintaining five markers: the minimum, the p/2-, p-, and (1 + p)/2 quantiles, and the maximum.'
-      type: object
-      properties:
-        desired_marker_positions:
-          description: The desired marker positions.
-          type: array
-          items:
-            type: number
-            format: double
-          minItems: 5
-          maxItems: 5
-        marker_heights:
-          description: The heights of the markers.
-          type: array
-          items:
-            type: number
-            format: double
-          minItems: 5
-          maxItems: 5
-        marker_positions:
-          description: 'The positions of the markers.
-
-
-            We track sample size in the 5th position, as useful observations won''t start until we''ve filled the heights at the 6th sample anyway This does deviate from the paper, but it''s a more useful representation that works according to the paper''s algorithm.'
-          type: array
-          items:
-            type: integer
-            format: uint64
-            minimum: 0
-          minItems: 5
-          maxItems: 5
-        p:
-          description: The p value for the quantile.
-          type: number
-          format: double
-      required:
-      - desired_marker_positions
-      - marker_heights
-      - marker_positions
-      - p
-    Binuint32:
-      description: Type storing bin edges and a count of samples within it.
-      type: object
-      properties:
-        count:
-          description: The total count of samples in this bin.
-          type: integer
-          format: uint64
-          minimum: 0
-        range:
-          description: The range of the support covered by this bin.
-          allOf:
-          - $ref: '#/components/schemas/BinRangeuint32'
-      required:
-      - count
-      - range
-    Histogramuint32:
-      description: 'Histogram metric
-
-
-        A histogram maintains the count of any number of samples, over a set of bins. Bins are specified on construction via their _left_ edges, inclusive. There can''t be any "gaps" in the bins, and an additional bin may be added to the left, right, or both so that the bins extend to the entire range of the support.
-
-
-        Note that any gaps, unsorted bins, or non-finite values will result in an error.'
-      type: object
-      properties:
-        bins:
-          description: The bins of the histogram.
-          type: array
-          items:
-            $ref: '#/components/schemas/Binuint32'
-        max:
-          description: The maximum value of all samples in the histogram.
-          type: integer
-          format: uint32
-          minimum: 0
-        min:
-          description: The minimum value of all samples in the histogram.
-          type: integer
-          format: uint32
-          minimum: 0
-        n_samples:
-          description: The total number of samples in the histogram.
-          type: integer
-          format: uint64
-          minimum: 0
-        p50:
-          description: p50 Quantile
-          allOf:
-          - $ref: '#/components/schemas/Quantile'
-        p90:
-          description: p95 Quantile
-          allOf:
-          - $ref: '#/components/schemas/Quantile'
-        p99:
-          description: p99 Quantile
-          allOf:
-          - $ref: '#/components/schemas/Quantile'
-        squared_mean:
-          description: 'M2 for Welford''s algorithm for variance calculation.
-
-
-            Read about [Welford''s algorithm](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford''s_online_algorithm) for more information on the algorithm.'
-          type: number
-          format: double
-        start_time:
-          description: The start time of the histogram.
-          type: string
-          format: date-time
-        sum_of_samples:
-          description: The sum of all samples in the histogram.
-          type: integer
-          format: int64
-      required:
-      - bins
-      - max
-      - min
-      - n_samples
-      - p50
-      - p90
-      - p99
-      - squared_mean
-      - start_time
-      - sum_of_samples
-    BinRangeint8:
-      description: 'A type storing a range over `T`.
-
-
-        This type supports ranges similar to the `RangeTo`, `Range` and `RangeFrom` types in the standard library. Those cover `(..end)`, `(start..end)`, and `(start..)` respectively.'
-      oneOf:
-      - description: A range unbounded below and exclusively above, `..end`.
-        type: object
-        properties:
-          end:
-            type: integer
-            format: int8
-          type:
-            type: string
-            enum:
-            - range_to
-        required:
-        - end
-        - type
-      - description: A range bounded inclusively below and exclusively above, `start..end`.
-        type: object
-        properties:
-          end:
-            type: integer
-            format: int8
-          start:
-            type: integer
-            format: int8
-          type:
-            type: string
-            enum:
-            - range
-        required:
-        - end
-        - start
-        - type
-      - description: A range bounded inclusively below and unbounded above, `start..`.
-        type: object
-        properties:
-          start:
-            type: integer
-            format: int8
-          type:
-            type: string
-            enum:
-            - range_from
-        required:
-        - start
-        - type
-    MissingDatum:
-      type: object
-      properties:
-        datum_type:
-          $ref: '#/components/schemas/DatumType'
-        start_time:
-          type:
-          - string
-          - 'null'
-          format: date-time
-      required:
-      - datum_type
-    Histogramint32:
-      description: 'Histogram metric
-
-
-        A histogram maintains the count of any number of samples, over a set of bins. Bins are specified on construction via their _left_ edges, inclusive. There can''t be any "gaps" in the bins, and an additional bin may be added to the left, right, or both so that the bins extend to the entire range of the support.
-
-
-        Note that any gaps, unsorted bins, or non-finite values will result in an error.'
-      type: object
-      properties:
-        bins:
-          description: The bins of the histogram.
-          type: array
-          items:
-            $ref: '#/components/schemas/Binint32'
-        max:
-          description: The maximum value of all samples in the histogram.
-          type: integer
-          format: int32
-        min:
-          description: The minimum value of all samples in the histogram.
-          type: integer
-          format: int32
-        n_samples:
-          description: The total number of samples in the histogram.
-          type: integer
-          format: uint64
-          minimum: 0
-        p50:
-          description: p50 Quantile
-          allOf:
-          - $ref: '#/components/schemas/Quantile'
-        p90:
-          description: p95 Quantile
-          allOf:
-          - $ref: '#/components/schemas/Quantile'
-        p99:
-          description: p99 Quantile
-          allOf:
-          - $ref: '#/components/schemas/Quantile'
-        squared_mean:
-          description: 'M2 for Welford''s algorithm for variance calculation.
-
-
-            Read about [Welford''s algorithm](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford''s_online_algorithm) for more information on the algorithm.'
-          type: number
-          format: double
-        start_time:
-          description: The start time of the histogram.
-          type: string
-          format: date-time
-        sum_of_samples:
-          description: The sum of all samples in the histogram.
-          type: integer
-          format: int64
-      required:
-      - bins
-      - max
-      - min
-      - n_samples
-      - p50
-      - p90
-      - p99
-      - squared_mean
-      - start_time
-      - sum_of_samples
-    Error:
-      description: Error information from a response.
-      type: object
-      properties:
-        error_code:
-          type: string
-        message:
-          type: string
-        request_id:
-          type: string
-      required:
-      - message
-      - request_id
-    DatumType:
-      description: The type of an individual datum of a metric.
-      type: string
-      enum:
-      - bool
-      - i8
-      - u8
-      - i16
-      - u16
-      - i32
-      - u32
-      - i64
-      - u64
-      - f32
-      - f64
-      - string
-      - bytes
-      - cumulative_i64
-      - cumulative_u64
-      - cumulative_f32
-      - cumulative_f64
-      - histogram_i8
-      - histogram_u8
-      - histogram_i16
-      - histogram_u16
-      - histogram_i32
-      - histogram_u32
-      - histogram_i64
-      - histogram_u64
-      - histogram_f32
-      - histogram_f64
-    Histogramuint64:
-      description: 'Histogram metric
-
-
-        A histogram maintains the count of any number of samples, over a set of bins. Bins are specified on construction via their _left_ edges, inclusive. There can''t be any "gaps" in the bins, and an additional bin may be added to the left, right, or both so that the bins extend to the entire range of the support.
-
-
-        Note that any gaps, unsorted bins, or non-finite values will result in an error.'
-      type: object
-      properties:
-        bins:
-          description: The bins of the histogram.
-          type: array
-          items:
-            $ref: '#/components/schemas/Binuint64'
-        max:
-          description: The maximum value of all samples in the histogram.
-          type: integer
-          format: uint64
-          minimum: 0
-        min:
-          description: The minimum value of all samples in the histogram.
-          type: integer
-          format: uint64
-          minimum: 0
-        n_samples:
-          description: The total number of samples in the histogram.
-          type: integer
-          format: uint64
-          minimum: 0
-        p50:
-          description: p50 Quantile
-          allOf:
-          - $ref: '#/components/schemas/Quantile'
-        p90:
-          description: p95 Quantile
-          allOf:
-          - $ref: '#/components/schemas/Quantile'
-        p99:
-          description: p99 Quantile
-          allOf:
-          - $ref: '#/components/schemas/Quantile'
-        squared_mean:
-          description: 'M2 for Welford''s algorithm for variance calculation.
-
-
-            Read about [Welford''s algorithm](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford''s_online_algorithm) for more information on the algorithm.'
-          type: number
-          format: double
-        start_time:
-          description: The start time of the histogram.
-          type: string
-          format: date-time
-        sum_of_samples:
-          description: The sum of all samples in the histogram.
-          type: integer
-          format: int64
-      required:
-      - bins
-      - max
-      - min
-      - n_samples
-      - p50
-      - p90
-      - p99
-      - squared_mean
-      - start_time
-      - sum_of_samples
-    Histogramint16:
-      description: 'Histogram metric
-
-
-        A histogram maintains the count of any number of samples, over a set of bins. Bins are specified on construction via their _left_ edges, inclusive. There can''t be any "gaps" in the bins, and an additional bin may be added to the left, right, or both so that the bins extend to the entire range of the support.
-
-
-        Note that any gaps, unsorted bins, or non-finite values will result in an error.'
-      type: object
-      properties:
-        bins:
-          description: The bins of the histogram.
-          type: array
-          items:
-            $ref: '#/components/schemas/Binint16'
-        max:
-          description: The maximum value of all samples in the histogram.
-          type: integer
-          format: int16
-        min:
-          description: The minimum value of all samples in the histogram.
-          type: integer
-          format: int16
-        n_samples:
-          description: The total number of samples in the histogram.
-          type: integer
-          format: uint64
-          minimum: 0
-        p50:
-          description: p50 Quantile
-          allOf:
-          - $ref: '#/components/schemas/Quantile'
-        p90:
-          description: p95 Quantile
-          allOf:
-          - $ref: '#/components/schemas/Quantile'
-        p99:
-          description: p99 Quantile
-          allOf:
-          - $ref: '#/components/schemas/Quantile'
-        squared_mean:
-          description: 'M2 for Welford''s algorithm for variance calculation.
-
-
-            Read about [Welford''s algorithm](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford''s_online_algorithm) for more information on the algorithm.'
-          type: number
-          format: double
-        start_time:
-          description: The start time of the histogram.
-          type: string
-          format: date-time
-        sum_of_samples:
-          description: The sum of all samples in the histogram.
-          type: integer
-          format: int64
-      required:
-      - bins
-      - max
-      - min
-      - n_samples
-      - p50
-      - p90
-      - p99
-      - squared_mean
-      - start_time
-      - sum_of_samples
-    MeasurementResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/Measurement'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
-    Bindouble:
-      description: Type storing bin edges and a count of samples within it.
-      type: object
-      properties:
-        count:
-          description: The total count of samples in this bin.
-          type: integer
-          format: uint64
-          minimum: 0
-        range:
-          description: The range of the support covered by this bin.
-          allOf:
-          - $ref: '#/components/schemas/BinRangedouble'
-      required:
-      - count
-      - range
-    Histogramint64:
-      description: 'Histogram metric
-
-
-        A histogram maintains the count of any number of samples, over a set of bins. Bins are specified on construction via their _left_ edges, inclusive. There can''t be any "gaps" in the bins, and an additional bin may be added to the left, right, or both so that the bins extend to the entire range of the support.
-
-
-        Note that any gaps, unsorted bins, or non-finite values will result in an error.'
-      type: object
-      properties:
-        bins:
-          description: The bins of the histogram.
-          type: array
-          items:
-            $ref: '#/components/schemas/Binint64'
-        max:
-          description: The maximum value of all samples in the histogram.
-          type: integer
-          format: int64
-        min:
-          description: The minimum value of all samples in the histogram.
-          type: integer
-          format: int64
-        n_samples:
-          description: The total number of samples in the histogram.
-          type: integer
-          format: uint64
-          minimum: 0
-        p50:
-          description: p50 Quantile
-          allOf:
-          - $ref: '#/components/schemas/Quantile'
-        p90:
-          description: p95 Quantile
-          allOf:
-          - $ref: '#/components/schemas/Quantile'
-        p99:
-          description: p99 Quantile
-          allOf:
-          - $ref: '#/components/schemas/Quantile'
-        squared_mean:
-          description: 'M2 for Welford''s algorithm for variance calculation.
-
-
-            Read about [Welford''s algorithm](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford''s_online_algorithm) for more information on the algorithm.'
-          type: number
-          format: double
-        start_time:
-          description: The start time of the histogram.
-          type: string
-          format: date-time
-        sum_of_samples:
-          description: The sum of all samples in the histogram.
-          type: integer
-          format: int64
-      required:
-      - bins
-      - max
-      - min
-      - n_samples
-      - p50
-      - p90
-      - p99
-      - squared_mean
-      - start_time
-      - sum_of_samples
-    Histogramfloat:
-      description: 'Histogram metric
-
-
-        A histogram maintains the count of any number of samples, over a set of bins. Bins are specified on construction via their _left_ edges, inclusive. There can''t be any "gaps" in the bins, and an additional bin may be added to the left, right, or both so that the bins extend to the entire range of the support.
-
-
-        Note that any gaps, unsorted bins, or non-finite values will result in an error.'
-      type: object
-      properties:
-        bins:
-          description: The bins of the histogram.
-          type: array
-          items:
-            $ref: '#/components/schemas/Binfloat'
-        max:
-          description: The maximum value of all samples in the histogram.
-          type: number
-          format: float
-        min:
-          description: The minimum value of all samples in the histogram.
-          type: number
-          format: float
-        n_samples:
-          description: The total number of samples in the histogram.
-          type: integer
-          format: uint64
-          minimum: 0
-        p50:
-          description: p50 Quantile
-          allOf:
-          - $ref: '#/components/schemas/Quantile'
-        p90:
-          description: p95 Quantile
-          allOf:
-          - $ref: '#/components/schemas/Quantile'
-        p99:
-          description: p99 Quantile
-          allOf:
-          - $ref: '#/components/schemas/Quantile'
-        squared_mean:
-          description: 'M2 for Welford''s algorithm for variance calculation.
-
-
-            Read about [Welford''s algorithm](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford''s_online_algorithm) for more information on the algorithm.'
-          type: number
-          format: double
-        start_time:
-          description: The start time of the histogram.
-          type: string
-          format: date-time
-        sum_of_samples:
-          description: The sum of all samples in the histogram.
-          type: number
-          format: double
-      required:
-      - bins
-      - max
-      - min
-      - n_samples
-      - p50
-      - p90
-      - p99
-      - squared_mean
-      - start_time
-      - sum_of_samples
-    BinRangeuint16:
-      description: 'A type storing a range over `T`.
-
-
-        This type supports ranges similar to the `RangeTo`, `Range` and `RangeFrom` types in the standard library. Those cover `(..end)`, `(start..end)`, and `(start..)` respectively.'
-      oneOf:
-      - description: A range unbounded below and exclusively above, `..end`.
-        type: object
-        properties:
-          end:
-            type: integer
-            format: uint16
-            minimum: 0
-          type:
-            type: string
-            enum:
-            - range_to
-        required:
-        - end
-        - type
-      - description: A range bounded inclusively below and exclusively above, `start..end`.
-        type: object
-        properties:
-          end:
-            type: integer
-            format: uint16
-            minimum: 0
-          start:
-            type: integer
-            format: uint16
-            minimum: 0
-          type:
-            type: string
-            enum:
-            - range
-        required:
-        - end
-        - start
-        - type
-      - description: A range bounded inclusively below and unbounded above, `start..`.
-        type: object
-        properties:
-          start:
-            type: integer
-            format: uint16
-            minimum: 0
-          type:
-            type: string
-            enum:
-            - range_from
-        required:
-        - start
-        - type
-    NameOrId:
-      oneOf:
-      - title: id
-        allOf:
-        - type: string
-          format: uuid
-      - title: name
-        allOf:
-        - $ref: '#/components/schemas/Name'
-    Cumulativedouble:
-      description: A cumulative or counter data type.
-      type: object
-      properties:
-        start_time:
-          type: string
-          format: date-time
-        value:
-          type: number
-          format: double
-      required:
-      - start_time
-      - value
     BinRangeuint32:
       description: 'A type storing a range over `T`.
 
@@ -1177,97 +133,81 @@ components:
         required:
         - start
         - type
-    Measurement:
-      description: A `Measurement` is a timestamped datum from a single metric
+    Cumulativeint64:
+      description: A cumulative or counter data type.
       type: object
       properties:
-        datum:
-          $ref: '#/components/schemas/Datum'
-        timestamp:
-          type: string
-          format: date-time
-      required:
-      - datum
-      - timestamp
-    Histogramdouble:
-      description: 'Histogram metric
-
-
-        A histogram maintains the count of any number of samples, over a set of bins. Bins are specified on construction via their _left_ edges, inclusive. There can''t be any "gaps" in the bins, and an additional bin may be added to the left, right, or both so that the bins extend to the entire range of the support.
-
-
-        Note that any gaps, unsorted bins, or non-finite values will result in an error.'
-      type: object
-      properties:
-        bins:
-          description: The bins of the histogram.
-          type: array
-          items:
-            $ref: '#/components/schemas/Bindouble'
-        max:
-          description: The maximum value of all samples in the histogram.
-          type: number
-          format: double
-        min:
-          description: The minimum value of all samples in the histogram.
-          type: number
-          format: double
-        n_samples:
-          description: The total number of samples in the histogram.
-          type: integer
-          format: uint64
-          minimum: 0
-        p50:
-          description: p50 Quantile
-          allOf:
-          - $ref: '#/components/schemas/Quantile'
-        p90:
-          description: p95 Quantile
-          allOf:
-          - $ref: '#/components/schemas/Quantile'
-        p99:
-          description: p99 Quantile
-          allOf:
-          - $ref: '#/components/schemas/Quantile'
-        squared_mean:
-          description: 'M2 for Welford''s algorithm for variance calculation.
-
-
-            Read about [Welford''s algorithm](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford''s_online_algorithm) for more information on the algorithm.'
-          type: number
-          format: double
         start_time:
-          description: The start time of the histogram.
           type: string
           format: date-time
-        sum_of_samples:
-          description: The sum of all samples in the histogram.
-          type: number
-          format: double
+        value:
+          type: integer
+          format: int64
       required:
-      - bins
-      - max
-      - min
-      - n_samples
-      - p50
-      - p90
-      - p99
-      - squared_mean
       - start_time
-      - sum_of_samples
-    SystemMetricName:
-      type: string
-      enum:
-      - virtual_disk_space_provisioned
-      - cpus_provisioned
-      - ram_provisioned
-    Name:
-      title: A name unique within the parent collection
-      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
-      type: string
-      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
-      minLength: 1
-      maxLength: 63
+      - value
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    BinRangefloat:
+      description: 'A type storing a range over `T`.
+
+
+        This type supports ranges similar to the `RangeTo`, `Range` and `RangeFrom` types in the standard library. Those cover `(..end)`, `(start..end)`, and `(start..)` respectively.'
+      oneOf:
+      - description: A range unbounded below and exclusively above, `..end`.
+        type: object
+        properties:
+          end:
+            type: number
+            format: float
+          type:
+            type: string
+            enum:
+            - range_to
+        required:
+        - end
+        - type
+      - description: A range bounded inclusively below and exclusively above, `start..end`.
+        type: object
+        properties:
+          end:
+            type: number
+            format: float
+          start:
+            type: number
+            format: float
+          type:
+            type: string
+            enum:
+            - range
+        required:
+        - end
+        - start
+        - type
+      - description: A range bounded inclusively below and unbounded above, `start..`.
+        type: object
+        properties:
+          start:
+            type: number
+            format: float
+          type:
+            type: string
+            enum:
+            - range_from
+        required:
+        - start
+        - type
     BinRangeuint64:
       description: 'A type storing a range over `T`.
 
@@ -1387,13 +327,87 @@ components:
       - squared_mean
       - start_time
       - sum_of_samples
-    PaginationOrder:
-      description: The order in which the client wants to page through the requested collection
+    DatumType:
+      description: The type of an individual datum of a metric.
       type: string
       enum:
-      - ascending
-      - descending
-    Histogramuint8:
+      - bool
+      - i8
+      - u8
+      - i16
+      - u16
+      - i32
+      - u32
+      - i64
+      - u64
+      - f32
+      - f64
+      - string
+      - bytes
+      - cumulative_i64
+      - cumulative_u64
+      - cumulative_f32
+      - cumulative_f64
+      - histogram_i8
+      - histogram_u8
+      - histogram_i16
+      - histogram_u16
+      - histogram_i32
+      - histogram_u32
+      - histogram_i64
+      - histogram_u64
+      - histogram_f32
+      - histogram_f64
+    BinRangedouble:
+      description: 'A type storing a range over `T`.
+
+
+        This type supports ranges similar to the `RangeTo`, `Range` and `RangeFrom` types in the standard library. Those cover `(..end)`, `(start..end)`, and `(start..)` respectively.'
+      oneOf:
+      - description: A range unbounded below and exclusively above, `..end`.
+        type: object
+        properties:
+          end:
+            type: number
+            format: double
+          type:
+            type: string
+            enum:
+            - range_to
+        required:
+        - end
+        - type
+      - description: A range bounded inclusively below and exclusively above, `start..end`.
+        type: object
+        properties:
+          end:
+            type: number
+            format: double
+          start:
+            type: number
+            format: double
+          type:
+            type: string
+            enum:
+            - range
+        required:
+        - end
+        - start
+        - type
+      - description: A range bounded inclusively below and unbounded above, `start..`.
+        type: object
+        properties:
+          start:
+            type: number
+            format: double
+          type:
+            type: string
+            enum:
+            - range_from
+        required:
+        - start
+        - type
+    Histogramint16:
       description: 'Histogram metric
 
 
@@ -1407,16 +421,131 @@ components:
           description: The bins of the histogram.
           type: array
           items:
-            $ref: '#/components/schemas/Binuint8'
+            $ref: '#/components/schemas/Binint16'
         max:
           description: The maximum value of all samples in the histogram.
           type: integer
-          format: uint8
+          format: int16
+        min:
+          description: The minimum value of all samples in the histogram.
+          type: integer
+          format: int16
+        n_samples:
+          description: The total number of samples in the histogram.
+          type: integer
+          format: uint64
+          minimum: 0
+        p50:
+          description: p50 Quantile
+          allOf:
+          - $ref: '#/components/schemas/Quantile'
+        p90:
+          description: p95 Quantile
+          allOf:
+          - $ref: '#/components/schemas/Quantile'
+        p99:
+          description: p99 Quantile
+          allOf:
+          - $ref: '#/components/schemas/Quantile'
+        squared_mean:
+          description: 'M2 for Welford''s algorithm for variance calculation.
+
+
+            Read about [Welford''s algorithm](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford''s_online_algorithm) for more information on the algorithm.'
+          type: number
+          format: double
+        start_time:
+          description: The start time of the histogram.
+          type: string
+          format: date-time
+        sum_of_samples:
+          description: The sum of all samples in the histogram.
+          type: integer
+          format: int64
+      required:
+      - bins
+      - max
+      - min
+      - n_samples
+      - p50
+      - p90
+      - p99
+      - squared_mean
+      - start_time
+      - sum_of_samples
+    BinRangeint64:
+      description: 'A type storing a range over `T`.
+
+
+        This type supports ranges similar to the `RangeTo`, `Range` and `RangeFrom` types in the standard library. Those cover `(..end)`, `(start..end)`, and `(start..)` respectively.'
+      oneOf:
+      - description: A range unbounded below and exclusively above, `..end`.
+        type: object
+        properties:
+          end:
+            type: integer
+            format: int64
+          type:
+            type: string
+            enum:
+            - range_to
+        required:
+        - end
+        - type
+      - description: A range bounded inclusively below and exclusively above, `start..end`.
+        type: object
+        properties:
+          end:
+            type: integer
+            format: int64
+          start:
+            type: integer
+            format: int64
+          type:
+            type: string
+            enum:
+            - range
+        required:
+        - end
+        - start
+        - type
+      - description: A range bounded inclusively below and unbounded above, `start..`.
+        type: object
+        properties:
+          start:
+            type: integer
+            format: int64
+          type:
+            type: string
+            enum:
+            - range_from
+        required:
+        - start
+        - type
+    Histogramuint32:
+      description: 'Histogram metric
+
+
+        A histogram maintains the count of any number of samples, over a set of bins. Bins are specified on construction via their _left_ edges, inclusive. There can''t be any "gaps" in the bins, and an additional bin may be added to the left, right, or both so that the bins extend to the entire range of the support.
+
+
+        Note that any gaps, unsorted bins, or non-finite values will result in an error.'
+      type: object
+      properties:
+        bins:
+          description: The bins of the histogram.
+          type: array
+          items:
+            $ref: '#/components/schemas/Binuint32'
+        max:
+          description: The maximum value of all samples in the histogram.
+          type: integer
+          format: uint32
           minimum: 0
         min:
           description: The minimum value of all samples in the histogram.
           type: integer
-          format: uint8
+          format: uint32
           minimum: 0
         n_samples:
           description: The total number of samples in the histogram.
@@ -1461,7 +590,7 @@ components:
       - squared_mean
       - start_time
       - sum_of_samples
-    Binfloat:
+    Binuint16:
       description: Type storing bin edges and a count of samples within it.
       type: object
       properties:
@@ -1473,11 +602,58 @@ components:
         range:
           description: The range of the support covered by this bin.
           allOf:
-          - $ref: '#/components/schemas/BinRangefloat'
+          - $ref: '#/components/schemas/BinRangeuint16'
       required:
       - count
       - range
-    BinRangeint64:
+    Quantile:
+      description: 'Structure for estimating the p-quantile of a population.
+
+
+        This is based on the P² algorithm for estimating quantiles using constant space.
+
+
+        The algorithm consists of maintaining five markers: the minimum, the p/2-, p-, and (1 + p)/2 quantiles, and the maximum.'
+      type: object
+      properties:
+        desired_marker_positions:
+          description: The desired marker positions.
+          type: array
+          items:
+            type: number
+            format: double
+          minItems: 5
+          maxItems: 5
+        marker_heights:
+          description: The heights of the markers.
+          type: array
+          items:
+            type: number
+            format: double
+          minItems: 5
+          maxItems: 5
+        marker_positions:
+          description: 'The positions of the markers.
+
+
+            We track sample size in the 5th position, as useful observations won''t start until we''ve filled the heights at the 6th sample anyway This does deviate from the paper, but it''s a more useful representation that works according to the paper''s algorithm.'
+          type: array
+          items:
+            type: integer
+            format: uint64
+            minimum: 0
+          minItems: 5
+          maxItems: 5
+        p:
+          description: The p value for the quantile.
+          type: number
+          format: double
+      required:
+      - desired_marker_positions
+      - marker_heights
+      - marker_positions
+      - p
+    BinRangeint32:
       description: 'A type storing a range over `T`.
 
 
@@ -1488,7 +664,7 @@ components:
         properties:
           end:
             type: integer
-            format: int64
+            format: int32
           type:
             type: string
             enum:
@@ -1501,10 +677,10 @@ components:
         properties:
           end:
             type: integer
-            format: int64
+            format: int32
           start:
             type: integer
-            format: int64
+            format: int32
           type:
             type: string
             enum:
@@ -1518,7 +694,60 @@ components:
         properties:
           start:
             type: integer
-            format: int64
+            format: int32
+          type:
+            type: string
+            enum:
+            - range_from
+        required:
+        - start
+        - type
+    BinRangeuint8:
+      description: 'A type storing a range over `T`.
+
+
+        This type supports ranges similar to the `RangeTo`, `Range` and `RangeFrom` types in the standard library. Those cover `(..end)`, `(start..end)`, and `(start..)` respectively.'
+      oneOf:
+      - description: A range unbounded below and exclusively above, `..end`.
+        type: object
+        properties:
+          end:
+            type: integer
+            format: uint8
+            minimum: 0
+          type:
+            type: string
+            enum:
+            - range_to
+        required:
+        - end
+        - type
+      - description: A range bounded inclusively below and exclusively above, `start..end`.
+        type: object
+        properties:
+          end:
+            type: integer
+            format: uint8
+            minimum: 0
+          start:
+            type: integer
+            format: uint8
+            minimum: 0
+          type:
+            type: string
+            enum:
+            - range
+        required:
+        - end
+        - start
+        - type
+      - description: A range bounded inclusively below and unbounded above, `start..`.
+        type: object
+        properties:
+          start:
+            type: integer
+            format: uint8
+            minimum: 0
           type:
             type: string
             enum:
@@ -1594,7 +823,7 @@ components:
       - squared_mean
       - start_time
       - sum_of_samples
-    Binuint8:
+    Binuint32:
       description: Type storing bin edges and a count of samples within it.
       type: object
       properties:
@@ -1606,7 +835,221 @@ components:
         range:
           description: The range of the support covered by this bin.
           allOf:
-          - $ref: '#/components/schemas/BinRangeuint8'
+          - $ref: '#/components/schemas/BinRangeuint32'
+      required:
+      - count
+      - range
+    Histogramdouble:
+      description: 'Histogram metric
+
+
+        A histogram maintains the count of any number of samples, over a set of bins. Bins are specified on construction via their _left_ edges, inclusive. There can''t be any "gaps" in the bins, and an additional bin may be added to the left, right, or both so that the bins extend to the entire range of the support.
+
+
+        Note that any gaps, unsorted bins, or non-finite values will result in an error.'
+      type: object
+      properties:
+        bins:
+          description: The bins of the histogram.
+          type: array
+          items:
+            $ref: '#/components/schemas/Bindouble'
+        max:
+          description: The maximum value of all samples in the histogram.
+          type: number
+          format: double
+        min:
+          description: The minimum value of all samples in the histogram.
+          type: number
+          format: double
+        n_samples:
+          description: The total number of samples in the histogram.
+          type: integer
+          format: uint64
+          minimum: 0
+        p50:
+          description: p50 Quantile
+          allOf:
+          - $ref: '#/components/schemas/Quantile'
+        p90:
+          description: p95 Quantile
+          allOf:
+          - $ref: '#/components/schemas/Quantile'
+        p99:
+          description: p99 Quantile
+          allOf:
+          - $ref: '#/components/schemas/Quantile'
+        squared_mean:
+          description: 'M2 for Welford''s algorithm for variance calculation.
+
+
+            Read about [Welford''s algorithm](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford''s_online_algorithm) for more information on the algorithm.'
+          type: number
+          format: double
+        start_time:
+          description: The start time of the histogram.
+          type: string
+          format: date-time
+        sum_of_samples:
+          description: The sum of all samples in the histogram.
+          type: number
+          format: double
+      required:
+      - bins
+      - max
+      - min
+      - n_samples
+      - p50
+      - p90
+      - p99
+      - squared_mean
+      - start_time
+      - sum_of_samples
+    Histogramuint8:
+      description: 'Histogram metric
+
+
+        A histogram maintains the count of any number of samples, over a set of bins. Bins are specified on construction via their _left_ edges, inclusive. There can''t be any "gaps" in the bins, and an additional bin may be added to the left, right, or both so that the bins extend to the entire range of the support.
+
+
+        Note that any gaps, unsorted bins, or non-finite values will result in an error.'
+      type: object
+      properties:
+        bins:
+          description: The bins of the histogram.
+          type: array
+          items:
+            $ref: '#/components/schemas/Binuint8'
+        max:
+          description: The maximum value of all samples in the histogram.
+          type: integer
+          format: uint8
+          minimum: 0
+        min:
+          description: The minimum value of all samples in the histogram.
+          type: integer
+          format: uint8
+          minimum: 0
+        n_samples:
+          description: The total number of samples in the histogram.
+          type: integer
+          format: uint64
+          minimum: 0
+        p50:
+          description: p50 Quantile
+          allOf:
+          - $ref: '#/components/schemas/Quantile'
+        p90:
+          description: p95 Quantile
+          allOf:
+          - $ref: '#/components/schemas/Quantile'
+        p99:
+          description: p99 Quantile
+          allOf:
+          - $ref: '#/components/schemas/Quantile'
+        squared_mean:
+          description: 'M2 for Welford''s algorithm for variance calculation.
+
+
+            Read about [Welford''s algorithm](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford''s_online_algorithm) for more information on the algorithm.'
+          type: number
+          format: double
+        start_time:
+          description: The start time of the histogram.
+          type: string
+          format: date-time
+        sum_of_samples:
+          description: The sum of all samples in the histogram.
+          type: integer
+          format: int64
+      required:
+      - bins
+      - max
+      - min
+      - n_samples
+      - p50
+      - p90
+      - p99
+      - squared_mean
+      - start_time
+      - sum_of_samples
+    Cumulativedouble:
+      description: A cumulative or counter data type.
+      type: object
+      properties:
+        start_time:
+          type: string
+          format: date-time
+        value:
+          type: number
+          format: double
+      required:
+      - start_time
+      - value
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
+    MeasurementResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/Measurement'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    PaginationOrder:
+      description: The order in which the client wants to page through the requested collection
+      type: string
+      enum:
+      - ascending
+      - descending
+    Cumulativefloat:
+      description: A cumulative or counter data type.
+      type: object
+      properties:
+        start_time:
+          type: string
+          format: date-time
+        value:
+          type: number
+          format: float
+      required:
+      - start_time
+      - value
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
+    Binfloat:
+      description: Type storing bin edges and a count of samples within it.
+      type: object
+      properties:
+        count:
+          description: The total count of samples in this bin.
+          type: integer
+          format: uint64
+          minimum: 0
+        range:
+          description: The range of the support covered by this bin.
+          allOf:
+          - $ref: '#/components/schemas/BinRangefloat'
       required:
       - count
       - range
@@ -1623,6 +1066,495 @@ components:
           description: The range of the support covered by this bin.
           allOf:
           - $ref: '#/components/schemas/BinRangeint32'
+      required:
+      - count
+      - range
+    BinRangeuint16:
+      description: 'A type storing a range over `T`.
+
+
+        This type supports ranges similar to the `RangeTo`, `Range` and `RangeFrom` types in the standard library. Those cover `(..end)`, `(start..end)`, and `(start..)` respectively.'
+      oneOf:
+      - description: A range unbounded below and exclusively above, `..end`.
+        type: object
+        properties:
+          end:
+            type: integer
+            format: uint16
+            minimum: 0
+          type:
+            type: string
+            enum:
+            - range_to
+        required:
+        - end
+        - type
+      - description: A range bounded inclusively below and exclusively above, `start..end`.
+        type: object
+        properties:
+          end:
+            type: integer
+            format: uint16
+            minimum: 0
+          start:
+            type: integer
+            format: uint16
+            minimum: 0
+          type:
+            type: string
+            enum:
+            - range
+        required:
+        - end
+        - start
+        - type
+      - description: A range bounded inclusively below and unbounded above, `start..`.
+        type: object
+        properties:
+          start:
+            type: integer
+            format: uint16
+            minimum: 0
+          type:
+            type: string
+            enum:
+            - range_from
+        required:
+        - start
+        - type
+    Binint16:
+      description: Type storing bin edges and a count of samples within it.
+      type: object
+      properties:
+        count:
+          description: The total count of samples in this bin.
+          type: integer
+          format: uint64
+          minimum: 0
+        range:
+          description: The range of the support covered by this bin.
+          allOf:
+          - $ref: '#/components/schemas/BinRangeint16'
+      required:
+      - count
+      - range
+    BinRangeint16:
+      description: 'A type storing a range over `T`.
+
+
+        This type supports ranges similar to the `RangeTo`, `Range` and `RangeFrom` types in the standard library. Those cover `(..end)`, `(start..end)`, and `(start..)` respectively.'
+      oneOf:
+      - description: A range unbounded below and exclusively above, `..end`.
+        type: object
+        properties:
+          end:
+            type: integer
+            format: int16
+          type:
+            type: string
+            enum:
+            - range_to
+        required:
+        - end
+        - type
+      - description: A range bounded inclusively below and exclusively above, `start..end`.
+        type: object
+        properties:
+          end:
+            type: integer
+            format: int16
+          start:
+            type: integer
+            format: int16
+          type:
+            type: string
+            enum:
+            - range
+        required:
+        - end
+        - start
+        - type
+      - description: A range bounded inclusively below and unbounded above, `start..`.
+        type: object
+        properties:
+          start:
+            type: integer
+            format: int16
+          type:
+            type: string
+            enum:
+            - range_from
+        required:
+        - start
+        - type
+    Binint8:
+      description: Type storing bin edges and a count of samples within it.
+      type: object
+      properties:
+        count:
+          description: The total count of samples in this bin.
+          type: integer
+          format: uint64
+          minimum: 0
+        range:
+          description: The range of the support covered by this bin.
+          allOf:
+          - $ref: '#/components/schemas/BinRangeint8'
+      required:
+      - count
+      - range
+    Cumulativeuint64:
+      description: A cumulative or counter data type.
+      type: object
+      properties:
+        start_time:
+          type: string
+          format: date-time
+        value:
+          type: integer
+          format: uint64
+          minimum: 0
+      required:
+      - start_time
+      - value
+    Histogramint32:
+      description: 'Histogram metric
+
+
+        A histogram maintains the count of any number of samples, over a set of bins. Bins are specified on construction via their _left_ edges, inclusive. There can''t be any "gaps" in the bins, and an additional bin may be added to the left, right, or both so that the bins extend to the entire range of the support.
+
+
+        Note that any gaps, unsorted bins, or non-finite values will result in an error.'
+      type: object
+      properties:
+        bins:
+          description: The bins of the histogram.
+          type: array
+          items:
+            $ref: '#/components/schemas/Binint32'
+        max:
+          description: The maximum value of all samples in the histogram.
+          type: integer
+          format: int32
+        min:
+          description: The minimum value of all samples in the histogram.
+          type: integer
+          format: int32
+        n_samples:
+          description: The total number of samples in the histogram.
+          type: integer
+          format: uint64
+          minimum: 0
+        p50:
+          description: p50 Quantile
+          allOf:
+          - $ref: '#/components/schemas/Quantile'
+        p90:
+          description: p95 Quantile
+          allOf:
+          - $ref: '#/components/schemas/Quantile'
+        p99:
+          description: p99 Quantile
+          allOf:
+          - $ref: '#/components/schemas/Quantile'
+        squared_mean:
+          description: 'M2 for Welford''s algorithm for variance calculation.
+
+
+            Read about [Welford''s algorithm](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford''s_online_algorithm) for more information on the algorithm.'
+          type: number
+          format: double
+        start_time:
+          description: The start time of the histogram.
+          type: string
+          format: date-time
+        sum_of_samples:
+          description: The sum of all samples in the histogram.
+          type: integer
+          format: int64
+      required:
+      - bins
+      - max
+      - min
+      - n_samples
+      - p50
+      - p90
+      - p99
+      - squared_mean
+      - start_time
+      - sum_of_samples
+    Histogramfloat:
+      description: 'Histogram metric
+
+
+        A histogram maintains the count of any number of samples, over a set of bins. Bins are specified on construction via their _left_ edges, inclusive. There can''t be any "gaps" in the bins, and an additional bin may be added to the left, right, or both so that the bins extend to the entire range of the support.
+
+
+        Note that any gaps, unsorted bins, or non-finite values will result in an error.'
+      type: object
+      properties:
+        bins:
+          description: The bins of the histogram.
+          type: array
+          items:
+            $ref: '#/components/schemas/Binfloat'
+        max:
+          description: The maximum value of all samples in the histogram.
+          type: number
+          format: float
+        min:
+          description: The minimum value of all samples in the histogram.
+          type: number
+          format: float
+        n_samples:
+          description: The total number of samples in the histogram.
+          type: integer
+          format: uint64
+          minimum: 0
+        p50:
+          description: p50 Quantile
+          allOf:
+          - $ref: '#/components/schemas/Quantile'
+        p90:
+          description: p95 Quantile
+          allOf:
+          - $ref: '#/components/schemas/Quantile'
+        p99:
+          description: p99 Quantile
+          allOf:
+          - $ref: '#/components/schemas/Quantile'
+        squared_mean:
+          description: 'M2 for Welford''s algorithm for variance calculation.
+
+
+            Read about [Welford''s algorithm](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford''s_online_algorithm) for more information on the algorithm.'
+          type: number
+          format: double
+        start_time:
+          description: The start time of the histogram.
+          type: string
+          format: date-time
+        sum_of_samples:
+          description: The sum of all samples in the histogram.
+          type: number
+          format: double
+      required:
+      - bins
+      - max
+      - min
+      - n_samples
+      - p50
+      - p90
+      - p99
+      - squared_mean
+      - start_time
+      - sum_of_samples
+    Histogramint64:
+      description: 'Histogram metric
+
+
+        A histogram maintains the count of any number of samples, over a set of bins. Bins are specified on construction via their _left_ edges, inclusive. There can''t be any "gaps" in the bins, and an additional bin may be added to the left, right, or both so that the bins extend to the entire range of the support.
+
+
+        Note that any gaps, unsorted bins, or non-finite values will result in an error.'
+      type: object
+      properties:
+        bins:
+          description: The bins of the histogram.
+          type: array
+          items:
+            $ref: '#/components/schemas/Binint64'
+        max:
+          description: The maximum value of all samples in the histogram.
+          type: integer
+          format: int64
+        min:
+          description: The minimum value of all samples in the histogram.
+          type: integer
+          format: int64
+        n_samples:
+          description: The total number of samples in the histogram.
+          type: integer
+          format: uint64
+          minimum: 0
+        p50:
+          description: p50 Quantile
+          allOf:
+          - $ref: '#/components/schemas/Quantile'
+        p90:
+          description: p95 Quantile
+          allOf:
+          - $ref: '#/components/schemas/Quantile'
+        p99:
+          description: p99 Quantile
+          allOf:
+          - $ref: '#/components/schemas/Quantile'
+        squared_mean:
+          description: 'M2 for Welford''s algorithm for variance calculation.
+
+
+            Read about [Welford''s algorithm](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford''s_online_algorithm) for more information on the algorithm.'
+          type: number
+          format: double
+        start_time:
+          description: The start time of the histogram.
+          type: string
+          format: date-time
+        sum_of_samples:
+          description: The sum of all samples in the histogram.
+          type: integer
+          format: int64
+      required:
+      - bins
+      - max
+      - min
+      - n_samples
+      - p50
+      - p90
+      - p99
+      - squared_mean
+      - start_time
+      - sum_of_samples
+    Measurement:
+      description: A `Measurement` is a timestamped datum from a single metric
+      type: object
+      properties:
+        datum:
+          $ref: '#/components/schemas/Datum'
+        timestamp:
+          type: string
+          format: date-time
+      required:
+      - datum
+      - timestamp
+    Bindouble:
+      description: Type storing bin edges and a count of samples within it.
+      type: object
+      properties:
+        count:
+          description: The total count of samples in this bin.
+          type: integer
+          format: uint64
+          minimum: 0
+        range:
+          description: The range of the support covered by this bin.
+          allOf:
+          - $ref: '#/components/schemas/BinRangedouble'
+      required:
+      - count
+      - range
+    MissingDatum:
+      type: object
+      properties:
+        datum_type:
+          $ref: '#/components/schemas/DatumType'
+        start_time:
+          type:
+          - string
+          - 'null'
+          format: date-time
+      required:
+      - datum_type
+    BinRangeint8:
+      description: 'A type storing a range over `T`.
+
+
+        This type supports ranges similar to the `RangeTo`, `Range` and `RangeFrom` types in the standard library. Those cover `(..end)`, `(start..end)`, and `(start..)` respectively.'
+      oneOf:
+      - description: A range unbounded below and exclusively above, `..end`.
+        type: object
+        properties:
+          end:
+            type: integer
+            format: int8
+          type:
+            type: string
+            enum:
+            - range_to
+        required:
+        - end
+        - type
+      - description: A range bounded inclusively below and exclusively above, `start..end`.
+        type: object
+        properties:
+          end:
+            type: integer
+            format: int8
+          start:
+            type: integer
+            format: int8
+          type:
+            type: string
+            enum:
+            - range
+        required:
+        - end
+        - start
+        - type
+      - description: A range bounded inclusively below and unbounded above, `start..`.
+        type: object
+        properties:
+          start:
+            type: integer
+            format: int8
+          type:
+            type: string
+            enum:
+            - range_from
+        required:
+        - start
+        - type
+    Binuint8:
+      description: Type storing bin edges and a count of samples within it.
+      type: object
+      properties:
+        count:
+          description: The total count of samples in this bin.
+          type: integer
+          format: uint64
+          minimum: 0
+        range:
+          description: The range of the support covered by this bin.
+          allOf:
+          - $ref: '#/components/schemas/BinRangeuint8'
+      required:
+      - count
+      - range
+    SystemMetricName:
+      type: string
+      enum:
+      - virtual_disk_space_provisioned
+      - cpus_provisioned
+      - ram_provisioned
+    Binuint64:
+      description: Type storing bin edges and a count of samples within it.
+      type: object
+      properties:
+        count:
+          description: The total count of samples in this bin.
+          type: integer
+          format: uint64
+          minimum: 0
+        range:
+          description: The range of the support covered by this bin.
+          allOf:
+          - $ref: '#/components/schemas/BinRangeuint64'
+      required:
+      - count
+      - range
+    Binint64:
+      description: Type storing bin edges and a count of samples within it.
+      type: object
+      properties:
+        count:
+          description: The total count of samples in this bin.
+          type: integer
+          format: uint64
+          minimum: 0
+        range:
+          description: The range of the support covered by this bin.
+          allOf:
+          - $ref: '#/components/schemas/BinRangeint64'
       required:
       - count
       - range
@@ -1955,6 +1887,74 @@ components:
         required:
         - datum
         - type
+    Histogramuint64:
+      description: 'Histogram metric
+
+
+        A histogram maintains the count of any number of samples, over a set of bins. Bins are specified on construction via their _left_ edges, inclusive. There can''t be any "gaps" in the bins, and an additional bin may be added to the left, right, or both so that the bins extend to the entire range of the support.
+
+
+        Note that any gaps, unsorted bins, or non-finite values will result in an error.'
+      type: object
+      properties:
+        bins:
+          description: The bins of the histogram.
+          type: array
+          items:
+            $ref: '#/components/schemas/Binuint64'
+        max:
+          description: The maximum value of all samples in the histogram.
+          type: integer
+          format: uint64
+          minimum: 0
+        min:
+          description: The minimum value of all samples in the histogram.
+          type: integer
+          format: uint64
+          minimum: 0
+        n_samples:
+          description: The total number of samples in the histogram.
+          type: integer
+          format: uint64
+          minimum: 0
+        p50:
+          description: p50 Quantile
+          allOf:
+          - $ref: '#/components/schemas/Quantile'
+        p90:
+          description: p95 Quantile
+          allOf:
+          - $ref: '#/components/schemas/Quantile'
+        p99:
+          description: p99 Quantile
+          allOf:
+          - $ref: '#/components/schemas/Quantile'
+        squared_mean:
+          description: 'M2 for Welford''s algorithm for variance calculation.
+
+
+            Read about [Welford''s algorithm](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford''s_online_algorithm) for more information on the algorithm.'
+          type: number
+          format: double
+        start_time:
+          description: The start time of the histogram.
+          type: string
+          format: date-time
+        sum_of_samples:
+          description: The sum of all samples in the histogram.
+          type: integer
+          format: int64
+      required:
+      - bins
+      - max
+      - min
+      - n_samples
+      - p50
+      - p90
+      - p99
+      - squared_mean
+      - start_time
+      - sum_of_samples
   responses:
     Error:
       description: Error

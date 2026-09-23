@@ -7,7 +7,7 @@ info:
     email: api@oxide.computer
   version: 2026081901.0.0
 tags:
-- name: ip-pools
+- name: IP Pools
   description: IP pools are collections of external IPs that can be allocated and attached to instances.
   externalDocs:
     url: http://docs.oxide.computer/api/ip-pools
@@ -15,7 +15,7 @@ paths:
   /v1/ip-pools:
     get:
       tags:
-      - ip-pools
+      - IP Pools
       summary: List IP pools
       operationId: ip_pool_list
       parameters:
@@ -63,7 +63,7 @@ paths:
   /v1/ip-pools/{pool}:
     get:
       tags:
-      - ip-pools
+      - IP Pools
       summary: Fetch IP pool
       operationId: ip_pool_view
       parameters:
@@ -86,36 +86,6 @@ paths:
           $ref: '#/components/responses/Error'
 components:
   schemas:
-    IpPoolType:
-      description: Type of IP pool.
-      oneOf:
-      - description: Unicast IP pool for standard IP allocations.
-        type: string
-        enum:
-        - unicast
-      - description: 'Multicast IP pool for multicast group allocations.
-
-
-          All ranges in a multicast pool must be either ASM or SSM (not mixed).'
-        type: string
-        enum:
-        - multicast
-    SiloIpPoolResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/SiloIpPool'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
     NameOrId:
       oneOf:
       - title: id
@@ -144,6 +114,51 @@ components:
       enum:
       - v4
       - v6
+    NameOrIdSortMode:
+      description: Supported set of sort modes for scanning by name or id
+      oneOf:
+      - description: Sort in increasing order of "name"
+        type: string
+        enum:
+        - name_ascending
+      - description: Sort in decreasing order of "name"
+        type: string
+        enum:
+        - name_descending
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    SiloIpPoolResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/SiloIpPool'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    IpPoolType:
+      description: Type of IP pool.
+      oneOf:
+      - description: Unicast IP pool for standard IP allocations.
+        type: string
+        enum:
+        - unicast
+      - description: 'Multicast IP pool for multicast group allocations.
+
+
+          All ranges in a multicast pool must be either ASM or SSM (not mixed).'
+        type: string
+        enum:
+        - multicast
     Name:
       title: A name unique within the parent collection
       description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
@@ -197,21 +212,6 @@ components:
       - pool_type
       - time_created
       - time_modified
-    NameOrIdSortMode:
-      description: Supported set of sort modes for scanning by name or id
-      oneOf:
-      - description: Sort in increasing order of "name"
-        type: string
-        enum:
-        - name_ascending
-      - description: Sort in decreasing order of "name"
-        type: string
-        enum:
-        - name_descending
-      - description: Sort in increasing order of "id"
-        type: string
-        enum:
-        - id_ascending
   responses:
     Error:
       description: Error

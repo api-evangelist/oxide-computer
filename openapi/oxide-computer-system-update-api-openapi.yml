@@ -20,7 +20,7 @@ paths:
       description: 'Instructs the system that a system recovery operation ("mupdate") was completed using the software in the specified release.
 
 
-        The system recovery operation is used to bypass the control plane to deploy known-working software when the control plane itself is not functioning or otherwise unable to update itself.  When the control plane detects this, it stops making any changes to deployed software to avoid reverting the recovery itself.  This operation puts the control plane back in charge of determining what software should be deployed, instructing it that the specified software (which is also what''s currently running) is what''s supposed to be deployed.
+        The system recovery operation is used to bypass the control plane to deploy known-working software when the control plane itself is not functioning or otherwise unable to update itself. When the control plane detects this, it stops making any changes to deployed software to avoid reverting the recovery itself. This operation puts the control plane back in charge of determining what software should be deployed, instructing it that the specified software (which is also what''s currently running) is what''s supposed to be deployed.
 
 
         If the control plane knows the version of all running software (e.g., a single sled was recovered to the same version as the rest of the rack), requests where the provided version does not match what''s currently running will fail. If the control plane does not know the version of all running software (e.g., the entire rack was mupdated to a new release), requests with an incorrect provided version will succeed, but the control plane will continue to avoid changing deployed software until this operation is invoked with the correct version.
@@ -286,32 +286,20 @@ paths:
           $ref: '#/components/responses/Error'
 components:
   schemas:
-    IdSortMode:
-      description: 'Supported set of sort modes for scanning by id only.
-
-
-        Currently, we only support scanning in ascending order.'
-      oneOf:
-      - description: Sort in increasing order of "id"
-        type: string
-        enum:
-        - id_ascending
-    TargetRelease:
-      description: View of a system software target release
+    Error:
+      description: Error information from a response.
       type: object
       properties:
-        time_requested:
-          description: Time this was set as the target release
+        error_code:
           type: string
-          format: date-time
-        version:
-          description: The specified release of the rack's system software
+        message:
           type: string
-          pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+        request_id:
+          type: string
       required:
-      - time_requested
-      - version
-    TufRepoResultsPage:
+      - message
+      - request_id
+    UpdatesTrustRootResultsPage:
       description: A single page of results
       type: object
       properties:
@@ -319,7 +307,7 @@ components:
           description: list of items on this page of results
           type: array
           items:
-            $ref: '#/components/schemas/TufRepo'
+            $ref: '#/components/schemas/UpdatesTrustRoot'
         next_page:
           description: token used to fetch the next page of results (if any)
           type:
@@ -327,6 +315,27 @@ components:
           - 'null'
       required:
       - items
+    TufRepoUploadStatus:
+      description: Whether the uploaded TUF repo already existed or was new and had to be inserted. Part of `TufRepoUpload`.
+      oneOf:
+      - description: The repository already existed in the database
+        type: string
+        enum:
+        - already_exists
+      - description: The repository did not exist, and was inserted into the database
+        type: string
+        enum:
+        - inserted
+    SetTargetReleaseParams:
+      description: Parameters for PUT requests to `/v1/system/update/target-release`.
+      type: object
+      properties:
+        system_version:
+          description: Version of the system software to make the target release.
+          type: string
+          pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+      required:
+      - system_version
     UpdateStatus:
       type: object
       properties:
@@ -378,32 +387,6 @@ components:
       - suspended
       - target_release
       - time_last_step_planned
-    SetTargetReleaseParams:
-      description: Parameters for PUT requests to `/v1/system/update/target-release`.
-      type: object
-      properties:
-        system_version:
-          description: Version of the system software to make the target release.
-          type: string
-          pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
-      required:
-      - system_version
-    UpdatesTrustRootResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/UpdatesTrustRoot'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
     TufRepoUpload:
       type: object
       properties:
@@ -425,35 +408,37 @@ components:
         type: string
         enum:
         - version_descending
-    TufRepoUploadStatus:
-      description: Whether the uploaded TUF repo already existed or was new and had to be inserted. Part of `TufRepoUpload`.
-      oneOf:
-      - description: The repository already existed in the database
-        type: string
-        enum:
-        - already_exists
-      - description: The repository did not exist, and was inserted into the database
-        type: string
-        enum:
-        - inserted
-    UpdatesTrustRoot:
-      description: Trusted root role used by the update system to verify update repositories.
+    TufRepoResultsPage:
+      description: A single page of results
       type: object
       properties:
-        id:
-          description: The UUID of this trusted root role.
-          type: string
-          format: uuid
-        root_role:
-          description: The trusted root role itself, a JSON document as described by The Update Framework.
-        time_created:
-          description: Time the trusted root role was added.
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/TufRepo'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    TargetRelease:
+      description: View of a system software target release
+      type: object
+      properties:
+        time_requested:
+          description: Time this was set as the target release
           type: string
           format: date-time
+        version:
+          description: The specified release of the rack's system software
+          type: string
+          pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
       required:
-      - id
-      - root_role
-      - time_created
+      - time_requested
+      - version
     TufRepo:
       description: Metadata about a TUF repository
       type: object
@@ -484,19 +469,34 @@ components:
       - hash
       - system_version
       - time_created
-    Error:
-      description: Error information from a response.
+    IdSortMode:
+      description: 'Supported set of sort modes for scanning by id only.
+
+
+        Currently, we only support scanning in ascending order.'
+      oneOf:
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    UpdatesTrustRoot:
+      description: Trusted root role used by the update system to verify update repositories.
       type: object
       properties:
-        error_code:
+        id:
+          description: The UUID of this trusted root role.
           type: string
-        message:
+          format: uuid
+        root_role:
+          description: The trusted root role itself, a JSON document as described by The Update Framework.
+        time_created:
+          description: Time the trusted root role was added.
           type: string
-        request_id:
-          type: string
+          format: date-time
       required:
-      - message
-      - request_id
+      - id
+      - root_role
+      - time_created
   responses:
     Error:
       description: Error

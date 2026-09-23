@@ -7,7 +7,7 @@ info:
     email: api@oxide.computer
   version: 2026081901.0.0
 tags:
-- name: tokens
+- name: Tokens
   description: API clients use device access tokens for authentication.
   externalDocs:
     url: http://docs.oxide.computer/api/tokens
@@ -15,7 +15,7 @@ paths:
   /v1/me/access-tokens:
     get:
       tags:
-      - tokens
+      - Tokens
       summary: List access tokens
       description: List device access tokens for the currently authenticated user.
       operationId: current_user_access_token_list
@@ -56,7 +56,7 @@ paths:
   /v1/me/access-tokens/{token_id}:
     delete:
       tags:
-      - tokens
+      - Tokens
       summary: Delete access token
       description: Delete a device access token for the currently authenticated user.
       operationId: current_user_access_token_delete
@@ -77,29 +77,6 @@ paths:
           $ref: '#/components/responses/Error'
 components:
   schemas:
-    IdSortMode:
-      description: 'Supported set of sort modes for scanning by id only.
-
-
-        Currently, we only support scanning in ascending order.'
-      oneOf:
-      - description: Sort in increasing order of "id"
-        type: string
-        enum:
-        - id_ascending
-    Error:
-      description: Error information from a response.
-      type: object
-      properties:
-        error_code:
-          type: string
-        message:
-          type: string
-        request_id:
-          type: string
-      required:
-      - message
-      - request_id
     DeviceAccessToken:
       description: View of a device access token
       type: object
@@ -123,6 +100,19 @@ components:
       required:
       - id
       - time_created
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
     DeviceAccessTokenResultsPage:
       description: A single page of results
       type: object
@@ -139,6 +129,16 @@ components:
           - 'null'
       required:
       - items
+    IdSortMode:
+      description: 'Supported set of sort modes for scanning by id only.
+
+
+        Currently, we only support scanning in ascending order.'
+      oneOf:
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
   responses:
     Error:
       description: Error

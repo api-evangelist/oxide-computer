@@ -711,22 +711,134 @@ paths:
           $ref: '#/components/responses/Error'
 components:
   schemas:
-    PhysicalDiskKind:
-      description: Describes the form factor of physical disks.
-      type: string
-      enum:
-      - m2
-      - u2
-    IdSortMode:
-      description: 'Supported set of sort modes for scanning by id only.
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    UninitializedSled:
+      description: A sled that has not been added to an initialized rack yet
+      type: object
+      properties:
+        baseboard:
+          $ref: '#/components/schemas/Baseboard'
+        cubby:
+          type: integer
+          format: uint16
+          minimum: 0
+        rack_id:
+          type: string
+          format: uuid
+      required:
+      - baseboard
+      - cubby
+      - rack_id
+    UninitializedSledResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/UninitializedSled'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    ByteCount:
+      description: Byte count to express memory or storage capacity.
+      type: integer
+      format: uint64
+      minimum: 0
+    SledProvisionPolicyParams:
+      description: Parameters for `sled_set_provision_policy`.
+      type: object
+      properties:
+        state:
+          description: The provision state.
+          allOf:
+          - $ref: '#/components/schemas/SledProvisionPolicy'
+      required:
+      - state
+    SledProvisionPolicy:
+      description: 'The operator-defined provision policy of a sled.
 
 
-        Currently, we only support scanning in ascending order.'
+        This controls whether new resources are going to be provisioned on this sled.'
       oneOf:
-      - description: Sort in increasing order of "id"
+      - description: New resources will be provisioned on this sled.
         type: string
         enum:
-        - id_ascending
+        - provisionable
+      - description: New resources will not be provisioned on this sled. However, if the sled is currently in service, existing resources will continue to be on this sled unless manually migrated off.
+        type: string
+        enum:
+        - non_provisionable
+    PhysicalDiskAdoptionRequestUuid:
+      x-rust-type:
+        crate: omicron-uuid-kinds
+        path: omicron_uuid_kinds::PhysicalDiskAdoptionRequestUuid
+        version: '*'
+      type: string
+      format: uuid
+    PhysicalDiskAdoptionRequestResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/PhysicalDiskAdoptionRequest'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    SledState:
+      description: The current state of the sled.
+      oneOf:
+      - description: The sled is currently active, and has resources allocated on it.
+        type: string
+        enum:
+        - active
+      - description: 'The sled has been permanently removed from service.
+
+
+          This is a terminal state: once a particular sled ID is decommissioned, it will never return to service. (The actual hardware may be reused, but it will be treated as a brand-new sled.)'
+        type: string
+        enum:
+        - decommissioned
+    PhysicalDiskResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/PhysicalDisk'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
     PhysicalDiskState:
       description: The current state of the disk, as determined by Nexus.
       oneOf:
@@ -741,6 +853,12 @@ components:
         type: string
         enum:
         - decommissioned
+    PhysicalDiskKind:
+      description: Describes the form factor of physical disks.
+      type: string
+      enum:
+      - m2
+      - u2
     SledInstance:
       description: An operator's view of an instance running on a given sled
       type: object
@@ -790,7 +908,54 @@ components:
       - state
       - time_created
       - time_modified
-    SledResultsPage:
+    PhysicalDiskAdoptionRequest:
+      description: A request to adopt a physical disk into the control plane
+      type: object
+      properties:
+        disk_id:
+          $ref: '#/components/schemas/PhysicalDiskManufacturerIdentity'
+        id:
+          $ref: '#/components/schemas/PhysicalDiskAdoptionRequestUuid'
+        time_created:
+          type: string
+          format: date-time
+      required:
+      - disk_id
+      - id
+      - time_created
+    SledPolicy:
+      description: The operator-defined policy of a sled.
+      oneOf:
+      - description: The operator has indicated that the sled is in-service.
+        type: object
+        properties:
+          kind:
+            type: string
+            enum:
+            - in_service
+          provision_policy:
+            description: Determines whether new resources can be provisioned onto the sled.
+            allOf:
+            - $ref: '#/components/schemas/SledProvisionPolicy'
+        required:
+        - kind
+        - provision_policy
+      - description: 'The operator has indicated that the sled has been permanently removed from service.
+
+
+          This is a terminal state: once a particular sled ID is expunged, it will never return to service. (The actual hardware may be reused, but it will be treated as a brand-new sled.)
+
+
+          An expunged sled is always non-provisionable.'
+        type: object
+        properties:
+          kind:
+            type: string
+            enum:
+            - expunged
+        required:
+        - kind
+    RackResultsPage:
       description: A single page of results
       type: object
       properties:
@@ -798,7 +963,7 @@ components:
           description: list of items on this page of results
           type: array
           items:
-            $ref: '#/components/schemas/Sled'
+            $ref: '#/components/schemas/Rack'
         next_page:
           description: token used to fetch the next page of results (if any)
           type:
@@ -806,27 +971,74 @@ components:
           - 'null'
       required:
       - items
-    PhysicalDiskManufacturerIdentity:
-      description: The unique identity of a physical disk provided by the manufacturer
+    SwitchLinkState: {}
+    UnadoptedPhysicalDiskResultsPage:
+      description: A single page of results
       type: object
       properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/UnadoptedPhysicalDisk'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    PhysicalDisk:
+      description: 'View of a Physical Disk
+
+
+        Physical disks reside in a particular sled and are used to store both Instance Disk data as well as internal metadata.'
+      type: object
+      properties:
+        form_factor:
+          $ref: '#/components/schemas/PhysicalDiskKind'
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
         model:
           type: string
+        policy:
+          description: The operator-defined policy for a physical disk.
+          allOf:
+          - $ref: '#/components/schemas/PhysicalDiskPolicy'
         serial:
           type: string
+        sled_id:
+          description: The sled to which this disk is attached, if any.
+          type:
+          - string
+          - 'null'
+          format: uuid
+        state:
+          description: The current state Nexus believes the disk to be in.
+          allOf:
+          - $ref: '#/components/schemas/PhysicalDiskState'
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
         vendor:
           type: string
       required:
+      - form_factor
+      - id
       - model
+      - policy
       - serial
+      - state
+      - time_created
+      - time_modified
       - vendor
-    SledUuid:
-      x-rust-type:
-        crate: omicron-uuid-kinds
-        path: omicron_uuid_kinds::SledUuid
-        version: '*'
-      type: string
-      format: uuid
     PhysicalDiskPolicy:
       description: The operator-defined policy of a physical disk.
       oneOf:
@@ -854,7 +1066,17 @@ components:
             - expunged
         required:
         - kind
-    PhysicalDiskResultsPage:
+    IdSortMode:
+      description: 'Supported set of sort modes for scanning by id only.
+
+
+        Currently, we only support scanning in ascending order.'
+      oneOf:
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    SledResultsPage:
       description: A single page of results
       type: object
       properties:
@@ -862,7 +1084,7 @@ components:
           description: list of items on this page of results
           type: array
           items:
-            $ref: '#/components/schemas/PhysicalDisk'
+            $ref: '#/components/schemas/Sled'
         next_page:
           description: token used to fetch the next page of results (if any)
           type:
@@ -870,6 +1092,31 @@ components:
           - 'null'
       required:
       - items
+    SwitchResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/Switch'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
     SwitchPortApplySettings:
       description: Parameters for applying settings to switch ports.
       type: object
@@ -880,68 +1127,40 @@ components:
           - $ref: '#/components/schemas/NameOrId'
       required:
       - port_settings
-    SledProvisionPolicyResponse:
-      description: Response to `sled_set_provision_policy`.
+    UnadoptedPhysicalDisk:
+      description: A physical disk that has not yet been adopted by the control plane
       type: object
       properties:
-        new_state:
-          description: The new provision state.
-          allOf:
-          - $ref: '#/components/schemas/SledProvisionPolicy'
-        old_state:
-          description: The old provision state.
-          allOf:
-          - $ref: '#/components/schemas/SledProvisionPolicy'
+        disk_id:
+          $ref: '#/components/schemas/PhysicalDiskManufacturerIdentity'
+        sled_id:
+          $ref: '#/components/schemas/SledUuid'
+        slot:
+          type: integer
+          format: int64
+        variant:
+          $ref: '#/components/schemas/PhysicalDiskKind'
       required:
-      - new_state
-      - old_state
-    ByteCount:
-      description: Byte count to express memory or storage capacity.
-      type: integer
-      format: uint64
-      minimum: 0
-    UninitializedSledResultsPage:
-      description: A single page of results
+      - disk_id
+      - sled_id
+      - slot
+      - variant
+    Baseboard:
+      description: Properties that uniquely identify an Oxide hardware component
       type: object
       properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/UninitializedSled'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
+        part:
+          type: string
+        revision:
+          type: integer
+          format: uint32
+          minimum: 0
+        serial:
+          type: string
       required:
-      - items
-    SledProvisionPolicyParams:
-      description: Parameters for `sled_set_provision_policy`.
-      type: object
-      properties:
-        state:
-          description: The provision state.
-          allOf:
-          - $ref: '#/components/schemas/SledProvisionPolicy'
-      required:
-      - state
-    PhysicalDiskAdoptionRequestResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/PhysicalDiskAdoptionRequest'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
+      - part
+      - revision
+      - serial
     Switch:
       description: An operator's view of a Switch.
       type: object
@@ -970,6 +1189,129 @@ components:
       - rack_id
       - time_created
       - time_modified
+    SwitchPortResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/SwitchPort'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    Rack:
+      description: View of a Rack
+      type: object
+      properties:
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - id
+      - time_created
+      - time_modified
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
+    SwitchSlot:
+      description: Identifies switch physical location
+      oneOf:
+      - description: Switch in upper slot
+        type: string
+        enum:
+        - switch0
+      - description: Switch in lower slot
+        type: string
+        enum:
+        - switch1
+    SledUuid:
+      x-rust-type:
+        crate: omicron-uuid-kinds
+        path: omicron_uuid_kinds::SledUuid
+        version: '*'
+      type: string
+      format: uuid
+    SledInstanceResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/SledInstance'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    InstanceState:
+      description: 'Running state of an Instance (primarily: booted or stopped)
+
+
+        This typically reflects whether it''s starting, running, stopping, or stopped, but also includes states related to the Instance''s lifecycle'
+      oneOf:
+      - description: The instance is being created.
+        type: string
+        enum:
+        - creating
+      - description: The instance is currently starting up.
+        type: string
+        enum:
+        - starting
+      - description: The instance is currently running.
+        type: string
+        enum:
+        - running
+      - description: The instance has been requested to stop and a transition to "Stopped" is imminent.
+        type: string
+        enum:
+        - stopping
+      - description: The instance is currently stopped.
+        type: string
+        enum:
+        - stopped
+      - description: The instance is in the process of rebooting - it will remain in the "rebooting" state until the VM is starting once more.
+        type: string
+        enum:
+        - rebooting
+      - description: The instance is in the process of migrating - it will remain in the "migrating" state until the migration process is complete and the destination propolis is ready to continue execution.
+        type: string
+        enum:
+        - migrating
+      - description: The instance is attempting to recover from a failure.
+        type: string
+        enum:
+        - repairing
+      - description: The instance has encountered a failure.
+        type: string
+        enum:
+        - failed
+      - description: The instance has been deleted.
+        type: string
+        enum:
+        - destroyed
     Sled:
       description: An operator's view of a Sled.
       type: object
@@ -1026,218 +1368,6 @@ components:
       - time_modified
       - usable_hardware_threads
       - usable_physical_ram
-    PhysicalDiskAdoptionRequest:
-      description: A request to adopt a physical disk into the control plane
-      type: object
-      properties:
-        disk_id:
-          $ref: '#/components/schemas/PhysicalDiskManufacturerIdentity'
-        id:
-          $ref: '#/components/schemas/PhysicalDiskAdoptionRequestUuid'
-        time_created:
-          type: string
-          format: date-time
-      required:
-      - disk_id
-      - id
-      - time_created
-    Error:
-      description: Error information from a response.
-      type: object
-      properties:
-        error_code:
-          type: string
-        message:
-          type: string
-        request_id:
-          type: string
-      required:
-      - message
-      - request_id
-    Rack:
-      description: View of a Rack
-      type: object
-      properties:
-        id:
-          description: Unique, immutable, system-controlled identifier for each resource
-          type: string
-          format: uuid
-        time_created:
-          description: Timestamp when this resource was created
-          type: string
-          format: date-time
-        time_modified:
-          description: Timestamp when this resource was last modified
-          type: string
-          format: date-time
-      required:
-      - id
-      - time_created
-      - time_modified
-    SledInstanceResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/SledInstance'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
-    SledProvisionPolicy:
-      description: 'The operator-defined provision policy of a sled.
-
-
-        This controls whether new resources are going to be provisioned on this sled.'
-      oneOf:
-      - description: New resources will be provisioned on this sled.
-        type: string
-        enum:
-        - provisionable
-      - description: New resources will not be provisioned on this sled. However, if the sled is currently in service, existing resources will continue to be on this sled unless manually migrated off.
-        type: string
-        enum:
-        - non_provisionable
-    RackResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/Rack'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
-    SwitchPortResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/SwitchPort'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
-    PhysicalDiskAdoptionRequestUuid:
-      x-rust-type:
-        crate: omicron-uuid-kinds
-        path: omicron_uuid_kinds::PhysicalDiskAdoptionRequestUuid
-        version: '*'
-      type: string
-      format: uuid
-    InstanceState:
-      description: 'Running state of an Instance (primarily: booted or stopped)
-
-
-        This typically reflects whether it''s starting, running, stopping, or stopped, but also includes states related to the Instance''s lifecycle'
-      oneOf:
-      - description: The instance is being created.
-        type: string
-        enum:
-        - creating
-      - description: The instance is currently starting up.
-        type: string
-        enum:
-        - starting
-      - description: The instance is currently running.
-        type: string
-        enum:
-        - running
-      - description: The instance has been requested to stop and a transition to "Stopped" is imminent.
-        type: string
-        enum:
-        - stopping
-      - description: The instance is currently stopped.
-        type: string
-        enum:
-        - stopped
-      - description: The instance is in the process of rebooting - it will remain in the "rebooting" state until the VM is starting once more.
-        type: string
-        enum:
-        - rebooting
-      - description: The instance is in the process of migrating - it will remain in the "migrating" state until the migration process is complete and the destination propolis is ready to continue execution.
-        type: string
-        enum:
-        - migrating
-      - description: The instance is attempting to recover from a failure.
-        type: string
-        enum:
-        - repairing
-      - description: The instance has encountered a failure.
-        type: string
-        enum:
-        - failed
-      - description: The instance has been deleted.
-        type: string
-        enum:
-        - destroyed
-    NameOrId:
-      oneOf:
-      - title: id
-        allOf:
-        - type: string
-          format: uuid
-      - title: name
-        allOf:
-        - $ref: '#/components/schemas/Name'
-    SwitchLinkState: {}
-    Name:
-      title: A name unique within the parent collection
-      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
-      type: string
-      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
-      minLength: 1
-      maxLength: 63
-    SledPolicy:
-      description: The operator-defined policy of a sled.
-      oneOf:
-      - description: The operator has indicated that the sled is in-service.
-        type: object
-        properties:
-          kind:
-            type: string
-            enum:
-            - in_service
-          provision_policy:
-            description: Determines whether new resources can be provisioned onto the sled.
-            allOf:
-            - $ref: '#/components/schemas/SledProvisionPolicy'
-        required:
-        - kind
-        - provision_policy
-      - description: 'The operator has indicated that the sled has been permanently removed from service.
-
-
-          This is a terminal state: once a particular sled ID is expunged, it will never return to service. (The actual hardware may be reused, but it will be treated as a brand-new sled.)
-
-
-          An expunged sled is always non-provisionable.'
-        type: object
-        properties:
-          kind:
-            type: string
-            enum:
-            - expunged
-        required:
-        - kind
     SwitchPort:
       description: A switch port represents a physical external port on a rack switch.
       type: object
@@ -1269,165 +1399,35 @@ components:
       - port_name
       - rack_id
       - switch_slot
-    UnadoptedPhysicalDiskResultsPage:
-      description: A single page of results
+    PhysicalDiskManufacturerIdentity:
+      description: The unique identity of a physical disk provided by the manufacturer
       type: object
       properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/UnadoptedPhysicalDisk'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
-    SwitchResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/Switch'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
-    Baseboard:
-      description: Properties that uniquely identify an Oxide hardware component
-      type: object
-      properties:
-        part:
-          type: string
-        revision:
-          type: integer
-          format: uint32
-          minimum: 0
-        serial:
-          type: string
-      required:
-      - part
-      - revision
-      - serial
-    SwitchSlot:
-      description: Identifies switch physical location
-      oneOf:
-      - description: Switch in upper slot
-        type: string
-        enum:
-        - switch0
-      - description: Switch in lower slot
-        type: string
-        enum:
-        - switch1
-    SledState:
-      description: The current state of the sled.
-      oneOf:
-      - description: The sled is currently active, and has resources allocated on it.
-        type: string
-        enum:
-        - active
-      - description: 'The sled has been permanently removed from service.
-
-
-          This is a terminal state: once a particular sled ID is decommissioned, it will never return to service. (The actual hardware may be reused, but it will be treated as a brand-new sled.)'
-        type: string
-        enum:
-        - decommissioned
-    PhysicalDisk:
-      description: 'View of a Physical Disk
-
-
-        Physical disks reside in a particular sled and are used to store both Instance Disk data as well as internal metadata.'
-      type: object
-      properties:
-        form_factor:
-          $ref: '#/components/schemas/PhysicalDiskKind'
-        id:
-          description: Unique, immutable, system-controlled identifier for each resource
-          type: string
-          format: uuid
         model:
           type: string
-        policy:
-          description: The operator-defined policy for a physical disk.
-          allOf:
-          - $ref: '#/components/schemas/PhysicalDiskPolicy'
         serial:
           type: string
-        sled_id:
-          description: The sled to which this disk is attached, if any.
-          type:
-          - string
-          - 'null'
-          format: uuid
-        state:
-          description: The current state Nexus believes the disk to be in.
-          allOf:
-          - $ref: '#/components/schemas/PhysicalDiskState'
-        time_created:
-          description: Timestamp when this resource was created
-          type: string
-          format: date-time
-        time_modified:
-          description: Timestamp when this resource was last modified
-          type: string
-          format: date-time
         vendor:
           type: string
       required:
-      - form_factor
-      - id
       - model
-      - policy
       - serial
-      - state
-      - time_created
-      - time_modified
       - vendor
-    UninitializedSled:
-      description: A sled that has not been added to an initialized rack yet
+    SledProvisionPolicyResponse:
+      description: Response to `sled_set_provision_policy`.
       type: object
       properties:
-        baseboard:
-          $ref: '#/components/schemas/Baseboard'
-        cubby:
-          type: integer
-          format: uint16
-          minimum: 0
-        rack_id:
-          type: string
-          format: uuid
+        new_state:
+          description: The new provision state.
+          allOf:
+          - $ref: '#/components/schemas/SledProvisionPolicy'
+        old_state:
+          description: The old provision state.
+          allOf:
+          - $ref: '#/components/schemas/SledProvisionPolicy'
       required:
-      - baseboard
-      - cubby
-      - rack_id
-    UnadoptedPhysicalDisk:
-      description: A physical disk that has not yet been adopted by the control plane
-      type: object
-      properties:
-        disk_id:
-          $ref: '#/components/schemas/PhysicalDiskManufacturerIdentity'
-        sled_id:
-          $ref: '#/components/schemas/SledUuid'
-        slot:
-          type: integer
-          format: int64
-        variant:
-          $ref: '#/components/schemas/PhysicalDiskKind'
-      required:
-      - disk_id
-      - sled_id
-      - slot
-      - variant
+      - new_state
+      - old_state
   responses:
     Error:
       description: Error

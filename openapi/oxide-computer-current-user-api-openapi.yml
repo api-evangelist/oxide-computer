@@ -7,7 +7,7 @@ info:
     email: api@oxide.computer
   version: 2026081901.0.0
 tags:
-- name: current-user
+- name: Current User
   description: Information pertaining to the current user.
   externalDocs:
     url: http://docs.oxide.computer/api/current-user
@@ -15,7 +15,7 @@ paths:
   /v1/me:
     get:
       tags:
-      - current-user
+      - Current User
       summary: Fetch user for current session
       operationId: current_user_view
       responses:
@@ -32,7 +32,7 @@ paths:
   /v1/me/groups:
     get:
       tags:
-      - current-user
+      - Current User
       summary: Fetch current user's groups
       operationId: current_user_groups
       parameters:
@@ -72,7 +72,7 @@ paths:
   /v1/me/ssh-keys:
     get:
       tags:
-      - current-user
+      - Current User
       summary: List SSH public keys
       description: Lists SSH public keys for the currently authenticated user.
       operationId: current_user_ssh_key_list
@@ -112,7 +112,7 @@ paths:
         required: []
     post:
       tags:
-      - current-user
+      - Current User
       summary: Create SSH public key
       description: Create an SSH public key for the currently authenticated user.
       operationId: current_user_ssh_key_create
@@ -136,7 +136,7 @@ paths:
   /v1/me/ssh-keys/{ssh_key}:
     get:
       tags:
-      - current-user
+      - Current User
       summary: Fetch SSH public key
       description: Fetch SSH public key associated with the currently authenticated user.
       operationId: current_user_ssh_key_view
@@ -160,7 +160,7 @@ paths:
           $ref: '#/components/responses/Error'
     delete:
       tags:
-      - current-user
+      - Current User
       summary: Delete SSH public key
       description: Delete an SSH public key associated with the currently authenticated user.
       operationId: current_user_ssh_key_delete
@@ -180,16 +180,132 @@ paths:
           $ref: '#/components/responses/Error'
 components:
   schemas:
-    IdSortMode:
-      description: 'Supported set of sort modes for scanning by id only.
-
-
-        Currently, we only support scanning in ascending order.'
+    NameOrId:
       oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    SshKeyResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/SshKey'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    Group:
+      description: View of a Group
+      type: object
+      properties:
+        display_name:
+          description: Human-readable name that can identify the group
+          type: string
+        id:
+          type: string
+          format: uuid
+        silo_id:
+          description: Uuid of the silo to which this group belongs
+          type: string
+          format: uuid
+        time_created:
+          description: Timestamp when this group was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this group was last modified
+          type: string
+          format: date-time
+      required:
+      - display_name
+      - id
+      - silo_id
+      - time_created
+      - time_modified
+    NameOrIdSortMode:
+      description: Supported set of sort modes for scanning by name or id
+      oneOf:
+      - description: Sort in increasing order of "name"
+        type: string
+        enum:
+        - name_ascending
+      - description: Sort in decreasing order of "name"
+        type: string
+        enum:
+        - name_descending
       - description: Sort in increasing order of "id"
         type: string
         enum:
         - id_ascending
+    SshKey:
+      description: View of an SSH Key
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        public_key:
+          description: SSH public key, e.g., `"ssh-ed25519 AAAAC3NzaC..."`
+          type: string
+        silo_user_id:
+          description: The user to whom this key belongs
+          type: string
+          format: uuid
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - id
+      - name
+      - public_key
+      - silo_user_id
+      - time_created
+      - time_modified
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
     SshKeyCreate:
       description: Create-time parameters for an `SshKey`
       type: object
@@ -221,38 +337,6 @@ components:
           - 'null'
       required:
       - items
-    NameOrId:
-      oneOf:
-      - title: id
-        allOf:
-        - type: string
-          format: uuid
-      - title: name
-        allOf:
-        - $ref: '#/components/schemas/Name'
-    SshKeyResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/SshKey'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
-    Name:
-      title: A name unique within the parent collection
-      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
-      type: string
-      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
-      minLength: 1
-      maxLength: 63
     CurrentUser:
       description: Info about the current user
       type: object
@@ -294,100 +378,16 @@ components:
       - silo_name
       - time_created
       - time_modified
-    Error:
-      description: Error information from a response.
-      type: object
-      properties:
-        error_code:
-          type: string
-        message:
-          type: string
-        request_id:
-          type: string
-      required:
-      - message
-      - request_id
-    NameOrIdSortMode:
-      description: Supported set of sort modes for scanning by name or id
+    IdSortMode:
+      description: 'Supported set of sort modes for scanning by id only.
+
+
+        Currently, we only support scanning in ascending order.'
       oneOf:
-      - description: Sort in increasing order of "name"
-        type: string
-        enum:
-        - name_ascending
-      - description: Sort in decreasing order of "name"
-        type: string
-        enum:
-        - name_descending
       - description: Sort in increasing order of "id"
         type: string
         enum:
         - id_ascending
-    Group:
-      description: View of a Group
-      type: object
-      properties:
-        display_name:
-          description: Human-readable name that can identify the group
-          type: string
-        id:
-          type: string
-          format: uuid
-        silo_id:
-          description: Uuid of the silo to which this group belongs
-          type: string
-          format: uuid
-        time_created:
-          description: Timestamp when this group was created
-          type: string
-          format: date-time
-        time_modified:
-          description: Timestamp when this group was last modified
-          type: string
-          format: date-time
-      required:
-      - display_name
-      - id
-      - silo_id
-      - time_created
-      - time_modified
-    SshKey:
-      description: View of an SSH Key
-      type: object
-      properties:
-        description:
-          description: Human-readable free-form text about a resource
-          type: string
-        id:
-          description: Unique, immutable, system-controlled identifier for each resource
-          type: string
-          format: uuid
-        name:
-          description: Unique, mutable, user-controlled identifier for each resource
-          allOf:
-          - $ref: '#/components/schemas/Name'
-        public_key:
-          description: SSH public key, e.g., `"ssh-ed25519 AAAAC3NzaC..."`
-          type: string
-        silo_user_id:
-          description: The user to whom this key belongs
-          type: string
-          format: uuid
-        time_created:
-          description: Timestamp when this resource was created
-          type: string
-          format: date-time
-        time_modified:
-          description: Timestamp when this resource was last modified
-          type: string
-          format: date-time
-      required:
-      - description
-      - id
-      - name
-      - public_key
-      - silo_user_id
-      - time_created
-      - time_modified
   responses:
     Error:
       description: Error

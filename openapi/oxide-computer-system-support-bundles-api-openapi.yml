@@ -302,6 +302,19 @@ paths:
               schema: {}
 components:
   schemas:
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
     SupportBundleState:
       oneOf:
       - description: 'Support Bundle still actively being collected.
@@ -343,30 +356,6 @@ components:
         type: string
         enum:
         - time_and_id_descending
-    SupportBundleInfoResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/SupportBundleInfo'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
-    SupportBundleUpdate:
-      type: object
-      properties:
-        user_comment:
-          description: User comment for the support bundle
-          type:
-          - string
-          - 'null'
     SupportBundleInfo:
       type: object
       properties:
@@ -393,19 +382,14 @@ components:
       - reason_for_creation
       - state
       - time_created
-    Error:
-      description: Error information from a response.
+    SupportBundleUpdate:
       type: object
       properties:
-        error_code:
-          type: string
-        message:
-          type: string
-        request_id:
-          type: string
-      required:
-      - message
-      - request_id
+        user_comment:
+          description: User comment for the support bundle
+          type:
+          - string
+          - 'null'
     SupportBundleCreate:
       type: object
       properties:
@@ -414,6 +398,22 @@ components:
           type:
           - string
           - 'null'
+    SupportBundleInfoResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/SupportBundleInfo'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
   responses:
     Error:
       description: Error

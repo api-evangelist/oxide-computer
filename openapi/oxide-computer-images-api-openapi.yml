@@ -7,7 +7,7 @@ info:
     email: api@oxide.computer
   version: 2026081901.0.0
 tags:
-- name: images
+- name: Images
   description: Images are read-only virtual disks that may be used to boot virtual machines.
   externalDocs:
     url: http://docs.oxide.computer/api/images
@@ -15,7 +15,7 @@ paths:
   /v1/images:
     get:
       tags:
-      - images
+      - Images
       summary: List images
       description: List images which are global or scoped to the specified project. The images are returned sorted by creation date, with the most recent images appearing first.
       operationId: image_list
@@ -60,7 +60,7 @@ paths:
         required: []
     post:
       tags:
-      - images
+      - Images
       summary: Create image
       description: Create a new image in a project.
       operationId: image_create
@@ -90,7 +90,7 @@ paths:
   /v1/images/{image}:
     get:
       tags:
-      - images
+      - Images
       summary: Fetch image
       description: Fetch the details for a specific image in a project.
       operationId: image_view
@@ -119,7 +119,7 @@ paths:
           $ref: '#/components/responses/Error'
     delete:
       tags:
-      - images
+      - Images
       summary: Delete image
       description: Permanently delete an image from a project. This operation cannot be undone. Any instances in the project using the image will continue to run, however new instances can not be created with this image.
       operationId: image_delete
@@ -145,7 +145,7 @@ paths:
   /v1/images/{image}/demote:
     post:
       tags:
-      - images
+      - Images
       summary: Demote silo image
       description: Demote silo image to be visible only to a specified project
       operationId: image_demote
@@ -176,7 +176,7 @@ paths:
   /v1/images/{image}/promote:
     post:
       tags:
-      - images
+      - Images
       summary: Promote project image
       description: Promote project image to be visible to all projects in the silo
       operationId: image_promote
@@ -205,6 +205,52 @@ paths:
           $ref: '#/components/responses/Error'
 components:
   schemas:
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
+    ImageCreate:
+      description: Create-time parameters for an `Image`
+      type: object
+      properties:
+        description:
+          type: string
+        name:
+          $ref: '#/components/schemas/Name'
+        os:
+          description: The family of the operating system (e.g. Debian, Ubuntu, etc.)
+          type: string
+        source:
+          description: The source of the image's contents.
+          allOf:
+          - $ref: '#/components/schemas/ImageSource'
+        version:
+          description: The version of the operating system (e.g. 18.04, 20.04, etc.)
+          type: string
+      required:
+      - description
+      - name
+      - os
+      - source
+      - version
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
     Image:
       description: 'View of an image
 
@@ -265,22 +311,6 @@ components:
       - time_created
       - time_modified
       - version
-    NameOrId:
-      oneOf:
-      - title: id
-        allOf:
-        - type: string
-          format: uuid
-      - title: name
-        allOf:
-        - $ref: '#/components/schemas/Name'
-    Name:
-      title: A name unique within the parent collection
-      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
-      type: string
-      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
-      minLength: 1
-      maxLength: 63
     ImageSource:
       description: The source of the underlying image.
       oneOf:
@@ -296,24 +326,21 @@ components:
         required:
         - id
         - type
-    ByteCount:
-      description: Byte count to express memory or storage capacity.
-      type: integer
-      format: uint64
-      minimum: 0
-    Digest:
+    NameOrIdSortMode:
+      description: Supported set of sort modes for scanning by name or id
       oneOf:
-      - type: object
-        properties:
-          type:
-            type: string
-            enum:
-            - sha256
-          value:
-            type: string
-        required:
-        - type
-        - value
+      - description: Sort in increasing order of "name"
+        type: string
+        enum:
+        - name_ascending
+      - description: Sort in decreasing order of "name"
+        type: string
+        enum:
+        - name_descending
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
     ImageResultsPage:
       description: A single page of results
       type: object
@@ -330,58 +357,31 @@ components:
           - 'null'
       required:
       - items
-    Error:
-      description: Error information from a response.
-      type: object
-      properties:
-        error_code:
-          type: string
-        message:
-          type: string
-        request_id:
-          type: string
-      required:
-      - message
-      - request_id
-    NameOrIdSortMode:
-      description: Supported set of sort modes for scanning by name or id
+    ByteCount:
+      description: Byte count to express memory or storage capacity.
+      type: integer
+      format: uint64
+      minimum: 0
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
+    Digest:
       oneOf:
-      - description: Sort in increasing order of "name"
-        type: string
-        enum:
-        - name_ascending
-      - description: Sort in decreasing order of "name"
-        type: string
-        enum:
-        - name_descending
-      - description: Sort in increasing order of "id"
-        type: string
-        enum:
-        - id_ascending
-    ImageCreate:
-      description: Create-time parameters for an `Image`
-      type: object
-      properties:
-        description:
-          type: string
-        name:
-          $ref: '#/components/schemas/Name'
-        os:
-          description: The family of the operating system (e.g. Debian, Ubuntu, etc.)
-          type: string
-        source:
-          description: The source of the image's contents.
-          allOf:
-          - $ref: '#/components/schemas/ImageSource'
-        version:
-          description: The version of the operating system (e.g. 18.04, 20.04, etc.)
-          type: string
-      required:
-      - description
-      - name
-      - os
-      - source
-      - version
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - sha256
+          value:
+            type: string
+        required:
+        - type
+        - value
     BlockSize:
       title: Block size in bytes
       description: 'Valid values are: 512, 2048, or 4096.'

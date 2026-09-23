@@ -7,7 +7,7 @@ info:
     email: api@oxide.computer
   version: 2026081901.0.0
 tags:
-- name: floating-ips
+- name: Floating IPs
   description: Floating IPs allow a project to allocate well-known IPs to instances.
   externalDocs:
     url: http://docs.oxide.computer/api/floating-ips
@@ -15,7 +15,7 @@ paths:
   /v1/floating-ips:
     get:
       tags:
-      - floating-ips
+      - Floating IPs
       summary: List floating IPs
       operationId: floating_ip_list
       parameters:
@@ -60,7 +60,7 @@ paths:
         - project
     post:
       tags:
-      - floating-ips
+      - Floating IPs
       summary: Create floating IP
       description: A specific IP address can be reserved, or an IP can be auto-allocated from a specific pool or the silo's default pool.
       operationId: floating_ip_create
@@ -91,7 +91,7 @@ paths:
   /v1/floating-ips/{floating_ip}:
     get:
       tags:
-      - floating-ips
+      - Floating IPs
       summary: Fetch floating IP
       operationId: floating_ip_view
       parameters:
@@ -119,7 +119,7 @@ paths:
           $ref: '#/components/responses/Error'
     put:
       tags:
-      - floating-ips
+      - Floating IPs
       summary: Update floating IP
       operationId: floating_ip_update
       parameters:
@@ -153,7 +153,7 @@ paths:
           $ref: '#/components/responses/Error'
     delete:
       tags:
-      - floating-ips
+      - Floating IPs
       summary: Delete floating IP
       operationId: floating_ip_delete
       parameters:
@@ -178,7 +178,7 @@ paths:
   /v1/floating-ips/{floating_ip}/attach:
     post:
       tags:
-      - floating-ips
+      - Floating IPs
       summary: Attach floating IP
       description: Attach floating IP to an instance or other resource.
       operationId: floating_ip_attach
@@ -214,7 +214,7 @@ paths:
   /v1/floating-ips/{floating_ip}/detach:
     post:
       tags:
-      - floating-ips
+      - Floating IPs
       summary: Detach floating IP
       operationId: floating_ip_detach
       parameters:
@@ -242,6 +242,59 @@ paths:
           $ref: '#/components/responses/Error'
 components:
   schemas:
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
+    PoolSelector:
+      description: Specify which IP or external subnet pool to allocate from.
+      oneOf:
+      - description: Use the specified pool by name or ID.
+        type: object
+        properties:
+          pool:
+            description: The pool to allocate from.
+            allOf:
+            - $ref: '#/components/schemas/NameOrId'
+          type:
+            type: string
+            enum:
+            - explicit
+        required:
+        - pool
+        - type
+      - description: Use the default pool for the silo.
+        type: object
+        properties:
+          ip_version:
+            description: IP version to use when multiple default pools exist. Required if both IPv4 and IPv6 default pools are configured.
+            default: null
+            allOf:
+            - $ref: '#/components/schemas/IpVersion'
+          type:
+            type: string
+            enum:
+            - auto
+        required:
+        - type
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
     FloatingIpAttach:
       description: Parameters for attaching a floating IP address to another resource
       type: object
@@ -257,15 +310,43 @@ components:
       required:
       - kind
       - parent
-    NameOrId:
+    IpVersion:
+      description: The IP address version.
+      type: string
+      enum:
+      - v4
+      - v6
+    NameOrIdSortMode:
+      description: Supported set of sort modes for scanning by name or id
       oneOf:
-      - title: id
-        allOf:
-        - type: string
-          format: uuid
-      - title: name
-        allOf:
-        - $ref: '#/components/schemas/Name'
+      - description: Sort in increasing order of "name"
+        type: string
+        enum:
+        - name_ascending
+      - description: Sort in decreasing order of "name"
+        type: string
+        enum:
+        - name_descending
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    FloatingIpResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/FloatingIp'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
     FloatingIpUpdate:
       description: Updateable identity-related parameters
       type: object
@@ -309,22 +390,6 @@ components:
       required:
       - description
       - name
-    FloatingIpResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/FloatingIp'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
     FloatingIp:
       description: A Floating IP is a well-known IP address which can be attached and detached from instances.
       type: object
@@ -411,71 +476,6 @@ components:
             - auto
         required:
         - type
-    IpVersion:
-      description: The IP address version.
-      type: string
-      enum:
-      - v4
-      - v6
-    PoolSelector:
-      description: Specify which IP or external subnet pool to allocate from.
-      oneOf:
-      - description: Use the specified pool by name or ID.
-        type: object
-        properties:
-          pool:
-            description: The pool to allocate from.
-            allOf:
-            - $ref: '#/components/schemas/NameOrId'
-          type:
-            type: string
-            enum:
-            - explicit
-        required:
-        - pool
-        - type
-      - description: Use the default pool for the silo.
-        type: object
-        properties:
-          ip_version:
-            description: IP version to use when multiple default pools exist. Required if both IPv4 and IPv6 default pools are configured.
-            default: null
-            allOf:
-            - $ref: '#/components/schemas/IpVersion'
-          type:
-            type: string
-            enum:
-            - auto
-        required:
-        - type
-    Error:
-      description: Error information from a response.
-      type: object
-      properties:
-        error_code:
-          type: string
-        message:
-          type: string
-        request_id:
-          type: string
-      required:
-      - message
-      - request_id
-    NameOrIdSortMode:
-      description: Supported set of sort modes for scanning by name or id
-      oneOf:
-      - description: Sort in increasing order of "name"
-        type: string
-        enum:
-        - name_ascending
-      - description: Sort in decreasing order of "name"
-        type: string
-        enum:
-        - name_descending
-      - description: Sort in increasing order of "id"
-        type: string
-        enum:
-        - id_ascending
   responses:
     Error:
       description: Error
