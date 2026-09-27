@@ -320,100 +320,23 @@ paths:
           $ref: '#/components/responses/Error'
 components:
   schemas:
-    AntiAffinityGroupResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/AntiAffinityGroup'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
-    NameOrId:
+    AffinityPolicy:
+      description: 'Affinity policy used to describe "what to do when a request cannot be satisfied"
+
+
+        Used for both Affinity and Anti-Affinity Groups'
       oneOf:
-      - title: id
-        allOf:
-        - type: string
-          format: uuid
-      - title: name
-        allOf:
-        - $ref: '#/components/schemas/Name'
-    Error:
-      description: Error information from a response.
-      type: object
-      properties:
-        error_code:
-          type: string
-        message:
-          type: string
-        request_id:
-          type: string
-      required:
-      - message
-      - request_id
-    AntiAffinityGroup:
-      description: View of an Anti-Affinity Group
-      type: object
-      properties:
-        description:
-          description: Human-readable free-form text about a resource
-          type: string
-        failure_domain:
-          $ref: '#/components/schemas/FailureDomain'
-        id:
-          description: Unique, immutable, system-controlled identifier for each resource
-          type: string
-          format: uuid
-        name:
-          description: Unique, mutable, user-controlled identifier for each resource
-          allOf:
-          - $ref: '#/components/schemas/Name'
-        policy:
-          $ref: '#/components/schemas/AffinityPolicy'
-        project_id:
-          type: string
-          format: uuid
-        time_created:
-          description: Timestamp when this resource was created
-          type: string
-          format: date-time
-        time_modified:
-          description: Timestamp when this resource was last modified
-          type: string
-          format: date-time
-      required:
-      - description
-      - failure_domain
-      - id
-      - name
-      - policy
-      - project_id
-      - time_created
-      - time_modified
-    AntiAffinityGroupCreate:
-      description: Create-time parameters for an `AntiAffinityGroup`
-      type: object
-      properties:
-        description:
-          type: string
-        failure_domain:
-          $ref: '#/components/schemas/FailureDomain'
-        name:
-          $ref: '#/components/schemas/Name'
-        policy:
-          $ref: '#/components/schemas/AffinityPolicy'
-      required:
-      - description
-      - failure_domain
-      - name
-      - policy
+      - description: 'If the affinity request cannot be satisfied, allow it anyway.
+
+
+          This enables a "best-effort" attempt to satisfy the affinity policy.'
+        type: string
+        enum:
+        - allow
+      - description: If the affinity request cannot be satisfied, fail explicitly.
+        type: string
+        enum:
+        - fail
     NameOrIdSortMode:
       description: Supported set of sort modes for scanning by name or id
       oneOf:
@@ -475,23 +398,52 @@ components:
         type: string
         enum:
         - destroyed
-    AffinityPolicy:
-      description: 'Affinity policy used to describe "what to do when a request cannot be satisfied"
-
-
-        Used for both Affinity and Anti-Affinity Groups'
+    FailureDomain:
+      description: Describes the scope of affinity for the purposes of co-location.
       oneOf:
-      - description: 'If the affinity request cannot be satisfied, allow it anyway.
-
-
-          This enables a "best-effort" attempt to satisfy the affinity policy.'
+      - description: Instances are considered co-located if they are on the same sled
         type: string
         enum:
-        - allow
-      - description: If the affinity request cannot be satisfied, fail explicitly.
-        type: string
-        enum:
-        - fail
+        - sled
+    AntiAffinityGroup:
+      description: View of an Anti-Affinity Group
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        failure_domain:
+          $ref: '#/components/schemas/FailureDomain'
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        policy:
+          $ref: '#/components/schemas/AffinityPolicy'
+        project_id:
+          type: string
+          format: uuid
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - failure_domain
+      - id
+      - name
+      - policy
+      - project_id
+      - time_created
+      - time_modified
     AntiAffinityGroupUpdate:
       description: Updateable properties of an `AntiAffinityGroup`
       type: object
@@ -503,13 +455,39 @@ components:
         name:
           allOf:
           - $ref: '#/components/schemas/Name'
-    Name:
-      title: A name unique within the parent collection
-      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
-      type: string
-      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
-      minLength: 1
-      maxLength: 63
+    AntiAffinityGroupMemberResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/AntiAffinityGroupMember'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    AntiAffinityGroupCreate:
+      description: Create-time parameters for an `AntiAffinityGroup`
+      type: object
+      properties:
+        description:
+          type: string
+        failure_domain:
+          $ref: '#/components/schemas/FailureDomain'
+        name:
+          $ref: '#/components/schemas/Name'
+        policy:
+          $ref: '#/components/schemas/AffinityPolicy'
+      required:
+      - description
+      - failure_domain
+      - name
+      - policy
     AntiAffinityGroupMember:
       description: 'A member of an Anti-Affinity Group
 
@@ -546,7 +524,36 @@ components:
         required:
         - type
         - value
-    AntiAffinityGroupMemberResultsPage:
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
+    AntiAffinityGroupResultsPage:
       description: A single page of results
       type: object
       properties:
@@ -554,7 +561,7 @@ components:
           description: list of items on this page of results
           type: array
           items:
-            $ref: '#/components/schemas/AntiAffinityGroupMember'
+            $ref: '#/components/schemas/AntiAffinityGroup'
         next_page:
           description: token used to fetch the next page of results (if any)
           type:
@@ -562,13 +569,6 @@ components:
           - 'null'
       required:
       - items
-    FailureDomain:
-      description: Describes the scope of affinity for the purposes of co-location.
-      oneOf:
-      - description: Instances are considered co-located if they are on the same sled
-        type: string
-        enum:
-        - sled
   responses:
     Error:
       description: Error

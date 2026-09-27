@@ -36,6 +36,15 @@ components:
       type: string
       enum:
       - ok
+    Ping:
+      type: object
+      properties:
+        status:
+          description: Whether the external API is reachable. Will always be Ok if the endpoint returns anything at all.
+          allOf:
+          - $ref: '#/components/schemas/PingStatus'
+      required:
+      - status
     Error:
       description: Error information from a response.
       type: object
@@ -49,15 +58,6 @@ components:
       required:
       - message
       - request_id
-    Ping:
-      type: object
-      properties:
-        status:
-          description: Whether the external API is reachable. Will always be Ok if the endpoint returns anything at all.
-          allOf:
-          - $ref: '#/components/schemas/PingStatus'
-      required:
-      - status
   responses:
     Error:
       description: Error

@@ -204,53 +204,22 @@ paths:
         5XX:
           $ref: '#/components/responses/Error'
 components:
-  schemas:
-    NameOrId:
-      oneOf:
-      - title: id
-        allOf:
-        - type: string
-          format: uuid
-      - title: name
-        allOf:
-        - $ref: '#/components/schemas/Name'
-    ImageCreate:
-      description: Create-time parameters for an `Image`
-      type: object
-      properties:
-        description:
-          type: string
-        name:
-          $ref: '#/components/schemas/Name'
-        os:
-          description: The family of the operating system (e.g. Debian, Ubuntu, etc.)
-          type: string
-        source:
-          description: The source of the image's contents.
-          allOf:
-          - $ref: '#/components/schemas/ImageSource'
-        version:
-          description: The version of the operating system (e.g. 18.04, 20.04, etc.)
-          type: string
-      required:
-      - description
-      - name
-      - os
-      - source
-      - version
+  responses:
     Error:
-      description: Error information from a response.
-      type: object
-      properties:
-        error_code:
-          type: string
-        message:
-          type: string
-        request_id:
-          type: string
-      required:
-      - message
-      - request_id
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    BlockSize:
+      title: Block size in bytes
+      description: 'Valid values are: 512, 2048, or 4096.'
+      type: integer
+      enum:
+      - 512
+      - 2048
+      - 4096
     Image:
       description: 'View of an image
 
@@ -311,21 +280,6 @@ components:
       - time_created
       - time_modified
       - version
-    ImageSource:
-      description: The source of the underlying image.
-      oneOf:
-      - type: object
-        properties:
-          id:
-            type: string
-            format: uuid
-          type:
-            type: string
-            enum:
-            - snapshot
-        required:
-        - id
-        - type
     NameOrIdSortMode:
       description: Supported set of sort modes for scanning by name or id
       oneOf:
@@ -341,6 +295,30 @@ components:
         type: string
         enum:
         - id_ascending
+    ImageCreate:
+      description: Create-time parameters for an `Image`
+      type: object
+      properties:
+        description:
+          type: string
+        name:
+          $ref: '#/components/schemas/Name'
+        os:
+          description: The family of the operating system (e.g. Debian, Ubuntu, etc.)
+          type: string
+        source:
+          description: The source of the image's contents.
+          allOf:
+          - $ref: '#/components/schemas/ImageSource'
+        version:
+          description: The version of the operating system (e.g. 18.04, 20.04, etc.)
+          type: string
+      required:
+      - description
+      - name
+      - os
+      - source
+      - version
     ImageResultsPage:
       description: A single page of results
       type: object
@@ -357,18 +335,6 @@ components:
           - 'null'
       required:
       - items
-    ByteCount:
-      description: Byte count to express memory or storage capacity.
-      type: integer
-      format: uint64
-      minimum: 0
-    Name:
-      title: A name unique within the parent collection
-      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
-      type: string
-      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
-      minLength: 1
-      maxLength: 63
     Digest:
       oneOf:
       - type: object
@@ -382,18 +348,52 @@ components:
         required:
         - type
         - value
-    BlockSize:
-      title: Block size in bytes
-      description: 'Valid values are: 512, 2048, or 4096.'
-      type: integer
-      enum:
-      - 512
-      - 2048
-      - 4096
-  responses:
+    ImageSource:
+      description: The source of the underlying image.
+      oneOf:
+      - type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+          type:
+            type: string
+            enum:
+            - snapshot
+        required:
+        - id
+        - type
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
     Error:
-      description: Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
+    ByteCount:
+      description: Byte count to express memory or storage capacity.
+      type: integer
+      format: uint64
+      minimum: 0

@@ -76,7 +76,40 @@ paths:
         5XX:
           $ref: '#/components/responses/Error'
 components:
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
+    DeviceAccessTokenResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceAccessToken'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    IdSortMode:
+      description: 'Supported set of sort modes for scanning by id only.
+
+
+        Currently, we only support scanning in ascending order.'
+      oneOf:
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
     DeviceAccessToken:
       description: View of a device access token
       type: object
@@ -113,36 +146,3 @@ components:
       required:
       - message
       - request_id
-    DeviceAccessTokenResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/DeviceAccessToken'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
-    IdSortMode:
-      description: 'Supported set of sort modes for scanning by id only.
-
-
-        Currently, we only support scanning in ascending order.'
-      oneOf:
-      - description: Sort in increasing order of "id"
-        type: string
-        enum:
-        - id_ascending
-  responses:
-    Error:
-      description: Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'

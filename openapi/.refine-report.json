@@ -35,16 +35,13 @@
     "oxide-computer-tokens-api-openapi.yml",
     "oxide-computer-vpcs-api-openapi.yml"
   ],
-  "archived": [
-    "deleted 1 superseded output(s) from the previous generation"
-  ],
+  "archived": [],
   "errors": [],
   "warnings": [],
   "notes": [
     "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
     "oxide-computer-region-api-openapi.json: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
-    "superseded outputs removed: oxide-computer-vp-cs-api-openapi.yml",
-    "apis.yml register: written (+1 apis, 30 total)"
+    "apis.yml register: already-registered"
   ],
   "skipped": [
     "oxide-computer-affinity-api-openapi.yml: previously refined output, superseded by openapi/_original/",
@@ -76,6 +73,6 @@
     "oxide-computer-system-support-bundles-api-openapi.yml: previously refined output, superseded by openapi/_original/",
     "oxide-computer-system-update-api-openapi.yml: previously refined output, superseded by openapi/_original/",
     "oxide-computer-tokens-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "oxide-computer-vp-cs-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+    "oxide-computer-vpcs-api-openapi.yml: previously refined output, superseded by openapi/_original/"
   ]
 }

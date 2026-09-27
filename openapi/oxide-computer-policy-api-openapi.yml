@@ -53,6 +53,12 @@ paths:
           $ref: '#/components/responses/Error'
 components:
   schemas:
+    FleetRole:
+      type: string
+      enum:
+      - admin
+      - collaborator
+      - viewer
     Error:
       description: Error information from a response.
       type: object
@@ -66,18 +72,6 @@ components:
       required:
       - message
       - request_id
-    IdentityType:
-      description: Describes what kind of identity is described by an id
-      type: string
-      enum:
-      - silo_user
-      - silo_group
-    FleetRole:
-      type: string
-      enum:
-      - admin
-      - collaborator
-      - viewer
     FleetRolePolicy:
       description: 'Policy for a particular resource
 
@@ -92,6 +86,12 @@ components:
             $ref: '#/components/schemas/FleetRoleRoleAssignment'
       required:
       - role_assignments
+    IdentityType:
+      description: Describes what kind of identity is described by an id
+      type: string
+      enum:
+      - silo_user
+      - silo_group
     FleetRoleRoleAssignment:
       description: 'Describes the assignment of a particular role on a particular resource to a particular identity (user, group, etc.)
 

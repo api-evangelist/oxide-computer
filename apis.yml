@@ -55,7 +55,7 @@ tags:
 - Hardware
 - On-Premises
 - Private Cloud
-- Open-Source
+- Open Source
 tags_raw:
 - Cloud Computing
 - Infrastructure
@@ -67,6 +67,7 @@ tags_raw:
 - On-Premise
 - Private Cloud
 - Open Source
+- Open-Source
 apis:
 - aid: oxide-computer:oxide-computer-affinity-api
   name: Oxide Affinity API

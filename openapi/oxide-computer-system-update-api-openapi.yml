@@ -286,6 +286,71 @@ paths:
           $ref: '#/components/responses/Error'
 components:
   schemas:
+    UpdatesTrustRoot:
+      description: Trusted root role used by the update system to verify update repositories.
+      type: object
+      properties:
+        id:
+          description: The UUID of this trusted root role.
+          type: string
+          format: uuid
+        root_role:
+          description: The trusted root role itself, a JSON document as described by The Update Framework.
+        time_created:
+          description: Time the trusted root role was added.
+          type: string
+          format: date-time
+      required:
+      - id
+      - root_role
+      - time_created
+    TufRepoUpload:
+      type: object
+      properties:
+        repo:
+          $ref: '#/components/schemas/TufRepo'
+        status:
+          $ref: '#/components/schemas/TufRepoUploadStatus'
+      required:
+      - repo
+      - status
+    VersionSortMode:
+      description: Supported sort modes when scanning by semantic version
+      oneOf:
+      - description: Sort in increasing semantic version order (oldest first)
+        type: string
+        enum:
+        - version_ascending
+      - description: Sort in decreasing semantic version order (newest first)
+        type: string
+        enum:
+        - version_descending
+    TufRepoUploadStatus:
+      description: Whether the uploaded TUF repo already existed or was new and had to be inserted. Part of `TufRepoUpload`.
+      oneOf:
+      - description: The repository already existed in the database
+        type: string
+        enum:
+        - already_exists
+      - description: The repository did not exist, and was inserted into the database
+        type: string
+        enum:
+        - inserted
+    TargetRelease:
+      description: View of a system software target release
+      type: object
+      properties:
+        time_requested:
+          description: Time this was set as the target release
+          type: string
+          format: date-time
+        version:
+          description: The specified release of the rack's system software
+          type: string
+          pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+      required:
+      - time_requested
+      - version
     Error:
       description: Error information from a response.
       type: object
@@ -299,6 +364,46 @@ components:
       required:
       - message
       - request_id
+    TufRepo:
+      description: Metadata about a TUF repository
+      type: object
+      properties:
+        file_name:
+          description: 'The file name of the repository, as reported by the client that uploaded it
+
+
+            This is intended for debugging. The file name may not match any particular pattern, and even if it does, it may not be accurate since it''s just what the client reported.'
+          type: string
+        hash:
+          description: The hash of the repository
+          type: string
+          format: hex string (32 bytes)
+        system_version:
+          description: 'The system version for this repository
+
+
+            The system version is a top-level version number applied to all the software in the repository.'
+          type: string
+          pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+        time_created:
+          description: Time the repository was uploaded
+          type: string
+          format: date-time
+      required:
+      - file_name
+      - hash
+      - system_version
+      - time_created
+    SetTargetReleaseParams:
+      description: Parameters for PUT requests to `/v1/system/update/target-release`.
+      type: object
+      properties:
+        system_version:
+          description: Version of the system software to make the target release.
+          type: string
+          pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+      required:
+      - system_version
     UpdatesTrustRootResultsPage:
       description: A single page of results
       type: object
@@ -315,27 +420,32 @@ components:
           - 'null'
       required:
       - items
-    TufRepoUploadStatus:
-      description: Whether the uploaded TUF repo already existed or was new and had to be inserted. Part of `TufRepoUpload`.
+    IdSortMode:
+      description: 'Supported set of sort modes for scanning by id only.
+
+
+        Currently, we only support scanning in ascending order.'
       oneOf:
-      - description: The repository already existed in the database
+      - description: Sort in increasing order of "id"
         type: string
         enum:
-        - already_exists
-      - description: The repository did not exist, and was inserted into the database
-        type: string
-        enum:
-        - inserted
-    SetTargetReleaseParams:
-      description: Parameters for PUT requests to `/v1/system/update/target-release`.
+        - id_ascending
+    TufRepoResultsPage:
+      description: A single page of results
       type: object
       properties:
-        system_version:
-          description: Version of the system software to make the target release.
-          type: string
-          pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/TufRepo'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
       required:
-      - system_version
+      - items
     UpdateStatus:
       type: object
       properties:
@@ -387,116 +497,6 @@ components:
       - suspended
       - target_release
       - time_last_step_planned
-    TufRepoUpload:
-      type: object
-      properties:
-        repo:
-          $ref: '#/components/schemas/TufRepo'
-        status:
-          $ref: '#/components/schemas/TufRepoUploadStatus'
-      required:
-      - repo
-      - status
-    VersionSortMode:
-      description: Supported sort modes when scanning by semantic version
-      oneOf:
-      - description: Sort in increasing semantic version order (oldest first)
-        type: string
-        enum:
-        - version_ascending
-      - description: Sort in decreasing semantic version order (newest first)
-        type: string
-        enum:
-        - version_descending
-    TufRepoResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/TufRepo'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
-    TargetRelease:
-      description: View of a system software target release
-      type: object
-      properties:
-        time_requested:
-          description: Time this was set as the target release
-          type: string
-          format: date-time
-        version:
-          description: The specified release of the rack's system software
-          type: string
-          pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
-      required:
-      - time_requested
-      - version
-    TufRepo:
-      description: Metadata about a TUF repository
-      type: object
-      properties:
-        file_name:
-          description: 'The file name of the repository, as reported by the client that uploaded it
-
-
-            This is intended for debugging. The file name may not match any particular pattern, and even if it does, it may not be accurate since it''s just what the client reported.'
-          type: string
-        hash:
-          description: The hash of the repository
-          type: string
-          format: hex string (32 bytes)
-        system_version:
-          description: 'The system version for this repository
-
-
-            The system version is a top-level version number applied to all the software in the repository.'
-          type: string
-          pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
-        time_created:
-          description: Time the repository was uploaded
-          type: string
-          format: date-time
-      required:
-      - file_name
-      - hash
-      - system_version
-      - time_created
-    IdSortMode:
-      description: 'Supported set of sort modes for scanning by id only.
-
-
-        Currently, we only support scanning in ascending order.'
-      oneOf:
-      - description: Sort in increasing order of "id"
-        type: string
-        enum:
-        - id_ascending
-    UpdatesTrustRoot:
-      description: Trusted root role used by the update system to verify update repositories.
-      type: object
-      properties:
-        id:
-          description: The UUID of this trusted root role.
-          type: string
-          format: uuid
-        root_role:
-          description: The trusted root role itself, a JSON document as described by The Update Framework.
-        time_created:
-          description: Time the trusted root role was added.
-          type: string
-          format: date-time
-      required:
-      - id
-      - root_role
-      - time_created
   responses:
     Error:
       description: Error

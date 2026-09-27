@@ -73,46 +73,6 @@ paths:
         - start_time
 components:
   schemas:
-    AuditLogEntryResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditLogEntry'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
-    Error:
-      description: Error information from a response.
-      type: object
-      properties:
-        error_code:
-          type: string
-        message:
-          type: string
-        request_id:
-          type: string
-      required:
-      - message
-      - request_id
-    TimeAndIdSortMode:
-      description: Supported set of sort modes for scanning by timestamp and ID
-      oneOf:
-      - description: Sort in increasing order of timestamp and ID, i.e., earliest first
-        type: string
-        enum:
-        - time_and_id_ascending
-      - description: Sort in increasing order of timestamp and ID, i.e., most recent first
-        type: string
-        enum:
-        - time_and_id_descending
     AuditLogEntryResult:
       description: Result of an audit log entry
       oneOf:
@@ -162,6 +122,67 @@ components:
             - unknown
         required:
         - kind
+    TimeAndIdSortMode:
+      description: Supported set of sort modes for scanning by timestamp and ID
+      oneOf:
+      - description: Sort in increasing order of timestamp and ID, i.e., earliest first
+        type: string
+        enum:
+        - time_and_id_ascending
+      - description: Sort in increasing order of timestamp and ID, i.e., most recent first
+        type: string
+        enum:
+        - time_and_id_descending
+    AuditLogEntryActor:
+      oneOf:
+      - type: object
+        properties:
+          kind:
+            type: string
+            enum:
+            - user_builtin
+          user_builtin_id:
+            type: string
+            format: uuid
+        required:
+        - kind
+        - user_builtin_id
+      - type: object
+        properties:
+          kind:
+            type: string
+            enum:
+            - silo_user
+          silo_id:
+            type: string
+            format: uuid
+          silo_user_id:
+            type: string
+            format: uuid
+        required:
+        - kind
+        - silo_id
+        - silo_user_id
+      - type: object
+        properties:
+          kind:
+            type: string
+            enum:
+            - scim
+          silo_id:
+            type: string
+            format: uuid
+        required:
+        - kind
+        - silo_id
+      - type: object
+        properties:
+          kind:
+            type: string
+            enum:
+            - unauthenticated
+        required:
+        - kind
     AuthMethod:
       description: Authentication method used for a request
       oneOf:
@@ -177,6 +198,19 @@ components:
         type: string
         enum:
         - scim_token
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
     AuditLogEntry:
       description: Audit log entry
       type: object
@@ -237,56 +271,22 @@ components:
       - source_ip
       - time_completed
       - time_started
-    AuditLogEntryActor:
-      oneOf:
-      - type: object
-        properties:
-          kind:
-            type: string
-            enum:
-            - user_builtin
-          user_builtin_id:
-            type: string
-            format: uuid
-        required:
-        - kind
-        - user_builtin_id
-      - type: object
-        properties:
-          kind:
-            type: string
-            enum:
-            - silo_user
-          silo_id:
-            type: string
-            format: uuid
-          silo_user_id:
-            type: string
-            format: uuid
-        required:
-        - kind
-        - silo_id
-        - silo_user_id
-      - type: object
-        properties:
-          kind:
-            type: string
-            enum:
-            - scim
-          silo_id:
-            type: string
-            format: uuid
-        required:
-        - kind
-        - silo_id
-      - type: object
-        properties:
-          kind:
-            type: string
-            enum:
-            - unauthenticated
-        required:
-        - kind
+    AuditLogEntryResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditLogEntry'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
   responses:
     Error:
       description: Error

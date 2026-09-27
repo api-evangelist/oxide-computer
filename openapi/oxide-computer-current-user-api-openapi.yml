@@ -179,30 +179,30 @@ paths:
         5XX:
           $ref: '#/components/responses/Error'
 components:
-  schemas:
-    NameOrId:
-      oneOf:
-      - title: id
-        allOf:
-        - type: string
-          format: uuid
-      - title: name
-        allOf:
-        - $ref: '#/components/schemas/Name'
+  responses:
     Error:
-      description: Error information from a response.
-      type: object
-      properties:
-        error_code:
-          type: string
-        message:
-          type: string
-        request_id:
-          type: string
-      required:
-      - message
-      - request_id
-    SshKeyResultsPage:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    NameOrIdSortMode:
+      description: Supported set of sort modes for scanning by name or id
+      oneOf:
+      - description: Sort in increasing order of "name"
+        type: string
+        enum:
+        - name_ascending
+      - description: Sort in decreasing order of "name"
+        type: string
+        enum:
+        - name_descending
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    GroupResultsPage:
       description: A single page of results
       type: object
       properties:
@@ -210,7 +210,7 @@ components:
           description: list of items on this page of results
           type: array
           items:
-            $ref: '#/components/schemas/SshKey'
+            $ref: '#/components/schemas/Group'
         next_page:
           description: token used to fetch the next page of results (if any)
           type:
@@ -246,97 +246,19 @@ components:
       - silo_id
       - time_created
       - time_modified
-    NameOrIdSortMode:
-      description: Supported set of sort modes for scanning by name or id
-      oneOf:
-      - description: Sort in increasing order of "name"
-        type: string
-        enum:
-        - name_ascending
-      - description: Sort in decreasing order of "name"
-        type: string
-        enum:
-        - name_descending
-      - description: Sort in increasing order of "id"
-        type: string
-        enum:
-        - id_ascending
-    SshKey:
-      description: View of an SSH Key
+    Error:
+      description: Error information from a response.
       type: object
       properties:
-        description:
-          description: Human-readable free-form text about a resource
+        error_code:
           type: string
-        id:
-          description: Unique, immutable, system-controlled identifier for each resource
+        message:
           type: string
-          format: uuid
-        name:
-          description: Unique, mutable, user-controlled identifier for each resource
-          allOf:
-          - $ref: '#/components/schemas/Name'
-        public_key:
-          description: SSH public key, e.g., `"ssh-ed25519 AAAAC3NzaC..."`
-          type: string
-        silo_user_id:
-          description: The user to whom this key belongs
-          type: string
-          format: uuid
-        time_created:
-          description: Timestamp when this resource was created
-          type: string
-          format: date-time
-        time_modified:
-          description: Timestamp when this resource was last modified
-          type: string
-          format: date-time
-      required:
-      - description
-      - id
-      - name
-      - public_key
-      - silo_user_id
-      - time_created
-      - time_modified
-    Name:
-      title: A name unique within the parent collection
-      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
-      type: string
-      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
-      minLength: 1
-      maxLength: 63
-    SshKeyCreate:
-      description: Create-time parameters for an `SshKey`
-      type: object
-      properties:
-        description:
-          type: string
-        name:
-          $ref: '#/components/schemas/Name'
-        public_key:
-          description: SSH public key, e.g., `"ssh-ed25519 AAAAC3NzaC..."`
+        request_id:
           type: string
       required:
-      - description
-      - name
-      - public_key
-    GroupResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/Group'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
+      - message
+      - request_id
     CurrentUser:
       description: Info about the current user
       type: object
@@ -378,6 +300,82 @@ components:
       - silo_name
       - time_created
       - time_modified
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
+    SshKeyResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/SshKey'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    SshKey:
+      description: View of an SSH Key
+      type: object
+      properties:
+        description:
+          description: Human-readable free-form text about a resource
+          type: string
+        id:
+          description: Unique, immutable, system-controlled identifier for each resource
+          type: string
+          format: uuid
+        name:
+          description: Unique, mutable, user-controlled identifier for each resource
+          allOf:
+          - $ref: '#/components/schemas/Name'
+        public_key:
+          description: SSH public key, e.g., `"ssh-ed25519 AAAAC3NzaC..."`
+          type: string
+        silo_user_id:
+          description: The user to whom this key belongs
+          type: string
+          format: uuid
+        time_created:
+          description: Timestamp when this resource was created
+          type: string
+          format: date-time
+        time_modified:
+          description: Timestamp when this resource was last modified
+          type: string
+          format: date-time
+      required:
+      - description
+      - id
+      - name
+      - public_key
+      - silo_user_id
+      - time_created
+      - time_modified
+    SshKeyCreate:
+      description: Create-time parameters for an `SshKey`
+      type: object
+      properties:
+        description:
+          type: string
+        name:
+          $ref: '#/components/schemas/Name'
+        public_key:
+          description: SSH public key, e.g., `"ssh-ed25519 AAAAC3NzaC..."`
+          type: string
+      required:
+      - description
+      - name
+      - public_key
     IdSortMode:
       description: 'Supported set of sort modes for scanning by id only.
 
@@ -388,10 +386,12 @@ components:
         type: string
         enum:
         - id_ascending
-  responses:
-    Error:
-      description: Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'

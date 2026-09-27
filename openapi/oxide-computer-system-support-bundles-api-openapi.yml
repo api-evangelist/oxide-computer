@@ -302,19 +302,6 @@ paths:
               schema: {}
 components:
   schemas:
-    Error:
-      description: Error information from a response.
-      type: object
-      properties:
-        error_code:
-          type: string
-        message:
-          type: string
-        request_id:
-          type: string
-      required:
-      - message
-      - request_id
     SupportBundleState:
       oneOf:
       - description: 'Support Bundle still actively being collected.
@@ -382,22 +369,6 @@ components:
       - reason_for_creation
       - state
       - time_created
-    SupportBundleUpdate:
-      type: object
-      properties:
-        user_comment:
-          description: User comment for the support bundle
-          type:
-          - string
-          - 'null'
-    SupportBundleCreate:
-      type: object
-      properties:
-        user_comment:
-          description: User comment for the support bundle
-          type:
-          - string
-          - 'null'
     SupportBundleInfoResultsPage:
       description: A single page of results
       type: object
@@ -414,6 +385,35 @@ components:
           - 'null'
       required:
       - items
+    SupportBundleUpdate:
+      type: object
+      properties:
+        user_comment:
+          description: User comment for the support bundle
+          type:
+          - string
+          - 'null'
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    SupportBundleCreate:
+      type: object
+      properties:
+        user_comment:
+          description: User comment for the support bundle
+          type:
+          - string
+          - 'null'
   responses:
     Error:
       description: Error
