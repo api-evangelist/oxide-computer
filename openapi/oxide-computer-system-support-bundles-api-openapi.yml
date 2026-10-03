@@ -302,6 +302,22 @@ paths:
               schema: {}
 components:
   schemas:
+    SupportBundleInfoResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/SupportBundleInfo'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
     SupportBundleState:
       oneOf:
       - description: 'Support Bundle still actively being collected.
@@ -332,17 +348,6 @@ components:
         type: string
         enum:
         - active
-    TimeAndIdSortMode:
-      description: Supported set of sort modes for scanning by timestamp and ID
-      oneOf:
-      - description: Sort in increasing order of timestamp and ID, i.e., earliest first
-        type: string
-        enum:
-        - time_and_id_ascending
-      - description: Sort in increasing order of timestamp and ID, i.e., most recent first
-        type: string
-        enum:
-        - time_and_id_descending
     SupportBundleInfo:
       type: object
       properties:
@@ -369,22 +374,14 @@ components:
       - reason_for_creation
       - state
       - time_created
-    SupportBundleInfoResultsPage:
-      description: A single page of results
+    SupportBundleCreate:
       type: object
       properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/SupportBundleInfo'
-        next_page:
-          description: token used to fetch the next page of results (if any)
+        user_comment:
+          description: User comment for the support bundle
           type:
           - string
           - 'null'
-      required:
-      - items
     SupportBundleUpdate:
       type: object
       properties:
@@ -393,6 +390,17 @@ components:
           type:
           - string
           - 'null'
+    TimeAndIdSortMode:
+      description: Supported set of sort modes for scanning by timestamp and ID
+      oneOf:
+      - description: Sort in increasing order of timestamp and ID, i.e., earliest first
+        type: string
+        enum:
+        - time_and_id_ascending
+      - description: Sort in increasing order of timestamp and ID, i.e., most recent first
+        type: string
+        enum:
+        - time_and_id_descending
     Error:
       description: Error information from a response.
       type: object
@@ -406,14 +414,6 @@ components:
       required:
       - message
       - request_id
-    SupportBundleCreate:
-      type: object
-      properties:
-        user_comment:
-          description: User comment for the support bundle
-          type:
-          - string
-          - 'null'
   responses:
     Error:
       description: Error

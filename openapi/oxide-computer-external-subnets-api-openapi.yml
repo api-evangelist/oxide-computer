@@ -250,16 +250,27 @@ components:
           - $ref: '#/components/schemas/NameOrId'
       required:
       - instance
-    Ipv4Net:
-      example: 192.168.1.0/24
-      title: An IPv4 subnet
-      description: An IPv4 subnet, including prefix and prefix length
+    Ipv6Net:
+      example: fd12:3456::/64
+      title: An IPv6 subnet
+      description: An IPv6 subnet, including prefix and subnet mask
       x-rust-type:
         crate: oxnet
-        path: oxnet::Ipv4Net
+        path: oxnet::Ipv6Net
         version: 0.1.0
       type: string
-      pattern: ^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/([0-9]|1[0-9]|2[0-9]|3[0-2])$
+      pattern: ^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))\/([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])$
+    ExternalSubnetUpdate:
+      description: Update an external subnet
+      type: object
+      properties:
+        description:
+          type:
+          - string
+          - 'null'
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
     IpNet:
       x-rust-type:
         crate: oxnet
@@ -287,16 +298,88 @@ components:
         type: string
         enum:
         - id_ascending
-    Ipv6Net:
-      example: fd12:3456::/64
-      title: An IPv6 subnet
-      description: An IPv6 subnet, including prefix and subnet mask
-      x-rust-type:
-        crate: oxnet
-        path: oxnet::Ipv6Net
-        version: 0.1.0
-      type: string
-      pattern: ^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))\/([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])$
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
+    PoolSelector:
+      description: Specify which IP or external subnet pool to allocate from.
+      oneOf:
+      - description: Use the specified pool by name or ID.
+        type: object
+        properties:
+          pool:
+            description: The pool to allocate from.
+            allOf:
+            - $ref: '#/components/schemas/NameOrId'
+          type:
+            type: string
+            enum:
+            - explicit
+        required:
+        - pool
+        - type
+      - description: Use the default pool for the silo.
+        type: object
+        properties:
+          ip_version:
+            description: IP version to use when multiple default pools exist. Required if both IPv4 and IPv6 default pools are configured.
+            default: null
+            allOf:
+            - $ref: '#/components/schemas/IpVersion'
+          type:
+            type: string
+            enum:
+            - auto
+        required:
+        - type
+    ExternalSubnetAllocator:
+      description: Specify how to allocate an external subnet.
+      oneOf:
+      - description: Reserve a specific subnet.
+        type: object
+        properties:
+          subnet:
+            description: The subnet CIDR to reserve. Must be available in the pool.
+            allOf:
+            - $ref: '#/components/schemas/IpNet'
+          type:
+            type: string
+            enum:
+            - explicit
+        required:
+        - subnet
+        - type
+      - description: Automatically allocate a subnet with the specified prefix length.
+        type: object
+        properties:
+          pool_selector:
+            description: 'Pool selection.
+
+
+              If omitted, this field uses the silo''s default pool. If the silo has default pools for both IPv4 and IPv6, the request will fail unless `ip_version` is specified in the pool selector.'
+            default:
+              ip_version: null
+              type: auto
+            allOf:
+            - $ref: '#/components/schemas/PoolSelector'
+          prefix_length:
+            description: The prefix length for the allocated subnet (e.g., 24 for a /24).
+            type: integer
+            format: uint8
+            minimum: 0
+          type:
+            type: string
+            enum:
+            - auto
+        required:
+        - prefix_length
+        - type
     ExternalSubnetResultsPage:
       description: A single page of results
       type: object
@@ -342,12 +425,6 @@ components:
       - allocator
       - description
       - name
-    IpVersion:
-      description: The IP address version.
-      type: string
-      enum:
-      - v4
-      - v6
     Name:
       title: A name unique within the parent collection
       description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
@@ -355,17 +432,6 @@ components:
       pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
       minLength: 1
       maxLength: 63
-    ExternalSubnetUpdate:
-      description: Update an external subnet
-      type: object
-      properties:
-        description:
-          type:
-          - string
-          - 'null'
-        name:
-          allOf:
-          - $ref: '#/components/schemas/Name'
     ExternalSubnet:
       description: An external subnet allocated from a subnet pool
       type: object
@@ -421,88 +487,22 @@ components:
       - subnet_pool_member_id
       - time_created
       - time_modified
-    PoolSelector:
-      description: Specify which IP or external subnet pool to allocate from.
-      oneOf:
-      - description: Use the specified pool by name or ID.
-        type: object
-        properties:
-          pool:
-            description: The pool to allocate from.
-            allOf:
-            - $ref: '#/components/schemas/NameOrId'
-          type:
-            type: string
-            enum:
-            - explicit
-        required:
-        - pool
-        - type
-      - description: Use the default pool for the silo.
-        type: object
-        properties:
-          ip_version:
-            description: IP version to use when multiple default pools exist. Required if both IPv4 and IPv6 default pools are configured.
-            default: null
-            allOf:
-            - $ref: '#/components/schemas/IpVersion'
-          type:
-            type: string
-            enum:
-            - auto
-        required:
-        - type
-    NameOrId:
-      oneOf:
-      - title: id
-        allOf:
-        - type: string
-          format: uuid
-      - title: name
-        allOf:
-        - $ref: '#/components/schemas/Name'
-    ExternalSubnetAllocator:
-      description: Specify how to allocate an external subnet.
-      oneOf:
-      - description: Reserve a specific subnet.
-        type: object
-        properties:
-          subnet:
-            description: The subnet CIDR to reserve. Must be available in the pool.
-            allOf:
-            - $ref: '#/components/schemas/IpNet'
-          type:
-            type: string
-            enum:
-            - explicit
-        required:
-        - subnet
-        - type
-      - description: Automatically allocate a subnet with the specified prefix length.
-        type: object
-        properties:
-          pool_selector:
-            description: 'Pool selection.
-
-
-              If omitted, this field uses the silo''s default pool. If the silo has default pools for both IPv4 and IPv6, the request will fail unless `ip_version` is specified in the pool selector.'
-            default:
-              ip_version: null
-              type: auto
-            allOf:
-            - $ref: '#/components/schemas/PoolSelector'
-          prefix_length:
-            description: The prefix length for the allocated subnet (e.g., 24 for a /24).
-            type: integer
-            format: uint8
-            minimum: 0
-          type:
-            type: string
-            enum:
-            - auto
-        required:
-        - prefix_length
-        - type
+    Ipv4Net:
+      example: 192.168.1.0/24
+      title: An IPv4 subnet
+      description: An IPv4 subnet, including prefix and prefix length
+      x-rust-type:
+        crate: oxnet
+        path: oxnet::Ipv4Net
+        version: 0.1.0
+      type: string
+      pattern: ^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/([0-9]|1[0-9]|2[0-9]|3[0-2])$
+    IpVersion:
+      description: The IP address version.
+      type: string
+      enum:
+      - v4
+      - v6
   responses:
     Error:
       description: Error

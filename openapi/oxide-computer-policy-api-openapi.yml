@@ -53,6 +53,38 @@ paths:
           $ref: '#/components/responses/Error'
 components:
   schemas:
+    FleetRolePolicy:
+      description: 'Policy for a particular resource
+
+
+        Note that the Policy only describes access granted explicitly for this resource.  The policies of parent resources can also cause a user to have access to this resource.'
+      type: object
+      properties:
+        role_assignments:
+          description: Roles directly assigned on this resource
+          type: array
+          items:
+            $ref: '#/components/schemas/FleetRoleRoleAssignment'
+      required:
+      - role_assignments
+    FleetRoleRoleAssignment:
+      description: 'Describes the assignment of a particular role on a particular resource to a particular identity (user, group, etc.)
+
+
+        The resource is not part of this structure.  Rather, `RoleAssignment`s are put into a `Policy` and that Policy is applied to a particular resource.'
+      type: object
+      properties:
+        identity_id:
+          type: string
+          format: uuid
+        identity_type:
+          $ref: '#/components/schemas/IdentityType'
+        role_name:
+          $ref: '#/components/schemas/FleetRole'
+      required:
+      - identity_id
+      - identity_type
+      - role_name
     FleetRole:
       type: string
       enum:
@@ -72,44 +104,12 @@ components:
       required:
       - message
       - request_id
-    FleetRolePolicy:
-      description: 'Policy for a particular resource
-
-
-        Note that the Policy only describes access granted explicitly for this resource.  The policies of parent resources can also cause a user to have access to this resource.'
-      type: object
-      properties:
-        role_assignments:
-          description: Roles directly assigned on this resource
-          type: array
-          items:
-            $ref: '#/components/schemas/FleetRoleRoleAssignment'
-      required:
-      - role_assignments
     IdentityType:
       description: Describes what kind of identity is described by an id
       type: string
       enum:
       - silo_user
       - silo_group
-    FleetRoleRoleAssignment:
-      description: 'Describes the assignment of a particular role on a particular resource to a particular identity (user, group, etc.)
-
-
-        The resource is not part of this structure.  Rather, `RoleAssignment`s are put into a `Policy` and that Policy is applied to a particular resource.'
-      type: object
-      properties:
-        identity_id:
-          type: string
-          format: uuid
-        identity_type:
-          $ref: '#/components/schemas/IdentityType'
-        role_name:
-          $ref: '#/components/schemas/FleetRole'
-      required:
-      - identity_id
-      - identity_type
-      - role_name
   responses:
     Error:
       description: Error

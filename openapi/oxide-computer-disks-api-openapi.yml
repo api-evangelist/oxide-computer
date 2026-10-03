@@ -256,27 +256,14 @@ paths:
           $ref: '#/components/responses/Error'
 components:
   schemas:
-    DiskCreate:
-      description: Create-time parameters for a `Disk`
-      type: object
-      properties:
-        description:
-          type: string
-        disk_backend:
-          description: The source for this `Disk`'s blocks
-          allOf:
-          - $ref: '#/components/schemas/DiskBackend'
-        name:
-          $ref: '#/components/schemas/Name'
-        size:
-          description: The total size of the Disk (in bytes)
-          allOf:
-          - $ref: '#/components/schemas/ByteCount'
-      required:
-      - description
-      - disk_backend
-      - name
-      - size
+    BlockSize:
+      title: Block size in bytes
+      description: 'Valid values are: 512, 2048, or 4096.'
+      type: integer
+      enum:
+      - 512
+      - 2048
+      - 4096
     DiskState:
       description: State of a Disk
       oneOf:
@@ -400,14 +387,34 @@ components:
             - faulted
         required:
         - state
-    BlockSize:
-      title: Block size in bytes
-      description: 'Valid values are: 512, 2048, or 4096.'
-      type: integer
-      enum:
-      - 512
-      - 2048
-      - 4096
+    NameOrIdSortMode:
+      description: Supported set of sort modes for scanning by name or id
+      oneOf:
+      - description: Sort in increasing order of "name"
+        type: string
+        enum:
+        - name_ascending
+      - description: Sort in decreasing order of "name"
+        type: string
+        enum:
+        - name_descending
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    ImportBlocksBulkWrite:
+      description: Parameters for importing blocks with a bulk write
+      type: object
+      properties:
+        base64_encoded_data:
+          type: string
+        offset:
+          type: integer
+          format: uint64
+          minimum: 0
+      required:
+      - base64_encoded_data
+      - offset
     DiskResultsPage:
       description: A single page of results
       type: object
@@ -424,21 +431,15 @@ components:
           - 'null'
       required:
       - items
-    NameOrIdSortMode:
-      description: Supported set of sort modes for scanning by name or id
+    NameOrId:
       oneOf:
-      - description: Sort in increasing order of "name"
-        type: string
-        enum:
-        - name_ascending
-      - description: Sort in decreasing order of "name"
-        type: string
-        enum:
-        - name_descending
-      - description: Sort in increasing order of "id"
-        type: string
-        enum:
-        - id_ascending
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
     DiskBackend:
       description: The source of a `Disk`'s blocks
       oneOf:
@@ -463,6 +464,32 @@ components:
         required:
         - disk_source
         - type
+    ByteCount:
+      description: Byte count to express memory or storage capacity.
+      type: integer
+      format: uint64
+      minimum: 0
+    DiskCreate:
+      description: Create-time parameters for a `Disk`
+      type: object
+      properties:
+        description:
+          type: string
+        disk_backend:
+          description: The source for this `Disk`'s blocks
+          allOf:
+          - $ref: '#/components/schemas/DiskBackend'
+        name:
+          $ref: '#/components/schemas/Name'
+        size:
+          description: The total size of the Disk (in bytes)
+          allOf:
+          - $ref: '#/components/schemas/ByteCount'
+      required:
+      - description
+      - disk_backend
+      - name
+      - size
     FinalizeDisk:
       description: Parameters for finalizing a disk
       type: object
@@ -471,6 +498,24 @@ components:
           description: If specified a snapshot of the disk will be created with the given name during finalization. If not specified, a snapshot for the disk will _not_ be created. A snapshot can be manually created once the disk transitions into the `Detached` state.
           allOf:
           - $ref: '#/components/schemas/Name'
+    DiskType:
+      type: string
+      enum:
+      - distributed
+      - local
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
     Disk:
       description: View of a Disk
       type: object
@@ -535,11 +580,13 @@ components:
       - state
       - time_created
       - time_modified
-    DiskType:
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
       type: string
-      enum:
-      - distributed
-      - local
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
     DiskSource:
       description: Different sources for a Distributed Disk
       oneOf:
@@ -603,53 +650,6 @@ components:
         required:
         - block_size
         - type
-    Name:
-      title: A name unique within the parent collection
-      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
-      type: string
-      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
-      minLength: 1
-      maxLength: 63
-    ImportBlocksBulkWrite:
-      description: Parameters for importing blocks with a bulk write
-      type: object
-      properties:
-        base64_encoded_data:
-          type: string
-        offset:
-          type: integer
-          format: uint64
-          minimum: 0
-      required:
-      - base64_encoded_data
-      - offset
-    Error:
-      description: Error information from a response.
-      type: object
-      properties:
-        error_code:
-          type: string
-        message:
-          type: string
-        request_id:
-          type: string
-      required:
-      - message
-      - request_id
-    NameOrId:
-      oneOf:
-      - title: id
-        allOf:
-        - type: string
-          format: uuid
-      - title: name
-        allOf:
-        - $ref: '#/components/schemas/Name'
-    ByteCount:
-      description: Byte count to express memory or storage capacity.
-      type: integer
-      format: uint64
-      minimum: 0
   responses:
     Error:
       description: Error

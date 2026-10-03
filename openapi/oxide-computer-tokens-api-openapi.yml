@@ -84,22 +84,19 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
-    DeviceAccessTokenResultsPage:
-      description: A single page of results
+    Error:
+      description: Error information from a response.
       type: object
       properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/DeviceAccessToken'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
       required:
-      - items
+      - message
+      - request_id
     IdSortMode:
       description: 'Supported set of sort modes for scanning by id only.
 
@@ -133,16 +130,19 @@ components:
       required:
       - id
       - time_created
-    Error:
-      description: Error information from a response.
+    DeviceAccessTokenResultsPage:
+      description: A single page of results
       type: object
       properties:
-        error_code:
-          type: string
-        message:
-          type: string
-        request_id:
-          type: string
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceAccessToken'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
       required:
-      - message
-      - request_id
+      - items
