@@ -53,20 +53,6 @@ paths:
           $ref: '#/components/responses/Error'
 components:
   schemas:
-    FleetRolePolicy:
-      description: 'Policy for a particular resource
-
-
-        Note that the Policy only describes access granted explicitly for this resource.  The policies of parent resources can also cause a user to have access to this resource.'
-      type: object
-      properties:
-        role_assignments:
-          description: Roles directly assigned on this resource
-          type: array
-          items:
-            $ref: '#/components/schemas/FleetRoleRoleAssignment'
-      required:
-      - role_assignments
     FleetRoleRoleAssignment:
       description: 'Describes the assignment of a particular role on a particular resource to a particular identity (user, group, etc.)
 
@@ -104,6 +90,20 @@ components:
       required:
       - message
       - request_id
+    FleetRolePolicy:
+      description: 'Policy for a particular resource
+
+
+        Note that the Policy only describes access granted explicitly for this resource.  The policies of parent resources can also cause a user to have access to this resource.'
+      type: object
+      properties:
+        role_assignments:
+          description: Roles directly assigned on this resource
+          type: array
+          items:
+            $ref: '#/components/schemas/FleetRoleRoleAssignment'
+      required:
+      - role_assignments
     IdentityType:
       description: Describes what kind of identity is described by an id
       type: string

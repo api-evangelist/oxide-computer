@@ -32,6 +32,10 @@ paths:
           $ref: '#/components/responses/Error'
 components:
   schemas:
+    PingStatus:
+      type: string
+      enum:
+      - ok
     Error:
       description: Error information from a response.
       type: object
@@ -45,10 +49,6 @@ components:
       required:
       - message
       - request_id
-    PingStatus:
-      type: string
-      enum:
-      - ok
     Ping:
       type: object
       properties:

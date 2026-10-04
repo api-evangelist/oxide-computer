@@ -406,106 +406,6 @@ paths:
           $ref: '#/components/responses/Error'
 components:
   schemas:
-    IpNet:
-      x-rust-type:
-        crate: oxnet
-        path: oxnet::IpNet
-        version: 0.1.0
-      oneOf:
-      - title: v4
-        allOf:
-        - $ref: '#/components/schemas/Ipv4Net'
-      - title: v6
-        allOf:
-        - $ref: '#/components/schemas/Ipv6Net'
-    NameOrId:
-      oneOf:
-      - title: id
-        allOf:
-        - type: string
-          format: uuid
-      - title: name
-        allOf:
-        - $ref: '#/components/schemas/Name'
-    SubnetPoolCreate:
-      description: Create a subnet pool
-      type: object
-      properties:
-        description:
-          type: string
-        ip_version:
-          description: The IP version for this pool (IPv4 or IPv6). All subnets in the pool must match this version.
-          allOf:
-          - $ref: '#/components/schemas/IpVersion'
-        name:
-          $ref: '#/components/schemas/Name'
-      required:
-      - description
-      - ip_version
-      - name
-    Name:
-      title: A name unique within the parent collection
-      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
-      type: string
-      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
-      minLength: 1
-      maxLength: 63
-    SubnetPoolMemberAdd:
-      description: Add a member (subnet) to a subnet pool
-      type: object
-      properties:
-        max_prefix_length:
-          description: 'Maximum prefix length for allocations from this subnet; a larger prefix means smaller allocations are allowed (e.g. a /24 prefix yields smaller subnet allocations than a /16 prefix).
-
-
-            Valid values: 0-32 for IPv4, 0-128 for IPv6. Default if not specified is 32 for IPv4 and 128 for IPv6.'
-          type:
-          - integer
-          - 'null'
-          format: uint8
-          minimum: 0
-        min_prefix_length:
-          description: 'Minimum prefix length for allocations from this subnet; a smaller prefix means larger allocations are allowed (e.g. a /16 prefix yields larger subnet allocations than a /24 prefix).
-
-
-            Valid values: 0-32 for IPv4, 0-128 for IPv6. Default if not specified is equal to the subnet''s prefix length.'
-          type:
-          - integer
-          - 'null'
-          format: uint8
-          minimum: 0
-        subnet:
-          description: The subnet to add to the pool
-          allOf:
-          - $ref: '#/components/schemas/IpNet'
-      required:
-      - subnet
-    SubnetPoolResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/SubnetPool'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
-    Ipv4Net:
-      example: 192.168.1.0/24
-      title: An IPv4 subnet
-      description: An IPv4 subnet, including prefix and prefix length
-      x-rust-type:
-        crate: oxnet
-        path: oxnet::Ipv4Net
-        version: 0.1.0
-      type: string
-      pattern: ^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/([0-9]|1[0-9]|2[0-9]|3[0-2])$
     SubnetPoolUpdate:
       description: Update a subnet pool
       type: object
@@ -517,20 +417,33 @@ components:
         name:
           allOf:
           - $ref: '#/components/schemas/Name'
-    SubnetPoolLinkSilo:
-      description: Link a subnet pool to a silo
+    SubnetPoolUtilization:
+      description: 'Utilization of addresses in a subnet pool.
+
+
+        Note that both the count of remaining addresses and the total capacity are integers, reported as floating point numbers. This accommodates allocations larger than a 64-bit integer, which is common with IPv6 address spaces. With very large subnet pools (> 2**53 addresses), integer precision will be lost, in exchange for representing the entire range. In such a case the pool still has many available addresses.'
+      type: object
+      properties:
+        capacity:
+          description: The total number of addresses in the pool.
+          type: number
+          format: double
+        remaining:
+          description: The number of remaining addresses in the pool.
+          type: number
+          format: double
+      required:
+      - capacity
+      - remaining
+    SubnetPoolSiloUpdate:
+      description: Update a subnet pool's silo link
       type: object
       properties:
         is_default:
-          description: Whether this is the default subnet pool for the silo. When true, external subnet allocations that don't specify a pool use this one.
+          description: Whether this is the default subnet pool for the silo
           type: boolean
-        silo:
-          description: The silo to link
-          allOf:
-          - $ref: '#/components/schemas/NameOrId'
       required:
       - is_default
-      - silo
     Ipv6Net:
       example: fd12:3456::/64
       title: An IPv6 subnet
@@ -556,6 +469,20 @@ components:
         type: string
         enum:
         - id_ascending
+    SubnetPoolLinkSilo:
+      description: Link a subnet pool to a silo
+      type: object
+      properties:
+        is_default:
+          description: Whether this is the default subnet pool for the silo. When true, external subnet allocations that don't specify a pool use this one.
+          type: boolean
+        silo:
+          description: The silo to link
+          allOf:
+          - $ref: '#/components/schemas/NameOrId'
+      required:
+      - is_default
+      - silo
     IdSortMode:
       description: 'Supported set of sort modes for scanning by id only.
 
@@ -566,22 +493,22 @@ components:
         type: string
         enum:
         - id_ascending
-    SubnetPoolMemberResultsPage:
-      description: A single page of results
+    SubnetPoolSiloLink:
+      description: A link between a subnet pool and a silo
       type: object
       properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/SubnetPoolMember'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
+        is_default:
+          type: boolean
+        silo_id:
+          type: string
+          format: uuid
+        subnet_pool_id:
+          type: string
+          format: uuid
       required:
-      - items
+      - is_default
+      - silo_id
+      - subnet_pool_id
     SubnetPoolMember:
       description: A member (subnet) within a subnet pool
       type: object
@@ -619,49 +546,68 @@ components:
       - subnet
       - subnet_pool_id
       - time_created
+    Ipv4Net:
+      example: 192.168.1.0/24
+      title: An IPv4 subnet
+      description: An IPv4 subnet, including prefix and prefix length
+      x-rust-type:
+        crate: oxnet
+        path: oxnet::Ipv4Net
+        version: 0.1.0
+      type: string
+      pattern: ^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/([0-9]|1[0-9]|2[0-9]|3[0-2])$
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
     IpVersion:
       description: The IP address version.
       type: string
       enum:
       - v4
       - v6
-    SubnetPoolMemberRemove:
-      description: Remove a subnet from a pool
+    SubnetPoolMemberAdd:
+      description: Add a member (subnet) to a subnet pool
       type: object
       properties:
+        max_prefix_length:
+          description: 'Maximum prefix length for allocations from this subnet; a larger prefix means smaller allocations are allowed (e.g. a /24 prefix yields smaller subnet allocations than a /16 prefix).
+
+
+            Valid values: 0-32 for IPv4, 0-128 for IPv6. Default if not specified is 32 for IPv4 and 128 for IPv6.'
+          type:
+          - integer
+          - 'null'
+          format: uint8
+          minimum: 0
+        min_prefix_length:
+          description: 'Minimum prefix length for allocations from this subnet; a smaller prefix means larger allocations are allowed (e.g. a /16 prefix yields larger subnet allocations than a /24 prefix).
+
+
+            Valid values: 0-32 for IPv4, 0-128 for IPv6. Default if not specified is equal to the subnet''s prefix length.'
+          type:
+          - integer
+          - 'null'
+          format: uint8
+          minimum: 0
         subnet:
-          description: The subnet to remove from the pool. Must match an existing entry exactly.
+          description: The subnet to add to the pool
           allOf:
           - $ref: '#/components/schemas/IpNet'
       required:
       - subnet
-    SubnetPoolUtilization:
-      description: 'Utilization of addresses in a subnet pool.
-
-
-        Note that both the count of remaining addresses and the total capacity are integers, reported as floating point numbers. This accommodates allocations larger than a 64-bit integer, which is common with IPv6 address spaces. With very large subnet pools (> 2**53 addresses), integer precision will be lost, in exchange for representing the entire range. In such a case the pool still has many available addresses.'
-      type: object
-      properties:
-        capacity:
-          description: The total number of addresses in the pool.
-          type: number
-          format: double
-        remaining:
-          description: The number of remaining addresses in the pool.
-          type: number
-          format: double
-      required:
-      - capacity
-      - remaining
-    SubnetPoolSiloUpdate:
-      description: Update a subnet pool's silo link
-      type: object
-      properties:
-        is_default:
-          description: Whether this is the default subnet pool for the silo
-          type: boolean
-      required:
-      - is_default
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
     Error:
       description: Error information from a response.
       type: object
@@ -675,22 +621,48 @@ components:
       required:
       - message
       - request_id
-    SubnetPoolSiloLink:
-      description: A link between a subnet pool and a silo
+    SubnetPoolSiloLinkResultsPage:
+      description: A single page of results
       type: object
       properties:
-        is_default:
-          type: boolean
-        silo_id:
-          type: string
-          format: uuid
-        subnet_pool_id:
-          type: string
-          format: uuid
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/SubnetPoolSiloLink'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
       required:
-      - is_default
-      - silo_id
-      - subnet_pool_id
+      - items
+    SubnetPoolMemberResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/SubnetPoolMember'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    SubnetPoolMemberRemove:
+      description: Remove a subnet from a pool
+      type: object
+      properties:
+        subnet:
+          description: The subnet to remove from the pool. Must match an existing entry exactly.
+          allOf:
+          - $ref: '#/components/schemas/IpNet'
+      required:
+      - subnet
     SubnetPool:
       description: A pool of subnets for external subnet allocation
       type: object
@@ -725,7 +697,7 @@ components:
       - name
       - time_created
       - time_modified
-    SubnetPoolSiloLinkResultsPage:
+    SubnetPoolResultsPage:
       description: A single page of results
       type: object
       properties:
@@ -733,7 +705,7 @@ components:
           description: list of items on this page of results
           type: array
           items:
-            $ref: '#/components/schemas/SubnetPoolSiloLink'
+            $ref: '#/components/schemas/SubnetPool'
         next_page:
           description: token used to fetch the next page of results (if any)
           type:
@@ -741,6 +713,34 @@ components:
           - 'null'
       required:
       - items
+    SubnetPoolCreate:
+      description: Create a subnet pool
+      type: object
+      properties:
+        description:
+          type: string
+        ip_version:
+          description: The IP version for this pool (IPv4 or IPv6). All subnets in the pool must match this version.
+          allOf:
+          - $ref: '#/components/schemas/IpVersion'
+        name:
+          $ref: '#/components/schemas/Name'
+      required:
+      - description
+      - ip_version
+      - name
+    IpNet:
+      x-rust-type:
+        crate: oxnet
+        path: oxnet::IpNet
+        version: 0.1.0
+      oneOf:
+      - title: v4
+        allOf:
+        - $ref: '#/components/schemas/Ipv4Net'
+      - title: v6
+        allOf:
+        - $ref: '#/components/schemas/Ipv6Net'
   responses:
     Error:
       description: Error

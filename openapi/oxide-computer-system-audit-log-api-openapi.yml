@@ -73,82 +73,34 @@ paths:
         - start_time
 components:
   schemas:
-    AuditLogEntryResultsPage:
-      description: A single page of results
+    AuthMethod:
+      description: Authentication method used for a request
+      oneOf:
+      - description: Console session cookie
+        type: string
+        enum:
+        - session_cookie
+      - description: Device access token (OAuth 2.0 device authorization flow)
+        type: string
+        enum:
+        - access_token
+      - description: SCIM client bearer token
+        type: string
+        enum:
+        - scim_token
+    Error:
+      description: Error information from a response.
       type: object
       properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditLogEntry'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
-    AuditLogEntry:
-      description: Audit log entry
-      type: object
-      properties:
-        actor:
-          $ref: '#/components/schemas/AuditLogEntryActor'
-        auth_method:
-          description: How the user authenticated the request (access token, session, or SCIM token). Null for unauthenticated requests like login attempts.
-          allOf:
-          - $ref: '#/components/schemas/AuthMethod'
-        credential_id:
-          description: ID of the credential used for authentication. Null for unauthenticated requests. The value of `auth_method` indicates what kind of credential it is (access token, session, or SCIM token).
-          type:
-          - string
-          - 'null'
-          format: uuid
-        id:
-          description: Unique identifier for the audit log entry
+        error_code:
           type: string
-          format: uuid
-        operation_id:
-          description: API endpoint ID, e.g., `project_create`
+        message:
           type: string
         request_id:
-          description: Request ID for tracing requests through the system
           type: string
-        request_uri:
-          description: URI of the request, truncated to 512 characters. Will only include host and scheme for HTTP/2 requests. For HTTP/1.1, the URI will consist of only the path and query.
-          type: string
-        result:
-          description: Result of the operation
-          allOf:
-          - $ref: '#/components/schemas/AuditLogEntryResult'
-        source_ip:
-          description: IP address that made the request
-          type: string
-          format: ip
-        time_completed:
-          description: Time operation completed
-          type: string
-          format: date-time
-        time_started:
-          description: When the request was received
-          type: string
-          format: date-time
-        user_agent:
-          description: User agent string from the request, truncated to 256 characters.
-          type:
-          - string
-          - 'null'
       required:
-      - actor
-      - id
-      - operation_id
+      - message
       - request_id
-      - request_uri
-      - result
-      - source_ip
-      - time_completed
-      - time_started
     AuditLogEntryActor:
       oneOf:
       - type: object
@@ -259,34 +211,82 @@ components:
         type: string
         enum:
         - time_and_id_descending
-    Error:
-      description: Error information from a response.
+    AuditLogEntry:
+      description: Audit log entry
       type: object
       properties:
-        error_code:
+        actor:
+          $ref: '#/components/schemas/AuditLogEntryActor'
+        auth_method:
+          description: How the user authenticated the request (access token, session, or SCIM token). Null for unauthenticated requests like login attempts.
+          allOf:
+          - $ref: '#/components/schemas/AuthMethod'
+        credential_id:
+          description: ID of the credential used for authentication. Null for unauthenticated requests. The value of `auth_method` indicates what kind of credential it is (access token, session, or SCIM token).
+          type:
+          - string
+          - 'null'
+          format: uuid
+        id:
+          description: Unique identifier for the audit log entry
           type: string
-        message:
+          format: uuid
+        operation_id:
+          description: API endpoint ID, e.g., `project_create`
           type: string
         request_id:
+          description: Request ID for tracing requests through the system
           type: string
+        request_uri:
+          description: URI of the request, truncated to 512 characters. Will only include host and scheme for HTTP/2 requests. For HTTP/1.1, the URI will consist of only the path and query.
+          type: string
+        result:
+          description: Result of the operation
+          allOf:
+          - $ref: '#/components/schemas/AuditLogEntryResult'
+        source_ip:
+          description: IP address that made the request
+          type: string
+          format: ip
+        time_completed:
+          description: Time operation completed
+          type: string
+          format: date-time
+        time_started:
+          description: When the request was received
+          type: string
+          format: date-time
+        user_agent:
+          description: User agent string from the request, truncated to 256 characters.
+          type:
+          - string
+          - 'null'
       required:
-      - message
+      - actor
+      - id
+      - operation_id
       - request_id
-    AuthMethod:
-      description: Authentication method used for a request
-      oneOf:
-      - description: Console session cookie
-        type: string
-        enum:
-        - session_cookie
-      - description: Device access token (OAuth 2.0 device authorization flow)
-        type: string
-        enum:
-        - access_token
-      - description: SCIM client bearer token
-        type: string
-        enum:
-        - scim_token
+      - request_uri
+      - result
+      - source_ip
+      - time_completed
+      - time_started
+    AuditLogEntryResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditLogEntry'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
   responses:
     Error:
       description: Error

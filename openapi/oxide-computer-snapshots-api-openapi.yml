@@ -201,36 +201,6 @@ components:
       - state
       - time_created
       - time_modified
-    NameOrId:
-      oneOf:
-      - title: id
-        allOf:
-        - type: string
-          format: uuid
-      - title: name
-        allOf:
-        - $ref: '#/components/schemas/Name'
-    SnapshotCreate:
-      description: Create-time parameters for a `Snapshot`
-      type: object
-      properties:
-        description:
-          type: string
-        disk:
-          description: The disk to be snapshotted
-          allOf:
-          - $ref: '#/components/schemas/NameOrId'
-        name:
-          $ref: '#/components/schemas/Name'
-      required:
-      - description
-      - disk
-      - name
-    ByteCount:
-      description: Byte count to express memory or storage capacity.
-      type: integer
-      format: uint64
-      minimum: 0
     SnapshotState:
       type: string
       enum:
@@ -251,6 +221,20 @@ components:
       required:
       - message
       - request_id
+    ByteCount:
+      description: Byte count to express memory or storage capacity.
+      type: integer
+      format: uint64
+      minimum: 0
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
     SnapshotResultsPage:
       description: A single page of results
       type: object
@@ -274,6 +258,22 @@ components:
       pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
       minLength: 1
       maxLength: 63
+    SnapshotCreate:
+      description: Create-time parameters for a `Snapshot`
+      type: object
+      properties:
+        description:
+          type: string
+        disk:
+          description: The disk to be snapshotted
+          allOf:
+          - $ref: '#/components/schemas/NameOrId'
+        name:
+          $ref: '#/components/schemas/Name'
+      required:
+      - description
+      - disk
+      - name
   responses:
     Error:
       description: Error

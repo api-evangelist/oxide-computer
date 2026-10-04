@@ -205,19 +205,6 @@ paths:
           $ref: '#/components/responses/Error'
 components:
   schemas:
-    Digest:
-      oneOf:
-      - type: object
-        properties:
-          type:
-            type: string
-            enum:
-            - sha256
-          value:
-            type: string
-        required:
-        - type
-        - value
     BlockSize:
       title: Block size in bytes
       description: 'Valid values are: 512, 2048, or 4096.'
@@ -241,51 +228,6 @@ components:
         type: string
         enum:
         - id_ascending
-    ImageResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/Image'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
-    NameOrId:
-      oneOf:
-      - title: id
-        allOf:
-        - type: string
-          format: uuid
-      - title: name
-        allOf:
-        - $ref: '#/components/schemas/Name'
-    ImageSource:
-      description: The source of the underlying image.
-      oneOf:
-      - type: object
-        properties:
-          id:
-            type: string
-            format: uuid
-          type:
-            type: string
-            enum:
-            - snapshot
-        required:
-        - id
-        - type
-    ByteCount:
-      description: Byte count to express memory or storage capacity.
-      type: integer
-      format: uint64
-      minimum: 0
     ImageCreate:
       description: Create-time parameters for an `Image`
       type: object
@@ -310,6 +252,19 @@ components:
       - os
       - source
       - version
+    Digest:
+      oneOf:
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - sha256
+          value:
+            type: string
+        required:
+        - type
+        - value
     Error:
       description: Error information from a response.
       type: object
@@ -323,6 +278,51 @@ components:
       required:
       - message
       - request_id
+    ByteCount:
+      description: Byte count to express memory or storage capacity.
+      type: integer
+      format: uint64
+      minimum: 0
+    ImageResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/Image'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    ImageSource:
+      description: The source of the underlying image.
+      oneOf:
+      - type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+          type:
+            type: string
+            enum:
+            - snapshot
+        required:
+        - id
+        - type
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
     Image:
       description: 'View of an image
 

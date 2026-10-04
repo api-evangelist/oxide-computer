@@ -286,6 +286,105 @@ paths:
           $ref: '#/components/responses/Error'
 components:
   schemas:
+    UpdatesTrustRootResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/UpdatesTrustRoot'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    TufRepoResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/TufRepo'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    VersionSortMode:
+      description: Supported sort modes when scanning by semantic version
+      oneOf:
+      - description: Sort in increasing semantic version order (oldest first)
+        type: string
+        enum:
+        - version_ascending
+      - description: Sort in decreasing semantic version order (newest first)
+        type: string
+        enum:
+        - version_descending
+    IdSortMode:
+      description: 'Supported set of sort modes for scanning by id only.
+
+
+        Currently, we only support scanning in ascending order.'
+      oneOf:
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
+    TargetRelease:
+      description: View of a system software target release
+      type: object
+      properties:
+        time_requested:
+          description: Time this was set as the target release
+          type: string
+          format: date-time
+        version:
+          description: The specified release of the rack's system software
+          type: string
+          pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+      required:
+      - time_requested
+      - version
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    UpdatesTrustRoot:
+      description: Trusted root role used by the update system to verify update repositories.
+      type: object
+      properties:
+        id:
+          description: The UUID of this trusted root role.
+          type: string
+          format: uuid
+        root_role:
+          description: The trusted root role itself, a JSON document as described by The Update Framework.
+        time_created:
+          description: Time the trusted root role was added.
+          type: string
+          format: date-time
+      required:
+      - id
+      - root_role
+      - time_created
     TufRepoUploadStatus:
       description: Whether the uploaded TUF repo already existed or was new and had to be inserted. Part of `TufRepoUpload`.
       oneOf:
@@ -327,22 +426,6 @@ components:
       - hash
       - system_version
       - time_created
-    UpdatesTrustRootResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/UpdatesTrustRoot'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
     UpdateStatus:
       type: object
       properties:
@@ -394,99 +477,6 @@ components:
       - suspended
       - target_release
       - time_last_step_planned
-    VersionSortMode:
-      description: Supported sort modes when scanning by semantic version
-      oneOf:
-      - description: Sort in increasing semantic version order (oldest first)
-        type: string
-        enum:
-        - version_ascending
-      - description: Sort in decreasing semantic version order (newest first)
-        type: string
-        enum:
-        - version_descending
-    TufRepoResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/TufRepo'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
-    SetTargetReleaseParams:
-      description: Parameters for PUT requests to `/v1/system/update/target-release`.
-      type: object
-      properties:
-        system_version:
-          description: Version of the system software to make the target release.
-          type: string
-          pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
-      required:
-      - system_version
-    Error:
-      description: Error information from a response.
-      type: object
-      properties:
-        error_code:
-          type: string
-        message:
-          type: string
-        request_id:
-          type: string
-      required:
-      - message
-      - request_id
-    IdSortMode:
-      description: 'Supported set of sort modes for scanning by id only.
-
-
-        Currently, we only support scanning in ascending order.'
-      oneOf:
-      - description: Sort in increasing order of "id"
-        type: string
-        enum:
-        - id_ascending
-    UpdatesTrustRoot:
-      description: Trusted root role used by the update system to verify update repositories.
-      type: object
-      properties:
-        id:
-          description: The UUID of this trusted root role.
-          type: string
-          format: uuid
-        root_role:
-          description: The trusted root role itself, a JSON document as described by The Update Framework.
-        time_created:
-          description: Time the trusted root role was added.
-          type: string
-          format: date-time
-      required:
-      - id
-      - root_role
-      - time_created
-    TargetRelease:
-      description: View of a system software target release
-      type: object
-      properties:
-        time_requested:
-          description: Time this was set as the target release
-          type: string
-          format: date-time
-        version:
-          description: The specified release of the rack's system software
-          type: string
-          pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
-      required:
-      - time_requested
-      - version
     TufRepoUpload:
       type: object
       properties:
@@ -497,6 +487,16 @@ components:
       required:
       - repo
       - status
+    SetTargetReleaseParams:
+      description: Parameters for PUT requests to `/v1/system/update/target-release`.
+      type: object
+      properties:
+        system_version:
+          description: Version of the system software to make the target release.
+          type: string
+          pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+      required:
+      - system_version
   responses:
     Error:
       description: Error
