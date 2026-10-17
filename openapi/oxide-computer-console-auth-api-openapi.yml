@@ -88,13 +88,20 @@ paths:
           $ref: '#/components/responses/Error'
 components:
   schemas:
-    DeviceAuthVerify:
+    DeviceAccessTokenRequest:
       type: object
       properties:
-        user_code:
+        client_id:
+          type: string
+          format: uuid
+        device_code:
+          type: string
+        grant_type:
           type: string
       required:
-      - user_code
+      - client_id
+      - device_code
+      - grant_type
     DeviceAuthRequest:
       type: object
       properties:
@@ -129,20 +136,13 @@ components:
       required:
       - message
       - request_id
-    DeviceAccessTokenRequest:
+    DeviceAuthVerify:
       type: object
       properties:
-        client_id:
-          type: string
-          format: uuid
-        device_code:
-          type: string
-        grant_type:
+        user_code:
           type: string
       required:
-      - client_id
-      - device_code
-      - grant_type
+      - user_code
   responses:
     Error:
       description: Error

@@ -200,7 +200,93 @@ paths:
         5XX:
           $ref: '#/components/responses/Error'
 components:
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
+    ProjectUpdate:
+      description: Updateable properties of a `Project`
+      type: object
+      properties:
+        description:
+          type:
+          - string
+          - 'null'
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+    ProjectCreate:
+      description: Create-time parameters for a `Project`
+      type: object
+      properties:
+        description:
+          type: string
+        name:
+          $ref: '#/components/schemas/Name'
+      required:
+      - description
+      - name
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
+    IdentityType:
+      description: Describes what kind of identity is described by an id
+      type: string
+      enum:
+      - silo_user
+      - silo_group
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
+    ProjectRole:
+      type: string
+      enum:
+      - admin
+      - collaborator
+      - limited_collaborator
+      - viewer
+    NameOrIdSortMode:
+      description: Supported set of sort modes for scanning by name or id
+      oneOf:
+      - description: Sort in increasing order of "name"
+        type: string
+        enum:
+        - name_ascending
+      - description: Sort in decreasing order of "name"
+        type: string
+        enum:
+        - name_descending
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
     ProjectRoleRoleAssignment:
       description: 'Describes the assignment of a particular role on a particular resource to a particular identity (user, group, etc.)
 
@@ -219,6 +305,22 @@ components:
       - identity_id
       - identity_type
       - role_name
+    ProjectResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/Project'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
     Project:
       description: View of a Project
       type: object
@@ -248,101 +350,6 @@ components:
       - name
       - time_created
       - time_modified
-    NameOrIdSortMode:
-      description: Supported set of sort modes for scanning by name or id
-      oneOf:
-      - description: Sort in increasing order of "name"
-        type: string
-        enum:
-        - name_ascending
-      - description: Sort in decreasing order of "name"
-        type: string
-        enum:
-        - name_descending
-      - description: Sort in increasing order of "id"
-        type: string
-        enum:
-        - id_ascending
-    ProjectCreate:
-      description: Create-time parameters for a `Project`
-      type: object
-      properties:
-        description:
-          type: string
-        name:
-          $ref: '#/components/schemas/Name'
-      required:
-      - description
-      - name
-    ProjectRole:
-      type: string
-      enum:
-      - admin
-      - collaborator
-      - limited_collaborator
-      - viewer
-    ProjectUpdate:
-      description: Updateable properties of a `Project`
-      type: object
-      properties:
-        description:
-          type:
-          - string
-          - 'null'
-        name:
-          allOf:
-          - $ref: '#/components/schemas/Name'
-    Error:
-      description: Error information from a response.
-      type: object
-      properties:
-        error_code:
-          type: string
-        message:
-          type: string
-        request_id:
-          type: string
-      required:
-      - message
-      - request_id
-    NameOrId:
-      oneOf:
-      - title: id
-        allOf:
-        - type: string
-          format: uuid
-      - title: name
-        allOf:
-        - $ref: '#/components/schemas/Name'
-    ProjectResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/Project'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
-    IdentityType:
-      description: Describes what kind of identity is described by an id
-      type: string
-      enum:
-      - silo_user
-      - silo_group
-    Name:
-      title: A name unique within the parent collection
-      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
-      type: string
-      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
-      minLength: 1
-      maxLength: 63
     ProjectRolePolicy:
       description: 'Policy for a particular resource
 
@@ -357,10 +364,3 @@ components:
             $ref: '#/components/schemas/ProjectRoleRoleAssignment'
       required:
       - role_assignments
-  responses:
-    Error:
-      description: Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'

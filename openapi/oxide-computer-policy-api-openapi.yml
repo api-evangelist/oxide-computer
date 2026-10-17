@@ -71,25 +71,6 @@ components:
       - identity_id
       - identity_type
       - role_name
-    FleetRole:
-      type: string
-      enum:
-      - admin
-      - collaborator
-      - viewer
-    Error:
-      description: Error information from a response.
-      type: object
-      properties:
-        error_code:
-          type: string
-        message:
-          type: string
-        request_id:
-          type: string
-      required:
-      - message
-      - request_id
     FleetRolePolicy:
       description: 'Policy for a particular resource
 
@@ -104,12 +85,31 @@ components:
             $ref: '#/components/schemas/FleetRoleRoleAssignment'
       required:
       - role_assignments
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
     IdentityType:
       description: Describes what kind of identity is described by an id
       type: string
       enum:
       - silo_user
       - silo_group
+    FleetRole:
+      type: string
+      enum:
+      - admin
+      - collaborator
+      - viewer
   responses:
     Error:
       description: Error

@@ -319,22 +319,66 @@ paths:
         5XX:
           $ref: '#/components/responses/Error'
 components:
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
-    NameOrIdSortMode:
-      description: Supported set of sort modes for scanning by name or id
+    AntiAffinityGroupMember:
+      description: 'A member of an Anti-Affinity Group
+
+
+        Membership in a group is not exclusive - members may belong to multiple affinity / anti-affinity groups.
+
+
+        Anti-Affinity Groups can contain up to 32 members.'
       oneOf:
-      - description: Sort in increasing order of "name"
-        type: string
-        enum:
-        - name_ascending
-      - description: Sort in decreasing order of "name"
-        type: string
-        enum:
-        - name_descending
-      - description: Sort in increasing order of "id"
-        type: string
-        enum:
-        - id_ascending
+      - description: 'An instance belonging to this group
+
+
+          Instances can belong to up to 16 anti-affinity groups.'
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - instance
+          value:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              name:
+                $ref: '#/components/schemas/Name'
+              run_state:
+                $ref: '#/components/schemas/InstanceState'
+            required:
+            - id
+            - name
+            - run_state
+        required:
+        - type
+        - value
+    AntiAffinityGroupResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/AntiAffinityGroup'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
     AntiAffinityGroupCreate:
       description: Create-time parameters for an `AntiAffinityGroup`
       type: object
@@ -352,6 +396,13 @@ components:
       - failure_domain
       - name
       - policy
+    Name:
+      title: A name unique within the parent collection
+      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
+      type: string
+      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
+      minLength: 1
+      maxLength: 63
     FailureDomain:
       description: Describes the scope of affinity for the purposes of co-location.
       oneOf:
@@ -359,6 +410,55 @@ components:
         type: string
         enum:
         - sled
+    AntiAffinityGroupMemberResultsPage:
+      description: A single page of results
+      type: object
+      properties:
+        items:
+          description: list of items on this page of results
+          type: array
+          items:
+            $ref: '#/components/schemas/AntiAffinityGroupMember'
+        next_page:
+          description: token used to fetch the next page of results (if any)
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+    NameOrId:
+      oneOf:
+      - title: id
+        allOf:
+        - type: string
+          format: uuid
+      - title: name
+        allOf:
+        - $ref: '#/components/schemas/Name'
+    AntiAffinityGroupUpdate:
+      description: Updateable properties of an `AntiAffinityGroup`
+      type: object
+      properties:
+        description:
+          type:
+          - string
+          - 'null'
+        name:
+          allOf:
+          - $ref: '#/components/schemas/Name'
+    Error:
+      description: Error information from a response.
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+      required:
+      - message
+      - request_id
     InstanceState:
       description: 'Running state of an Instance (primarily: booted or stopped)
 
@@ -405,91 +505,23 @@ components:
         type: string
         enum:
         - destroyed
-    AntiAffinityGroupUpdate:
-      description: Updateable properties of an `AntiAffinityGroup`
-      type: object
-      properties:
-        description:
-          type:
-          - string
-          - 'null'
-        name:
-          allOf:
-          - $ref: '#/components/schemas/Name'
-    Error:
-      description: Error information from a response.
-      type: object
-      properties:
-        error_code:
-          type: string
-        message:
-          type: string
-        request_id:
-          type: string
-      required:
-      - message
-      - request_id
-    AntiAffinityGroupMember:
-      description: 'A member of an Anti-Affinity Group
+    AffinityPolicy:
+      description: 'Affinity policy used to describe "what to do when a request cannot be satisfied"
 
 
-        Membership in a group is not exclusive - members may belong to multiple affinity / anti-affinity groups.
-
-
-        Anti-Affinity Groups can contain up to 32 members.'
+        Used for both Affinity and Anti-Affinity Groups'
       oneOf:
-      - description: 'An instance belonging to this group
+      - description: 'If the affinity request cannot be satisfied, allow it anyway.
 
 
-          Instances can belong to up to 16 anti-affinity groups.'
-        type: object
-        properties:
-          type:
-            type: string
-            enum:
-            - instance
-          value:
-            type: object
-            properties:
-              id:
-                type: string
-                format: uuid
-              name:
-                $ref: '#/components/schemas/Name'
-              run_state:
-                $ref: '#/components/schemas/InstanceState'
-            required:
-            - id
-            - name
-            - run_state
-        required:
-        - type
-        - value
-    NameOrId:
-      oneOf:
-      - title: id
-        allOf:
-        - type: string
-          format: uuid
-      - title: name
-        allOf:
-        - $ref: '#/components/schemas/Name'
-    AntiAffinityGroupMemberResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/AntiAffinityGroupMember'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
+          This enables a "best-effort" attempt to satisfy the affinity policy.'
+        type: string
+        enum:
+        - allow
+      - description: If the affinity request cannot be satisfied, fail explicitly.
+        type: string
+        enum:
+        - fail
     AntiAffinityGroup:
       description: View of an Anti-Affinity Group
       type: object
@@ -529,50 +561,18 @@ components:
       - project_id
       - time_created
       - time_modified
-    Name:
-      title: A name unique within the parent collection
-      description: Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID, but they may contain a UUID. They can be at most 63 characters long.
-      type: string
-      pattern: ^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z]([a-zA-Z0-9-]*[a-zA-Z0-9]+)?$
-      minLength: 1
-      maxLength: 63
-    AffinityPolicy:
-      description: 'Affinity policy used to describe "what to do when a request cannot be satisfied"
-
-
-        Used for both Affinity and Anti-Affinity Groups'
+    NameOrIdSortMode:
+      description: Supported set of sort modes for scanning by name or id
       oneOf:
-      - description: 'If the affinity request cannot be satisfied, allow it anyway.
-
-
-          This enables a "best-effort" attempt to satisfy the affinity policy.'
+      - description: Sort in increasing order of "name"
         type: string
         enum:
-        - allow
-      - description: If the affinity request cannot be satisfied, fail explicitly.
+        - name_ascending
+      - description: Sort in decreasing order of "name"
         type: string
         enum:
-        - fail
-    AntiAffinityGroupResultsPage:
-      description: A single page of results
-      type: object
-      properties:
-        items:
-          description: list of items on this page of results
-          type: array
-          items:
-            $ref: '#/components/schemas/AntiAffinityGroup'
-        next_page:
-          description: token used to fetch the next page of results (if any)
-          type:
-          - string
-          - 'null'
-      required:
-      - items
-  responses:
-    Error:
-      description: Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+        - name_descending
+      - description: Sort in increasing order of "id"
+        type: string
+        enum:
+        - id_ascending
