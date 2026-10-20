@@ -91,6 +91,66 @@ edges:
     detected: '2026-10-19'
   detected_by: sweep-cloud-native.py
   first_seen: '2026-10-15'
+- partner_name: PeeringDB (interconnection register)
+  partner: null
+  partner_match: register
+  type: register
+  channel: standard-directory
+  relationship: standard-participant
+  direction: partner-built
+  evidence: https://www.peeringdb.com/net/32316
+  category: network interconnection register
+  contract_reference:
+    register: PeeringDB (peeringdb.com/api net, ix, fac, org)
+    standard: null
+    spec_file: null
+    role: peeringdb-network
+    registered_name: Oxide Computer
+    register_id: https://www.peeringdb.com/net/32316
+    matched_domain: oxide.computer
+    matched_by: domain
+    asns:
+    - 395849
+    info_types: []
+    ix_presence: 0
+    exchanges_operated: []
+    facilities_operated: 0
+    signal_note: 'participation only: PeeringDB is self-registered by network operators; ASNs, IX presence and facility
+      counts are context, never counted'
+    detected_by: sweep-network-edge.py
+    detected: '2026-10-20'
+  detected_by: sweep-network-edge.py
+  first_seen: '2026-10-20'
+- partner_name: winget (Windows Package Manager)
+  partner: null
+  partner_match: null
+  type: register
+  direction: provider-built
+  category: official CLI (winget (Windows Package Manager))
+  evidence: https://github.com/microsoft/winget-pkgs/tree/master/manifests/o/OxideComputer/OxideCLI
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: winget (Windows Package Manager) (public package index)
+    spec_file: null
+    packages:
+    - name: OxideComputer.OxideCLI
+      kind: manifest
+      version: 0.18.0
+      released: '2026-08-21'
+      lapsed: false
+      page: https://github.com/microsoft/winget-pkgs/tree/master/manifests/o/OxideComputer/OxideCLI
+      cli: 'winget: The Oxide command-line interface'
+      repo_leg: github-org:oxidecomputer
+      publisher_leg: artifact-github-org:oxidecomputer
+      matched_by: github-org
+    current: true
+    signal_note: 'the provider''s own command-line tool on a package manager: distribution, not an integration;
+      lapsed = no release in 24 months or deprecated / disabled by the manager'
+    detected_by: sweep-official-clis.py
+    detected: '2026-10-20'
+  detected_by: sweep-official-clis.py
+  first_seen: '2026-10-20'
 generated: '2026-10-15'
 method: searched
 source:
@@ -107,3 +167,12 @@ checked:
 - https://registry.npmjs.org
 - https://repo1.maven.org/maven2
 - https://rubygems.org/api/v1
+- https://manrs.org/netops/participants/
+- https://www.peeringdb.com/api/fac
+- https://www.peeringdb.com/api/ix
+- https://www.peeringdb.com/api/net
+- https://cdn.winget.microsoft.com/cache
+- https://formulae.brew.sh/api/cask.json
+- https://formulae.brew.sh/api/formula.json
+- https://github.com/ScoopInstaller/Extras
+- https://github.com/ScoopInstaller/Main

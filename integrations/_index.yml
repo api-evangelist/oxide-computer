@@ -97,3 +97,63 @@
     detected: '2026-10-19'
   status: not-a-workflow
   arazzo: null
+- slug: oxide-computer-peeringdb-interconnection-register
+  label: PeeringDB (interconnection register)
+  partner_name: PeeringDB (interconnection register)
+  category: network interconnection register
+  type: register
+  channel: standard-directory
+  evidence: https://www.peeringdb.com/net/32316
+  source: edge
+  relationship: standard-participant
+  contract_reference:
+    register: PeeringDB (peeringdb.com/api net, ix, fac, org)
+    standard: null
+    spec_file: null
+    role: peeringdb-network
+    registered_name: Oxide Computer
+    register_id: https://www.peeringdb.com/net/32316
+    matched_domain: oxide.computer
+    matched_by: domain
+    asns:
+    - 395849
+    info_types: []
+    ix_presence: 0
+    exchanges_operated: []
+    facilities_operated: 0
+    signal_note: 'participation only: PeeringDB is self-registered by network operators; ASNs, IX presence and facility
+      counts are context, never counted'
+    detected_by: sweep-network-edge.py
+    detected: '2026-10-20'
+  status: not-a-workflow
+  arazzo: null
+- slug: oxide-computer-winget-windows-package-manager
+  label: winget (Windows Package Manager)
+  partner_name: winget (Windows Package Manager)
+  category: official CLI (winget (Windows Package Manager))
+  type: register
+  channel: package-registry
+  evidence: https://github.com/microsoft/winget-pkgs/tree/master/manifests/o/OxideComputer/OxideCLI
+  source: edge
+  relationship: distribution-channel
+  contract_reference:
+    register: winget (Windows Package Manager) (public package index)
+    spec_file: null
+    packages:
+    - name: OxideComputer.OxideCLI
+      kind: manifest
+      version: 0.18.0
+      released: '2026-08-21'
+      lapsed: false
+      page: https://github.com/microsoft/winget-pkgs/tree/master/manifests/o/OxideComputer/OxideCLI
+      cli: 'winget: The Oxide command-line interface'
+      repo_leg: github-org:oxidecomputer
+      publisher_leg: artifact-github-org:oxidecomputer
+      matched_by: github-org
+    current: true
+    signal_note: 'the provider''s own command-line tool on a package manager: distribution, not an integration;
+      lapsed = no release in 24 months or deprecated / disabled by the manager'
+    detected_by: sweep-official-clis.py
+    detected: '2026-10-20'
+  status: not-a-workflow
+  arazzo: null
