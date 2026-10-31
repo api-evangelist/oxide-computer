@@ -64,5 +64,153 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Oxide is a company surfaced via the API Evangelist harvest backlog (source: secondary-market) and added to the network as a stub for full-pipeline profiling.
-- https://forgeglobal.com/oxide-computer_stock/
+Oxide Computer Company builds a rack-scale cloud computer: integrated server sleds (Gimlet), a rack-level switch (Sidecar), Oxide's own illumos distribution (Helios), the Propolis/bhyve hypervisor and the Crucible distributed block store, all driven by a single control plane called Nexus. Nexus exposes the Oxide Region API, a 315-operation OpenAPI 3.0.3 REST contract covering silos, projects, instances, disks, snapshots, images, VPCs, subnets, firewall rules, floating and ephemeral IPs, IP pools, affinity groups, alerts and webhook receivers, audit log, metrics/OxQL, hardware inventory, BGP/BFD networking, SAML and SCIM identity, support bundles and system update. Because the product is a rack a customer owns, the API is served from the customer's own control-plane domain rather than a vendor-hosted endpoint. Oxide publishes first-party Rust, TypeScript and Go SDKs, an `oxide` CLI, a Terraform provider and a Packer plugin, and develops essentially the entire stack in the open on GitHub.
+
+**Areas:** Cloud Computing · Infrastructure · Compute · Virtualization · Networking · Storage · Hardware · On-Premises · Private Cloud · Open Source
+
+## Oxide on APIs.io
+
+Everything profiled for Oxide is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/oxide-computer/](https://apis.io/providers/oxide-computer/)** — or go straight to one of the APIs or properties below.
+
+### APIs (30)
+
+- [Oxide Affinity API](https://apis.io/apis/oxide-computer/oxide-computer-affinity-api/) — Anti-affinity groups give control over instance placement.
+- [Oxide Console Auth API](https://apis.io/apis/oxide-computer/oxide-computer-console-auth-api/) — API for console authentication
+- [Oxide Current User API](https://apis.io/apis/oxide-computer/oxide-computer-current-user-api/) — Information pertaining to the current user.
+- [Oxide Disks API](https://apis.io/apis/oxide-computer/oxide-computer-disks-api/) — Virtual disks are used to store instance-local data which includes the operating system.
+- [Oxide Experimental API](https://apis.io/apis/oxide-computer/oxide-computer-experimental-api/) — Experimental, unstable interfaces, primarily for use by Oxide personnel
+- [Oxide External Subnets API](https://apis.io/apis/oxide-computer/oxide-computer-external-subnets-api/) — External subnets that can be attached to instances.
+- [Oxide Floating Ips API](https://apis.io/apis/oxide-computer/oxide-computer-floating-ips-api/) — Floating IPs allow a project to allocate well-known IPs to instances.
+- [Oxide Images API](https://apis.io/apis/oxide-computer/oxide-computer-images-api/) — Images are read-only virtual disks that may be used to boot virtual machines.
+- [Oxide Instances API](https://apis.io/apis/oxide-computer/oxide-computer-instances-api/) — Virtual machine instances are the basic unit of computation. These operations are used for provisioning, controlling, and destroying instances.
+- [Oxide Ip Pools API](https://apis.io/apis/oxide-computer/oxide-computer-ip-pools-api/) — IP pools are collections of external IPs that can be allocated and attached to instances.
+- [Oxide Login API](https://apis.io/apis/oxide-computer/oxide-computer-login-api/) — Authentication endpoints
+- [Oxide Metrics API](https://apis.io/apis/oxide-computer/oxide-computer-metrics-api/) — Silo-scoped metrics
+- [Oxide Policy API](https://apis.io/apis/oxide-computer/oxide-computer-policy-api/) — System-wide IAM policy
+- [Oxide Projects API](https://apis.io/apis/oxide-computer/oxide-computer-projects-api/) — Projects are a grouping of associated resources such as instances and disks within a silo for purposes of billing and access control.
+- [Oxide Silos API](https://apis.io/apis/oxide-computer/oxide-computer-silos-api/) — Silos represent a logical partition of users and resources.
+- [Oxide Snapshots API](https://apis.io/apis/oxide-computer/oxide-computer-snapshots-api/) — Snapshots of virtual disks at a particular point in time.
+- [Oxide Subnet Pools API](https://apis.io/apis/oxide-computer/oxide-computer-subnet-pools-api/) — Subnet pools are collections of external subnets that can be allocated and attached to instances.
+- [Oxide System/alerts API](https://apis.io/apis/oxide-computer/oxide-computer-system-alerts-api/) — Alerts deliver notifications for events that occur on the Oxide rack
+- [Oxide System/audit Log API](https://apis.io/apis/oxide-computer/oxide-computer-system-audit-log-api/) — These endpoints relate to audit logs.
+- [Oxide System/hardware API](https://apis.io/apis/oxide-computer/oxide-computer-system-hardware-api/) — These operations pertain to hardware inventory and management. Racks are the unit of expansion of an Oxide deployment. Racks are in turn composed of sleds,…
+- [Oxide System/ip Pools API](https://apis.io/apis/oxide-computer/oxide-computer-system-ip-pools-api/) — IP pools are collections of external IPs. Linking a pool to a silo makes it available for allocation by users in that silo.
+- [Oxide System/metrics API](https://apis.io/apis/oxide-computer/oxide-computer-system-metrics-api/) — Metrics provide insight into the operation of the Oxide deployment. These include telemetry on hardware and software components that can be used to…
+- [Oxide System/networking API](https://apis.io/apis/oxide-computer/oxide-computer-system-networking-api/) — This provides rack-level network configuration.
+- [Oxide System/silos API](https://apis.io/apis/oxide-computer/oxide-computer-system-silos-api/) — Silos represent a logical partition of users and resources.
+- [Oxide System/status API](https://apis.io/apis/oxide-computer/oxide-computer-system-status-api/) — Endpoints related to system health
+- [Oxide System/subnet Pools API](https://apis.io/apis/oxide-computer/oxide-computer-system-subnet-pools-api/) — Subnet pools are collections of external subnets. Linking a pool to a silo makes it available for allocation by users in that silo.
+- [Oxide System/support Bundles API](https://apis.io/apis/oxide-computer/oxide-computer-system-support-bundles-api/) — Support bundles collect debugging information from the rack for use by Oxide support.
+- [Oxide System/update API](https://apis.io/apis/oxide-computer/oxide-computer-system-update-api/) — Upload and manage system updates
+- [Oxide Tokens API](https://apis.io/apis/oxide-computer/oxide-computer-tokens-api/) — API clients use device access tokens for authentication.
+- [Oxide Vpcs API](https://apis.io/apis/oxide-computer/oxide-computer-vpcs-api/) — Virtual Private Clouds (VPCs) provide isolated network environments for managing and deploying services.
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### AsyncAPI (1)
+
+Event-driven and webhook contracts.
+
+- [Oxide Computer Alerts Webhooks](https://apis.io/asyncapis/oxide-computer/oxide-computer-alerts-webhooks/)
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [oxide-computer-mcp.yml](https://apis.io/servers/oxide-computer/oxide-computer-mcp-yml/)
+
+#### Overlays (1)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Oxide Computer Region Api Overlay](https://apis.io/overlays/oxide-computer/oxide-computer-region-api-overlay/)
+
+#### Security (3)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Oxide Computer Authentication](https://apis.io/security/oxide-computer/oxide-computer-authentication/)
+- [Oxide Computer Domain Security](https://apis.io/security/oxide-computer/oxide-computer-domain-security/)
+- [Oxide Computer Vulnerability Disclosure](https://apis.io/security/oxide-computer/oxide-computer-vulnerability-disclosure/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Oxide Computer Plans Pricing](https://apis.io/plans/oxide-computer/oxide-computer-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Oxide Computer Rate Limits](https://apis.io/rate-limits/oxide-computer/oxide-computer-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://oxide.computer)
+- [Documentation](https://docs.oxide.computer)
+- [Getting started](https://docs.oxide.computer/guides/quickstart)
+- [API reference](https://docs.oxide.computer/api)
+- [Support](https://oxide.computer/contact)
+- [Blog](https://oxide.computer/blog)
+- [Privacy policy](https://oxide.computer/privacy-policy)
+- [GitHub](https://github.com/oxidecomputer)
+
+## API Evangelist rating
+
+**Kin Score 46.2** — developing · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 73.2 |
+| Contract quality | 47.7 |
+| Contract governance | 4.5 |
+| Operational transparency | 36.8 |
+| Developer ergonomics | 73.2 |
+| Access clarity | 10.5 |
+
+**Agent readiness 28.1** — agent-aware
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | derived (partial credit) |
+| OpenAPI Examples | — |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | yes |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | paginated |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 26.5** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/oxide-computer/](https://apis.io/providers/oxide-computer/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Oxide: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/oxide-computer/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
